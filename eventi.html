@@ -37,22 +37,28 @@
             border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
 
-        /* Gestione Visibilità Menu */
         .admin-section { padding-bottom: 20px; border-bottom: 1px solid #444; margin-bottom: 25px; }
         .hidden { display: none !important; }
         .form-group { display: flex; flex-direction: column; gap: 10px; }
         input { padding: 12px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; }
 
-        /* Lista Eventi */
+        /* --- STILE CARD EVENTI MIGLIORATO --- */
         .evento-card {
-            background: rgba(255, 255, 255, 0.1); padding: 15px;
-            border-radius: 12px; border-left: 5px solid #00d4ff; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05); padding: 18px;
+            border-radius: 15px; border-left: 6px solid #00d4ff; margin-bottom: 18px;
             display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
         }
-        .btn-elimina { background: #ff4d4d; color: #fff; border: none; padding: 8px; border-radius: 8px; cursor: pointer; display: none; }
+        .evento-info { display: flex; flex-direction: column; gap: 5px; }
+        .evento-data { 
+            color: #00d4ff; font-weight: bold; font-size: 1.2rem; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .evento-luogo { color: #ddd; font-size: 1rem; }
+        
+        .btn-elimina { background: #ff4d4d; color: #fff; border: none; padding: 10px; border-radius: 10px; cursor: pointer; display: none; }
         .gestione-attiva .btn-elimina { display: block; }
 
-        /* Video */
         .video-box { margin-top: 30px; text-align: center; border-top: 1px solid #444; padding-top: 20px; }
         .video-container { 
             position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; 
@@ -64,7 +70,7 @@
 <body id="main-body">
     <div class="page-overlay">
         <header>
-            <h1 style="color:#00d4ff; margin:0;">📅 EVENTI & PROMO</h1>
+            <h1 style="color:#00d4ff; margin:0;">🎧 EVENTI & PROMO</h1>
             <div class="nav-buttons">
                 <a href="index.html" class="bottone-pagine">🏠 Home</a>
                 <a href="richieste.html" class="bottone-pagine">🎵 Richieste</a>
@@ -85,30 +91,77 @@
                 <div class="form-group">
                     <input type="text" id="dataE" placeholder="Quando? (es: 10 Luglio)">
                     <input type="text" id="luogoE" placeholder="Dove? (es: Bar Centrale)">
-                    <button onclick="aggiungi()" class="bottone-pagine">PUBBLICA EVENTO</button>
+                    <button onclick="aggiungi()" id="btn-aggiungi" class="bottone-pagine">PUBBLICA EVENTO</button>
                     <button onclick="chiudi()" style="background:none; color:#ff4d4d; border:none; cursor:pointer; font-size:0.8rem;">Esci dalla gestione</button>
                 </div>
             </div>
 
             <div id="lista-eventi">
                 <div class="evento-card">
-                    <div><b>Coming Soon</b><br>Resta sintonizzato per le nuove date!</div>
+                    <div class="evento-info"><b>Caricamento eventi...</b><br>Attendere prego</div>
                 </div>
             </div>
 
             <div class="video-box">
                 <h3 style="color:#00d4ff;">🎬 PROMO REEL</h3>
                 <div class="video-container">
-			<video controls autoplay playsinline style="width: 100%; border-radius: 10px; border: 2px solid #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);">
-   				 <source src="promo.mp4" type="video/mp4">
-   				 Il tuo browser non supporta il formato video.
-			</video>
+                    <video controls autoplay playsinline style="width: 100%; border-radius: 10px; border: 2px solid #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);">
+                         <source src="promo.mp4" type="video/mp4">
+                         Il tuo browser non supporta il formato video.
+                    </video>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNAyFAedxUi40WU74OOESrFc1HwI9UqMWlrir1Ynw7we9iaE7JvN9HEuFpjX1uyHA3rg/exec'; 
+
+        // Funzione per formattare la data in modo leggibile
+        function formattaData(stringaData) {
+            if(!stringaData) return "Data TBD";
+            // Se è una stringa data ISO da Google (es. 2026-07-10T22:00:00Z), la pulisce
+            if(stringaData.includes('-') && stringaData.includes('T')) {
+                const d = new Date(stringaData);
+                return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'long' });
+            }
+            return stringaData; // Se è già testo semplice (es: "10 Luglio"), lo lascia così
+        }
+
+        async function caricaEventi() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const eventi = await response.json();
+                
+                const lista = document.getElementById('lista-eventi');
+                lista.innerHTML = ''; 
+                
+                if (eventi.length === 0) {
+                    lista.innerHTML = `<div class="evento-card"><div class="evento-info"><b>Coming Soon</b><br>Resta sintonizzato per le nuove date!</div></div>`;
+                    return;
+                }
+
+                eventi.forEach(evento => {
+                    const dataFormattata = formattaData(evento[0]);
+                    const card = document.createElement('div');
+                    card.className = 'evento-card';
+                    card.innerHTML = `
+                        <div class="evento-info">
+                            <span class="evento-data">${dataFormattata}</span>
+                            <span class="evento-luogo">${evento[1]}</span>
+                        </div>
+                        <button class="btn-elimina" onclick="nascondiEvento(this)">🗑️</button>
+                    `;
+                    lista.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Errore nel caricamento eventi:", error);
+                document.getElementById('lista-eventi').innerHTML = `<div class="evento-card"><div><b>Errore di connessione</b><br>Impossibile caricare gli eventi.</div></div>`;
+            }
+        }
+
+        window.onload = caricaEventi;
+
         function sblocca() {
             if(document.getElementById('passInput').value === 'Screb/735') {
                 document.getElementById('login-area').classList.add('hidden');
@@ -117,18 +170,32 @@
             } else { alert('Password Errata!'); }
         }
 
-        function aggiungi() {
+        async function aggiungi() {
             const d = document.getElementById('dataE').value;
             const l = document.getElementById('luogoE').value;
             if(!d || !l) return alert('Compila tutto!');
             
-            const card = document.createElement('div');
-            card.className = 'evento-card';
-            card.innerHTML = `<div><b>${d}</b><br>${l}</div><button class="btn-elimina" onclick="this.parentElement.remove()">🗑️</button>`;
-            
-            const lista = document.getElementById('lista-eventi');
-            lista.insertBefore(card, lista.firstChild);
-            document.getElementById('dataE').value = ''; document.getElementById('luogoE').value = '';
+            const btn = document.getElementById('btn-aggiungi');
+            btn.innerText = "CARICAMENTO...";
+            btn.disabled = true;
+
+            try {
+                const url = `${SCRIPT_URL}?action=add&dataE=${encodeURIComponent(d)}&luogoE=${encodeURIComponent(l)}`;
+                await fetch(url);
+                document.getElementById('dataE').value = ''; 
+                document.getElementById('luogoE').value = '';
+                await caricaEventi();
+            } catch (error) {
+                alert('Errore durante il salvataggio.');
+            } finally {
+                btn.innerText = "PUBBLICA EVENTO";
+                btn.disabled = false;
+            }
+        }
+
+        function nascondiEvento(btn) {
+            btn.parentElement.remove();
+            alert("Evento nascosto dalla pagina locale.");
         }
 
         function chiudi() {
