@@ -5,73 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Richiedi la tua Canzone - Rossi DJ</title>
     <style>
+        body, html { margin: 0; padding: 0; height: 100%; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('flx10live1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             background-color: #0f0f0f;
             color: #ffffff;
-            margin: 0;
+        }
+        .page-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
         }
-
         header {
             width: 100%;
             padding: 20px 0;
-            background: linear-gradient(145deg, #1a1a1a, #000000);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
             text-align: center;
             border-bottom: 2px solid #00d4ff;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+            position: relative;
+            z-index: 20;
         }
-
-        h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            color: #00d4ff;
-        }
-
+        h1 { margin: 0; font-size: 1.5rem; color: #00d4ff; }
         .container {
             width: 95%;
-            max-width: 600px;
-            margin-top: 20px;
+            max-width: 700px;
+            margin: 20px 0;
             flex-grow: 1;
-            display: flex;
-            justify-content: center;
+            position: relative;
+            z-index: 10;
         }
-
-        /* Stile per il modulo Google inserito */
         iframe {
             width: 100%;
             height: 800px;
             border: none;
             border-radius: 10px;
-            background-color: #ffffff; /* Il modulo di solito è bianco, lo rendiamo pulito */
+            background-color: #ffffff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
-
         footer {
             padding: 15px;
-            font-size: 0.8rem;
-            color: #666;
+            font-size: 0.9rem;
+            color: #eee;
+            background: rgba(0, 0, 0, 0.8);
+            width: 100%;
+            text-align: center;
+            z-index: 20;
         }
     </style>
 </head>
 <body>
-
-    <header>
-        <h1>🎵 Richiedi la tua Canzone</h1>
-        <p style="margin: 5px 0 0; font-size: 0.9rem; color: #ccc;">Rossi DJ @ Legnaro</p>
-    </header>
-
-    <div class="container">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScxub9hw5QXmbeEFm3kWBbiOWi9VLIhhCfEIST6C_7cZMNeSQ/viewform?embedded=true" width="640" height="543" frameborder="0" marginheight="0" marginwidth="0">Caricamento…</iframe> 
-        </iframe>
+    <div class="page-wrapper">
+        <header>
+            <h1>🎵 Richiedi la tua Canzone</h1>
+            <p style="margin: 5px 0 0; font-size: 0.9rem; color: #ccc;">Rossi DJ @ Legnaro</p>
+        </header>
+        <div class="container">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScxub9hw5QXmbeEFm3kWBbiOWi9VLIhhCfEIST6C_7cZMNeSQ/viewform?embedded=true">Caricamento…</iframe> 
+        </div>
+        <footer>
+            &copy; 2026 Rossi DJ - Musica su misura per te
+        </footer>
     </div>
-
-    <footer>
-        &copy; 2026 Rossi DJ - Musica su misura per te
-    </footer>
-
 </body>
 </html>
