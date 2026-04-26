@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventi - Rossi DJ</title>
+    <style>
+        body, html { margin: 0; padding: 0; min-height: 100%; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-image: url('flx10live1.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: #000; color: #fff;
+        }
+        .page-overlay {
+            background: rgba(0, 0, 0, 0.65);
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        header {
+            width: 100%; padding: 20px 0; background: #000;
+            text-align: center; border-bottom: 2px solid #00d4ff;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        
+        .bottone-pagine {
+            padding: 10px 25px; background: #00d4ff; color: #000;
+            text-decoration: none; font-weight: bold; border-radius: 50px;
+            cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s;
+        }
+        .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
+
+        .container {
+            width: 90%; max-width: 550px; margin: 30px 10px;
+            background: rgba(0, 0, 0, 0.9); padding: 25px; border-radius: 20px;
+            border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Gestione Visibilità Menu */
+        .admin-section { padding-bottom: 20px; border-bottom: 1px solid #444; margin-bottom: 25px; }
+        .hidden { display: none !important; }
+        .form-group { display: flex; flex-direction: column; gap: 10px; }
+        input { padding: 12px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; }
+
+        /* Lista Eventi */
+        .evento-card {
+            background: rgba(255, 255, 255, 0.1); padding: 15px;
+            border-radius: 12px; border-left: 5px solid #00d4ff; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .btn-elimina { background: #ff4d4d; color: #fff; border: none; padding: 8px; border-radius: 8px; cursor: pointer; display: none; }
+        .gestione-attiva .btn-elimina { display: block; }
+
+        /* Video */
+        .video-box { margin-top: 30px; text-align: center; border-top: 1px solid #444; padding-top: 20px; }
+        .video-container { 
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; 
+            border-radius: 15px; border: 2px solid #00d4ff; margin-top: 15px;
+        }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    </style>
+</head>
+<body id="main-body">
+    <div class="page-overlay">
+        <header>
+            <h1 style="color:#00d4ff; margin:0;">📅 EVENTI & PROMO</h1>
+            <div class="nav-buttons">
+                <a href="index.html" class="bottone-pagine">🏠 Home</a>
+                <a href="richieste.html" class="bottone-pagine">🎵 Richieste</a>
+            </div>
+        </header>
+
+        <div class="container">
+            <div id="login-area" class="admin-section">
+                <h3 style="color:#00d4ff; margin-top:0;">Area Riservata DJ</h3>
+                <div class="form-group">
+                    <input type="password" id="passInput" placeholder="Inserisci Password">
+                    <button onclick="sblocca()" class="bottone-pagine">ACCEDI A GESTIONE</button>
+                </div>
+            </div>
+
+            <div id="menu-area" class="admin-section hidden">
+                <h3 style="color:#00d4ff; margin-top:0;">Aggiungi Nuovo Evento</h3>
+                <div class="form-group">
+                    <input type="text" id="dataE" placeholder="Quando? (es: 10 Luglio)">
+                    <input type="text" id="luogoE" placeholder="Dove? (es: Bar Centrale)">
+                    <button onclick="aggiungi()" class="bottone-pagine">PUBBLICA EVENTO</button>
+                    <button onclick="chiudi()" style="background:none; color:#ff4d4d; border:none; cursor:pointer; font-size:0.8rem;">Esci dalla gestione</button>
+                </div>
+            </div>
+
+            <div id="lista-eventi">
+                <div class="evento-card">
+                    <div><b>Coming Soon</b><br>Resta sintonizzato per le nuove date!</div>
+                </div>
+            </div>
+
+            <div class="video-box">
+                <h3 style="color:#00d4ff;">🎬 PROMO REEL</h3>
+                <div class="video-container">
+			<video controls autoplay playsinline style="width: 100%; border-radius: 10px; border: 2px solid #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);">
+   				 <source src="promo.mp4" type="video/mp4">
+   				 Il tuo browser non supporta il formato video.
+			</video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sblocca() {
+            if(document.getElementById('passInput').value === 'Screb/735') {
+                document.getElementById('login-area').classList.add('hidden');
+                document.getElementById('menu-area').classList.remove('hidden');
+                document.getElementById('main-body').classList.add('gestione-attiva');
+            } else { alert('Password Errata!'); }
+        }
+
+        function aggiungi() {
+            const d = document.getElementById('dataE').value;
+            const l = document.getElementById('luogoE').value;
+            if(!d || !l) return alert('Compila tutto!');
+            
+            const card = document.createElement('div');
+            card.className = 'evento-card';
+            card.innerHTML = `<div><b>${d}</b><br>${l}</div><button class="btn-elimina" onclick="this.parentElement.remove()">🗑️</button>`;
+            
+            const lista = document.getElementById('lista-eventi');
+            lista.insertBefore(card, lista.firstChild);
+            document.getElementById('dataE').value = ''; document.getElementById('luogoE').value = '';
+        }
+
+        function chiudi() {
+            document.getElementById('login-area').classList.remove('hidden');
+            document.getElementById('menu-area').classList.add('hidden');
+            document.getElementById('main-body').classList.remove('gestione-attiva');
+            document.getElementById('passInput').value = '';
+        }
+    </script>
+</body>
+</html>

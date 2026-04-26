@@ -7,13 +7,12 @@
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            /* IMPOSTAZIONI DELL'IMMAGINE DI SFONDO */
             background-image: url('flx10live1.jpg');
-            background-size: cover; /* Adatta l'immagine a tutto lo schermo */
-            background-position: center; /* Centra l'immagine */
-            background-attachment: fixed; /* Mantiene l'immagine fissa quando si scorre */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             background-repeat: no-repeat;
-            background-color: #121212; /* Colore di riserva nel caso l'immagine non carichi subito */
+            background-color: #121212;
             color: #ffffff;
             margin: 0;
             display: flex;
@@ -26,19 +25,18 @@
         .container {
             max-width: 600px;
             padding: 40px;
-            /* Sfondo più scuro per leggere meglio il testo sull'immagine */
             background: rgba(0, 0, 0, 0.75); 
             border-radius: 20px;
             border: 1px solid #444;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Ombra per dare profondità */
-            backdrop-filter: blur(4px); /* Leggera sfocatura dietro il riquadro */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
         }
         
         h1 { color: #00d4ff; text-transform: uppercase; }
         
         .bottone-pagine {
             display: inline-block;
-            margin: 20px 0;
+            margin: 10px 0; /* Ridotto il margine per metterne due */
             padding: 15px 40px;
             background-color: #00d4ff; 
             color: #000; 
@@ -47,6 +45,7 @@
             border-radius: 50px;
             font-size: 1.2rem;
             transition: transform 0.2s;
+            min-width: 250px; /* Assicura che i bottoni abbiano la stessa larghezza */
         }
         
         .bottone-pagine:hover {
@@ -57,7 +56,7 @@
         .contact-info {
             margin-top: 30px;
             font-size: 0.9rem;
-            color: #e0e0e0; /* Reso leggermente più chiaro per contrastare lo sfondo nero */
+            color: #e0e0e0;
         }
 
         .contact-info a {
@@ -78,6 +77,10 @@
         <h1>Rossi DJ a Legnaro</h1>
         <p>Esperienze sonore uniche per ogni evento, dal locale alla festa privata.</p>
 
+        <a href="eventi.html" class="bottone-pagine">
+            📅 PROSSIMI EVENTI
+        </a>
+        <br>
         <a href="richieste.html" class="bottone-pagine">
             🎵 RICHIEDI UNA CANZONE
         </a>
