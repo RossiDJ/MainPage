@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rossi DJ - Prenota Evento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-image: url('flx10live1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.85); 
+            border-radius: 20px;
+            border: 1px solid #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        h1 { color: #00d4ff; text-transform: uppercase; text-align: center; margin-bottom: 20px; }
+        
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box; /* Evita che escano dai bordi */
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 5px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-invia {
+            width: 100%;
+            padding: 15px;
+            background-color: #25d366; /* Colore WhatsApp */
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-invia:hover {
+            transform: scale(1.02);
+            background-color: #1ebe57;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-back:hover { color: #00d4ff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Torna alla Home</a>
+    <h1>Prenota Evento</h1>
+    
+    <form id="bookingForm">
+        <div class="form-group">
+            <label for="data">Data indicativa</label>
+            <input type="date" id="data" name="data">
+        </div>
+
+        <div class="form-group">
+            <label for="ora">Orario indicativo</label>
+            <input type="time" id="ora" name="ora">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email (Obbligatoria)</label>
+            <input type="email" id="email" name="email" placeholder="esempio@mail.it" required>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Telefono (Obbligatorio)</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="Il tuo numero" required>
+        </div>
+
+        <div class="form-group">
+            <label for="descrizione">Breve descrizione</label>
+            <textarea id="descrizione" name="descrizione" placeholder="Raccontami il tuo evento..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-invia">
+            <i class="fab fa-whatsapp"></i> INVIA SU WHATSAPP
+        </button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Recupero i dati dal form
+        const data = document.getElementById('data').value || "Da definire";
+        const ora = document.getElementById('ora').value || "Da definire";
+        const email = document.getElementById('email').value;
+        const telefono = document.getElementById('telefono').value;
+        const descrizione = document.getElementById('descrizione').value || "Nessuna descrizione aggiuntiva";
+
+        // Formatto il messaggio
+        const messaggio = `*NUOVA RICHIESTA EVENTO*%0A%0A` +
+                          `📅 *Data:* ${data}%0A` +
+                          `🕒 *Ora:* ${ora}%0A` +
+                          `📧 *Email:* ${email}%0A` +
+                          `📞 *Tel:* ${telefono}%0A` +
+                          `📝 *Dettagli:* ${descrizione}`;
+
+        // Tuo numero di telefono (già inserito)
+        const mioNumero = "393466045298";
+
+        // Genero l'URL di WhatsApp
+        const urlWhatsApp = `https://wa.me/${mioNumero}?text=${messaggio}`;
+
+        // Apro WhatsApp in una nuova scheda
+        window.open(urlWhatsApp, '_blank');
+    });
+</script>
+
+</body>
+</html>
