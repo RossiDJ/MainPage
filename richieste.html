@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Richiedi la tua Canzone - Rossi DJ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body, html { margin: 0; padding: 0; height: 100%; }
         body {
@@ -14,12 +15,15 @@
             background-attachment: fixed;
             background-color: #0f0f0f;
             color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         .page-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            flex-grow: 1;
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
         }
@@ -30,86 +34,130 @@
             backdrop-filter: blur(5px);
             text-align: center;
             border-bottom: 2px solid #00d4ff;
-            position: relative;
-            z-index: 20;
         }
-        h1 { margin: 0; font-size: 1.5rem; color: #00d4ff; }
+        h1 { margin: 0; font-size: 1.5rem; color: #00d4ff; text-transform: uppercase; }
         
-        /* Contenitore per i bottoni nell'header */
         .nav-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
-            flex-wrap: wrap;
             margin-top: 15px;
         }
 
-        .bottone-pagine {
-            display: inline-block;
-            padding: 10px 25px;
-            background-color: #00d4ff; 
-            color: #000; 
+        .bottone-nav {
+            padding: 8px 20px;
+            background-color: transparent; 
+            color: #00d4ff; 
             text-decoration: none;
             font-weight: bold;
             border-radius: 50px;
-            font-size: 1rem;
-            transition: transform 0.2s, background-color 0.2s;
+            border: 2px solid #00d4ff;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
         
-        .bottone-pagine:hover {
-            transform: scale(1.05);
-            background-color: #00b8e6;
+        .bottone-nav:hover {
+            background-color: #00d4ff;
+            color: #000;
         }
 
+        /* Contenitore stile Index.html */
         .container {
-            width: 95%;
-            max-width: 700px;
-            margin: 20px 0;
-            flex-grow: 1;
-            position: relative;
-            z-index: 10;
-        }
-        
-        iframe {
-            width: 100%;
-            height: 800px;
-            border: none;
-            border-radius: 10px;
-            background-color: #ffffff;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            opacity: 0.85; 
-            transition: opacity 0.3s ease;
+            width: 90%;
+            max-width: 500px;
+            margin: auto;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.75); 
+            border-radius: 20px;
+            border: 1px solid #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            text-align: center;
         }
 
-        iframe:hover {
-            opacity: 0.95;
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d4ff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #00d4ff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .bottone-invia {
+            display: inline-block;
+            width: 100%;
+            padding: 15px;
+            background-color: #00d4ff; 
+            color: #000; 
+            border: none;
+            font-weight: bold;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+        
+        .bottone-invia:hover {
+            transform: scale(1.03);
+            background-color: #00b8e6;
         }
 
         footer {
             padding: 15px;
-            font-size: 0.9rem;
-            color: #eee;
+            font-size: 0.8rem;
+            color: #ccc;
             background: rgba(0, 0, 0, 0.8);
             width: 100%;
             text-align: center;
-            z-index: 20;
         }
     </style>
 </head>
 <body>
     <div class="page-wrapper">
         <header>
-            <h1>🎵 Richiedi la tua Canzone</h1>
-            <p style="margin: 5px 0 0; font-size: 0.9rem; color: #ccc;">Rossi DJ @ Legnaro</p>
-            
+            <h1>🎵 Richieste</h1>
             <div class="nav-buttons">
-                <a href="index.html" class="bottone-pagine">🏠 Home</a>
-                <a href="eventi.html" class="bottone-pagine">📅 Eventi</a>
+                <a href="index.html" class="bottone-nav"><i class="fas fa-home"></i> Home</a>
+                <a href="eventi.html" class="bottone-nav"><i class="fas fa-calendar"></i> Eventi</a>
             </div>
         </header>
 
         <div class="container">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScxub9hw5QXmbeEFm3kWBbiOWi9VLIhhCfEIST6C_7cZMNeSQ/viewform?embedded=true">Caricamento…</iframe> 
+            <form action="https://formspree.io/f/TUO_ID" method="POST">
+                <div class="form-group">
+                    <label for="artista">Artista</label>
+                    <input type="text" id="artista" name="artista" placeholder="Esempio: Gigi D'Agostino" required>
+                </div>
+                <div class="form-group">
+                    <label for="titolo">Titolo della Canzone</label>
+                    <input type="text" id="titolo" name="titolo" placeholder="Esempio: L'Amour Toujours" required>
+                </div>
+                <button type="submit" class="bottone-invia">INVIA RICHIESTA</button>
+            </form>
         </div>
 
         <footer>
