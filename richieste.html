@@ -15,15 +15,12 @@
             background-attachment: fixed;
             background-color: #0f0f0f;
             color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
         .page-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-grow: 1;
+            min-height: 100vh;
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
         }
@@ -34,6 +31,7 @@
             backdrop-filter: blur(5px);
             text-align: center;
             border-bottom: 2px solid #00d4ff;
+            z-index: 20;
         }
         h1 { margin: 0; font-size: 1.5rem; color: #00d4ff; text-transform: uppercase; }
         
@@ -44,25 +42,21 @@
             margin-top: 15px;
         }
 
-        .bottone-nav {
-            padding: 8px 20px;
-            background-color: transparent; 
-            color: #00d4ff; 
+        .bottone-pagine {
+            display: inline-block;
+            padding: 10px 25px;
+            background-color: #00d4ff; 
+            color: #000; 
             text-decoration: none;
             font-weight: bold;
             border-radius: 50px;
-            border: 2px solid #00d4ff;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            font-size: 1rem;
+            transition: transform 0.2s;
         }
         
-        .bottone-nav:hover {
-            background-color: #00d4ff;
-            color: #000;
-        }
+        .bottone-pagine:hover { transform: scale(1.05); }
 
-        /* Contenitore stile Index.html */
-        .container {
+        .container-form {
             width: 90%;
             max-width: 500px;
             margin: auto;
@@ -71,23 +65,12 @@
             border-radius: 20px;
             border: 1px solid #444;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             text-align: center;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #00d4ff;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-        }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; color: #00d4ff; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
 
         input[type="text"] {
             width: 100%;
@@ -101,13 +84,7 @@
             outline: none;
         }
 
-        input[type="text"]:focus {
-            border-color: #00d4ff;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
         .bottone-invia {
-            display: inline-block;
             width: 100%;
             padding: 15px;
             background-color: #00d4ff; 
@@ -118,18 +95,14 @@
             font-size: 1.2rem;
             cursor: pointer;
             transition: transform 0.2s;
-            margin-top: 10px;
         }
-        
-        .bottone-invia:hover {
-            transform: scale(1.03);
-            background-color: #00b8e6;
-        }
+
+        #successMessage { display: none; color: #00d4ff; font-weight: bold; padding: 20px; }
 
         footer {
             padding: 15px;
-            font-size: 0.8rem;
-            color: #ccc;
+            font-size: 0.9rem;
+            color: #eee;
             background: rgba(0, 0, 0, 0.8);
             width: 100%;
             text-align: center;
@@ -139,30 +112,54 @@
 <body>
     <div class="page-wrapper">
         <header>
-            <h1>🎵 Richieste</h1>
+            <h1>🎵 Richiedi la tua Canzone</h1>
             <div class="nav-buttons">
-                <a href="index.html" class="bottone-nav"><i class="fas fa-home"></i> Home</a>
-                <a href="eventi.html" class="bottone-nav"><i class="fas fa-calendar"></i> Eventi</a>
+                <a href="index.html" class="bottone-pagine">🏠 Home</a>
+                <a href="eventi.html" class="bottone-pagine">📅 Eventi</a>
             </div>
         </header>
 
-        <div class="container">
-            <form action="https://formspree.io/f/TUO_ID" method="POST">
-                <div class="form-group">
-                    <label for="artista">Artista</label>
-                    <input type="text" id="artista" name="artista" placeholder="Esempio: Gigi D'Agostino" required>
+        <div style="flex-grow: 1; display: flex; align-items: center; width: 100%;">
+            <div class="container-form">
+                <form id="requestForm" action="https://docs.google.com/forms/d/e/1FAIpQLScxub9hw5QXmbeEFm3kWBbiOWi9VLIhhCfEIST6C_7cZMNeSQ/formResponse" method="POST">
+                    <div class="form-group">
+                        <label>Artista</label>
+                        <input type="text" name="entry.272795737" placeholder="Esempio: Gigi D'Agostino" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Titolo della Canzone</label>
+                        <input type="text" name="entry.288440619" placeholder="Esempio: L'Amour Toujours" required>
+                    </div>
+                    <button type="submit" class="bottone-invia">INVIA A GOOGLE</button>
+                </form>
+                <div id="successMessage">
+                    <i class="fas fa-check-circle" style="font-size: 2rem;"></i><br><br>
+                    Richiesta inviata al Foglio Google!
                 </div>
-                <div class="form-group">
-                    <label for="titolo">Titolo della Canzone</label>
-                    <input type="text" id="titolo" name="titolo" placeholder="Esempio: L'Amour Toujours" required>
-                </div>
-                <button type="submit" class="bottone-invia">INVIA RICHIESTA</button>
-            </form>
+            </div>
         </div>
 
-        <footer>
-            &copy; 2026 Rossi DJ - Musica su misura per te
-        </footer>
+        <footer>&copy; 2026 Rossi DJ</footer>
     </div>
+
+    <script>
+        const form = document.getElementById('requestForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = form.querySelector('button');
+            btn.innerText = "INVIANDO...";
+            
+            // Invia i dati a Google in background
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                mode: 'no-cors'
+            });
+
+            // Mostra il messaggio di successo subito
+            form.style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+        };
+    </script>
 </body>
 </html>
