@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rossi DJ - Prenota Evento</title>
+    <title>Rossi DJ - Prenota il tuo Evento</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
@@ -55,7 +55,7 @@
             background: #1a1a1a;
             color: white;
             font-size: 1rem;
-            box-sizing: border-box; /* Evita che escano dai bordi */
+            box-sizing: border-box;
         }
 
         textarea {
@@ -72,7 +72,7 @@
         .btn-invia {
             width: 100%;
             padding: 15px;
-            background-color: #25d366; /* Colore WhatsApp */
+            background-color: #25d366; 
             color: white;
             border: none;
             border-radius: 50px;
@@ -107,11 +107,16 @@
 
 <div class="container">
     <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Torna alla Home</a>
-    <h1>Prenota Evento</h1>
+    <h1>Prenota il Tuo Evento</h1>
     
     <form id="bookingForm">
         <div class="form-group">
-            <label for="data">Data indicativa</label>
+            <label for="nome">Nome e Cognome (Obbligatorio)</label>
+            <input type="text" id="nome" name="nome" placeholder="Il tuo nome e cognome" required>
+        </div>
+
+        <div class="form-group">
+            <label for="data">Data dell'evento</label>
             <input type="date" id="data" name="data">
         </div>
 
@@ -126,8 +131,8 @@
         </div>
 
         <div class="form-group">
-            <label for="telefono">Telefono (Obbligatorio)</label>
-            <input type="tel" id="telefono" name="telefono" placeholder="Il tuo numero" required>
+            <label for="telefono">Telefono</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="Il tuo numero">
         </div>
 
         <div class="form-group">
@@ -146,6 +151,7 @@
         e.preventDefault();
 
         // Recupero i dati dal form
+        const nome = document.getElementById('nome').value;
         const data = document.getElementById('data').value || "Da definire";
         const ora = document.getElementById('ora').value || "Da definire";
         const email = document.getElementById('email').value;
@@ -154,13 +160,14 @@
 
         // Formatto il messaggio
         const messaggio = `*NUOVA RICHIESTA EVENTO*%0A%0A` +
+                          `👤 *Nome:* ${nome}%0A` +
                           `📅 *Data:* ${data}%0A` +
                           `🕒 *Ora:* ${ora}%0A` +
                           `📧 *Email:* ${email}%0A` +
                           `📞 *Tel:* ${telefono}%0A` +
                           `📝 *Dettagli:* ${descrizione}`;
 
-        // Tuo numero di telefono (già inserito)
+        // Tuo numero di telefono
         const mioNumero = "393466045298";
 
         // Genero l'URL di WhatsApp
