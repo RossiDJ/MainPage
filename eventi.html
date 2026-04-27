@@ -37,37 +37,46 @@
             border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
 
-        /* Gestione Visibilità Menu */
         .admin-section { padding-bottom: 20px; border-bottom: 1px solid #444; margin-bottom: 25px; }
         .hidden { display: none !important; }
         .form-group { display: flex; flex-direction: column; gap: 10px; }
         input { padding: 12px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; }
 
-        /* Lista Eventi */
         .evento-card {
-            background: rgba(255, 255, 255, 0.1); padding: 15px;
-            border-radius: 12px; border-left: 5px solid #00d4ff; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05); padding: 18px;
+            border-radius: 15px; border-left: 6px solid #00d4ff; margin-bottom: 18px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .btn-elimina { background: #ff4d4d; color: #fff; border: none; padding: 8px; border-radius: 8px; cursor: pointer; display: none; }
+        .evento-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+        .evento-data { color: #00d4ff; font-weight: bold; font-size: 1.2rem; }
+        .evento-luogo { color: #ddd; font-size: 1rem; }
+        
+        .btn-link {
+            display: inline-block; padding: 8px 15px; background: transparent;
+            color: #00d4ff; border: 2px solid #00d4ff; text-decoration: none;
+            border-radius: 10px; font-size: 0.85rem; font-weight: bold;
+            margin-top: 10px; transition: 0.3s; width: fit-content;
+        }
+        .btn-link:hover { background: #00d4ff; color: #000; }
+
+        .btn-elimina { background: #ff4d4d; color: #fff; border: none; padding: 10px; border-radius: 10px; cursor: pointer; display: none; margin-left: 10px; font-size: 1.2rem; }
         .gestione-attiva .btn-elimina { display: block; }
 
-        /* Video */
         .video-box { margin-top: 30px; text-align: center; border-top: 1px solid #444; padding-top: 20px; }
         .video-container { 
             position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; 
             border-radius: 15px; border: 2px solid #00d4ff; margin-top: 15px;
         }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .video-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body id="main-body">
     <div class="page-overlay">
         <header>
-            <h1 style="color:#00d4ff; margin:0;">📅 EVENTI & PROMO</h1>
+            <h1 style="color:#00d4ff; margin:0;">🎧 EVENTI & PROMO</h1>
             <div class="nav-buttons">
                 <a href="index.html" class="bottone-pagine">🏠 Home</a>
-                <a href="richieste.html" class="bottone-pagine">🎵 Richieste</a>
+                <a href="richieste.html" class="bottone-pagine">🎶 Richieste</a>
             </div>
         </header>
 
@@ -75,40 +84,91 @@
             <div id="login-area" class="admin-section">
                 <h3 style="color:#00d4ff; margin-top:0;">Area Riservata DJ</h3>
                 <div class="form-group">
-                    <input type="password" id="passInput" placeholder="Inserisci Password">
-                    <button onclick="sblocca()" class="bottone-pagine">ACCEDI A GESTIONE</button>
+                    <input type="password" id="passInput" placeholder="Password">
+                    <button onclick="sblocca()" class="bottone-pagine">ACCEDI</button>
                 </div>
             </div>
 
             <div id="menu-area" class="admin-section hidden">
-                <h3 style="color:#00d4ff; margin-top:0;">Aggiungi Nuovo Evento</h3>
+                <h3 style="color:#00d4ff; margin-top:0;">Nuovo Evento</h3>
                 <div class="form-group">
-                    <input type="text" id="dataE" placeholder="Quando? (es: 10 Luglio)">
-                    <input type="text" id="luogoE" placeholder="Dove? (es: Bar Centrale)">
-                    <button onclick="aggiungi()" class="bottone-pagine">PUBBLICA EVENTO</button>
-                    <button onclick="chiudi()" style="background:none; color:#ff4d4d; border:none; cursor:pointer; font-size:0.8rem;">Esci dalla gestione</button>
+                    <input type="text" id="dataE" placeholder="Quando? (es. Sabato 20/04)">
+                    <input type="text" id="luogoE" placeholder="Dove?">
+                    <input type="text" id="linkE" placeholder="Link Mappa (Opzionale)">
+                    <button onclick="aggiungi()" id="btn-aggiungi" class="bottone-pagine">PUBBLICA</button>
+                    <button onclick="chiudi()" style="background:none; color:#ff4d4d; border:none; cursor:pointer;">Esci</button>
                 </div>
             </div>
 
             <div id="lista-eventi">
-                <div class="evento-card">
-                    <div><b>Coming Soon</b><br>Resta sintonizzato per le nuove date!</div>
-                </div>
+                <p>Caricamento eventi...</p>
             </div>
 
             <div class="video-box">
                 <h3 style="color:#00d4ff;">🎬 PROMO REEL</h3>
                 <div class="video-container">
-			<video controls autoplay playsinline style="width: 100%; border-radius: 10px; border: 2px solid #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);">
-   				 <source src="promo.mp4" type="video/mp4">
-   				 Il tuo browser non supporta il formato video.
-			</video>
+                    <video controls autoplay playsinline muted loop>
+                         <source src="promo.mp4" type="video/mp4">
+                         Il tuo browser non supporta il formato video.
+                    </video>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLQcF5MEC_SdK5Lhg8gaAK-QoJ5IQh2HjEJEfXL4SYQJwTMi8klmwca9luhvpAom3B/exec'; 
+
+        async function caricaEventi() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const eventi = await response.json();
+                const lista = document.getElementById('lista-eventi');
+                lista.innerHTML = ''; 
+                
+                // .slice(1) esclude la riga delle intestazioni del foglio
+                const eventiValidi = eventi.slice(1);
+
+                if (eventiValidi.length === 0) {
+                    lista.innerHTML = '<p style="text-align:center; color:#888;">Nessun evento in programma.</p>';
+                    return;
+                }
+
+                eventiValidi.forEach((ev, index) => {
+                    // La riga reale nel foglio è l'indice attuale + 2 
+                    // (+1 perché JS parte da 0 e +1 perché abbiamo saltato la prima riga)
+                    const rigaFisica = index + 2; 
+                    
+                    const d = ev[0]; 
+                    const l = ev[1]; 
+                    const lnk = ev[2]; 
+                    
+                    const card = document.createElement('div');
+                    card.className = 'evento-card';
+                    
+                    let linkHTML = '';
+                    if(lnk && lnk.toString().trim().length > 1) {
+                        const cleanLink = lnk.toString().startsWith('http') ? lnk : `https://${lnk}`;
+                        linkHTML = `<a href="${cleanLink}" target="_blank" class="btn-link">📍 Info / Mappa</a>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="evento-info">
+                            <span class="evento-data">${d}</span>
+                            <span class="evento-luogo">${l}</span>
+                            ${linkHTML}
+                        </div>
+                        <button class="btn-elimina" onclick="eliminaEvento(${rigaFisica})">🗑️</button>
+                    `;
+                    lista.appendChild(card);
+                });
+            } catch (e) {
+                document.getElementById('lista-eventi').innerHTML = "Errore di caricamento.";
+            }
+        }
+
+        window.onload = caricaEventi;
+
         function sblocca() {
             if(document.getElementById('passInput').value === 'Screb/735') {
                 document.getElementById('login-area').classList.add('hidden');
@@ -117,25 +177,45 @@
             } else { alert('Password Errata!'); }
         }
 
-        function aggiungi() {
+        async function aggiungi() {
             const d = document.getElementById('dataE').value;
             const l = document.getElementById('luogoE').value;
-            if(!d || !l) return alert('Compila tutto!');
+            const lnk = document.getElementById('linkE').value;
+            if(!d || !l) return alert('Inserisci almeno Data e Luogo!');
             
-            const card = document.createElement('div');
-            card.className = 'evento-card';
-            card.innerHTML = `<div><b>${d}</b><br>${l}</div><button class="btn-elimina" onclick="this.parentElement.remove()">🗑️</button>`;
+            const btn = document.getElementById('btn-aggiungi');
+            btn.innerText = "INVIO...";
+            btn.disabled = true;
+
+            try {
+                const url = `${SCRIPT_URL}?action=add&dataE=${encodeURIComponent(d)}&luogoE=${encodeURIComponent(l)}&linkE=${encodeURIComponent(lnk)}`;
+                await fetch(url, { mode: 'no-cors' });
+                alert("Evento aggiunto!");
+                location.reload();
+            } catch (error) {
+                alert('Errore di connessione.');
+                btn.innerText = "PUBBLICA";
+                btn.disabled = false;
+            }
+        }
+
+        async function eliminaEvento(riga) {
+            if(!confirm("Vuoi eliminare questo evento definitivamente dal foglio?")) return;
             
-            const lista = document.getElementById('lista-eventi');
-            lista.insertBefore(card, lista.firstChild);
-            document.getElementById('dataE').value = ''; document.getElementById('luogoE').value = '';
+            try {
+                const url = `${SCRIPT_URL}?action=delete&row=${riga}`;
+                await fetch(url, { mode: 'no-cors' });
+                alert("Evento eliminato!");
+                location.reload();
+            } catch (error) {
+                alert('Errore durante l\'eliminazione.');
+            }
         }
 
         function chiudi() {
             document.getElementById('login-area').classList.remove('hidden');
             document.getElementById('menu-area').classList.add('hidden');
             document.getElementById('main-body').classList.remove('gestione-attiva');
-            document.getElementById('passInput').value = '';
         }
     </script>
 </body>

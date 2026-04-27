@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Richiedi la tua Canzone - Rossi DJ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body, html { margin: 0; padding: 0; height: 100%; }
         body {
@@ -30,17 +31,14 @@
             backdrop-filter: blur(5px);
             text-align: center;
             border-bottom: 2px solid #00d4ff;
-            position: relative;
             z-index: 20;
         }
-        h1 { margin: 0; font-size: 1.5rem; color: #00d4ff; }
+        h1 { margin: 0; font-size: 1.5rem; color: #00d4ff; text-transform: uppercase; }
         
-        /* Contenitore per i bottoni nell'header */
         .nav-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
-            flex-wrap: wrap;
             margin-top: 15px;
         }
 
@@ -53,37 +51,53 @@
             font-weight: bold;
             border-radius: 50px;
             font-size: 1rem;
-            transition: transform 0.2s, background-color 0.2s;
+            transition: transform 0.2s;
         }
         
-        .bottone-pagine:hover {
-            transform: scale(1.05);
-            background-color: #00b8e6;
+        .bottone-pagine:hover { transform: scale(1.05); }
+
+        .container-form {
+            width: 90%;
+            max-width: 500px;
+            margin: auto;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.75); 
+            border-radius: 20px;
+            border: 1px solid #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            text-align: center;
         }
 
-        .container {
-            width: 95%;
-            max-width: 700px;
-            margin: 20px 0;
-            flex-grow: 1;
-            position: relative;
-            z-index: 10;
-        }
-        
-        iframe {
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; color: #00d4ff; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
+
+        input[type="text"] {
             width: 100%;
-            height: 800px;
-            border: none;
+            padding: 12px;
             border-radius: 10px;
-            background-color: #ffffff;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            opacity: 0.85; 
-            transition: opacity 0.3s ease;
+            border: 1px solid #444;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
         }
 
-        iframe:hover {
-            opacity: 0.95;
+        .bottone-invia {
+            width: 100%;
+            padding: 15px;
+            background-color: #00d4ff; 
+            color: #000; 
+            border: none;
+            font-weight: bold;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
+
+        #successMessage { display: none; color: #00d4ff; font-weight: bold; padding: 20px; }
 
         footer {
             padding: 15px;
@@ -92,7 +106,6 @@
             background: rgba(0, 0, 0, 0.8);
             width: 100%;
             text-align: center;
-            z-index: 20;
         }
     </style>
 </head>
@@ -100,21 +113,53 @@
     <div class="page-wrapper">
         <header>
             <h1>🎵 Richiedi la tua Canzone</h1>
-            <p style="margin: 5px 0 0; font-size: 0.9rem; color: #ccc;">Rossi DJ @ Legnaro</p>
-            
             <div class="nav-buttons">
                 <a href="index.html" class="bottone-pagine">🏠 Home</a>
                 <a href="eventi.html" class="bottone-pagine">📅 Eventi</a>
             </div>
         </header>
 
-        <div class="container">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScxub9hw5QXmbeEFm3kWBbiOWi9VLIhhCfEIST6C_7cZMNeSQ/viewform?embedded=true">Caricamento…</iframe> 
+        <div style="flex-grow: 1; display: flex; align-items: center; width: 100%;">
+            <div class="container-form">
+                <form id="requestForm" action="https://docs.google.com/forms/d/e/1FAIpQLScxub9hw5QXmbeEFm3kWBbiOWi9VLIhhCfEIST6C_7cZMNeSQ/formResponse" method="POST">
+                    <div class="form-group">
+                        <label>Artista</label>
+                        <input type="text" name="entry.272795737" placeholder="Esempio: Gigi D'Agostino" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Titolo della Canzone</label>
+                        <input type="text" name="entry.288440619" placeholder="Esempio: L'Amour Toujours" required>
+                    </div>
+                    <button type="submit" class="bottone-invia">INVIA RICHIESTA</button>
+                </form>
+                <div id="successMessage">
+                    <i class="fas fa-check-circle" style="font-size: 2rem;"></i><br><br>
+                    Richiesta inviata al Foglio Google!
+                </div>
+            </div>
         </div>
 
-        <footer>
-            &copy; 2026 Rossi DJ - Musica su misura per te
-        </footer>
+        <footer>&copy; 2026 Rossi DJ</footer>
     </div>
+
+    <script>
+        const form = document.getElementById('requestForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = form.querySelector('button');
+            btn.innerText = "INVIANDO...";
+            
+            // Invia i dati a Google in background
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                mode: 'no-cors'
+            });
+
+            // Mostra il messaggio di successo subito
+            form.style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+        };
+    </script>
 </body>
 </html>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rossi DJ - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -36,7 +37,7 @@
         
         .bottone-pagine {
             display: inline-block;
-            margin: 10px 0; /* Ridotto il margine per metterne due */
+            margin: 10px 0;
             padding: 15px 40px;
             background-color: #00d4ff; 
             color: #000; 
@@ -45,7 +46,7 @@
             border-radius: 50px;
             font-size: 1.2rem;
             transition: transform 0.2s;
-            min-width: 250px; /* Assicura che i bottoni abbiano la stessa larghezza */
+            min-width: 250px;
         }
         
         .bottone-pagine:hover {
@@ -53,10 +54,37 @@
             background-color: #00b8e6;
         }
 
+        /* Nuova Sezione Social */
+        .social-section {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-icon {
+            font-size: 2rem;
+            color: #ffffff;
+            transition: color 0.3s, transform 0.2s;
+            text-decoration: none;
+        }
+
+        .social-icon:hover {
+            color: #00d4ff;
+            transform: translateY(-3px);
+        }
+
+        .social-icon.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
         .contact-info {
             margin-top: 30px;
             font-size: 0.9rem;
             color: #e0e0e0;
+            border-top: 1px solid #444;
+            padding-top: 20px;
         }
 
         .contact-info a {
@@ -74,16 +102,33 @@
 <body>
 
     <div class="container">
-        <h1>Rossi DJ a Legnaro</h1>
-        <p>Esperienze sonore uniche per ogni evento, dal locale alla festa privata.</p>
+        <h1>Rossi DJ</h1>
+        <p>Esperienze sonore uniche e dedicate per ogni evento, dal locale alla festa privata.</p>
 
+        <a href="richieste.html" class="bottone-pagine">
+            🎵 RICHIEDI UNA CANZONE
+        </a>
+        <br>
         <a href="eventi.html" class="bottone-pagine">
             📅 PROSSIMI EVENTI
         </a>
         <br>
-        <a href="richieste.html" class="bottone-pagine">
-            🎵 RICHIEDI UNA CANZONE
+        <a href="gallery.php" class="bottone-pagine">
+            📸 GALLERY
         </a>
+        <br>
+        <a href="prenotazioni.html" class="bottone-pagine">
+            🎉 PRENOTA IL TUO EVENTO
+        </a>
+
+        <div class="social-section">
+            <a href="https://www.facebook.com/share/1HtZxnxUDJ/" target="_blank" class="social-icon" title="Facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://www.instagram.com/rossiddj/" target="_blank" class="social-icon" title="Instagram (Presto disponibile)">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
 
         <div class="contact-info">
             <div>Email: <a href="mailto:RossiDJ@live.it">RossiDJ@live.it</a></div>
