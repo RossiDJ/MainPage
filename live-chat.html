@@ -6,31 +6,20 @@
     <title>Live Chat - Rossi DJ</title>
     <style>
         body, html { margin: 0; padding: 0; min-height: 100%; overflow-x: hidden; }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #000; color: #fff;
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; color: #fff; }
 
         .bg-animato {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: url('flx10live1.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: 0;
+            background-size: cover; background-position: center; z-index: 0;
             animation: respiroSfondo 20s ease-in-out infinite alternate;
         }
-        @keyframes respiroSfondo {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
-        }
+        @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
         .page-overlay {
-            background: rgba(0, 0, 0, 0.75); 
-            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.75); min-height: 100vh;
             display: flex; flex-direction: column; align-items: center;
-            position: relative;
-            z-index: 1; 
+            position: relative; z-index: 1;
         }
 
         header {
@@ -46,55 +35,38 @@
             cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s;
         }
         .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
-
         .bottone-live { background: #ff0055; color: #fff; }
         .bottone-live:hover { background: #cc0044; }
 
         .container {
             width: 90%; max-width: 550px; margin: 30px 10px;
             background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px;
-            border: 2px solid #ff0055; 
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+            border: 2px solid #ff0055; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
             display: flex; flex-direction: column; height: 65vh; box-sizing: border-box;
         }
 
         #loginScreen, #chatScreen { display: flex; flex-direction: column; height: 100%; }
         #chatScreen { display: none; }
-
         .form-group { display: flex; flex-direction: column; gap: 15px; justify-content: center; height: 100%; align-items: center; text-align: center;}
-        
-        input[type="text"] { 
-            width: 100%; box-sizing: border-box; padding: 15px; 
-            border-radius: 10px; border: 1px solid #555; 
-            background: #222; color: #fff; font-size: 1rem;
-        }
+        input[type="text"] { width: 100%; box-sizing: border-box; padding: 15px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; font-size: 1rem; }
         input[type="text"]:focus { outline: none; border-color: #ff0055; }
 
         #chatHeader { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
         .dot { height: 10px; width: 10px; background-color: #ff0055; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.2;} 100% {opacity: 1;} }
 
-        #messages { 
-            flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); 
-            border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 10px; 
-        }
-        
-        .msg { background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 12px; width: fit-content; max-width: 85%; word-wrap: break-word; border-left: 4px solid #00d4ff;}
-        .msg strong { color: #00d4ff; display: block; font-size: 0.85rem; margin-bottom: 2px; text-transform: uppercase; }
-        
+        #messages { flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 12px; width: fit-content; max-width: 85%; border-left: 4px solid #00d4ff;}
+        .msg strong { color: #00d4ff; display: block; font-size: 0.85rem; text-transform: uppercase; }
         .msg.twitch { border-left: 4px solid #9146FF; }
         .msg.twitch strong { color: #9146FF; } 
-
         .input-area { display: flex; gap: 10px; margin-top: 15px; }
-        .input-area input { flex-grow: 1; }
     </style>
 </head>
 <body>
 
     <div class="bg-animato"></div>
-
     <div class="page-overlay">
-        
         <header>
             <h1 style="color:#ff0055; margin:0; display:flex; justify-content:center; align-items:center; gap: 10px;">
                 <span class="dot"></span> LIVE CHAT
@@ -110,7 +82,6 @@
             <div id="loginScreen">
                 <div class="form-group">
                     <h3 style="color:#ff0055; margin-top:0;">Accesso Rapido</h3>
-                    <p style="color: #bbb; font-size: 0.9rem;">Inserisci un nickname per scrivere nella chat della serata e della live.</p>
                     <input type="text" id="usernameInput" placeholder="Scegli il tuo nome..." required>
                     <button id="loginBtn" class="bottone-pagine bottone-live" style="width: 100%;">ENTRA</button>
                 </div>
@@ -118,12 +89,10 @@
 
             <div id="chatScreen">
                 <div id="chatHeader">
-                    <span style="color:#fff; font-weight:bold;">Interagisci con il locale</span>
+                    <span style="color:#fff; font-weight:bold;">Chat Locale</span>
                     <span id="currentUser" style="font-size: 0.85rem; color: #00d4ff;"></span>
                 </div>
-                
                 <div id="messages"></div>
-                
                 <div class="input-area">
                     <input type="text" id="messageInput" placeholder="Scrivi un messaggio..." autocomplete="off">
                     <button id="sendBtn" class="bottone-pagine bottone-live">INVIA</button>
@@ -136,24 +105,40 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // Configurazione reale di Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M",
             authDomain: "rossidj-chat.firebaseapp.com",
             databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "rossidj-chat",
-            storageBucket: "rossidj-chat.firebasestorage.app",
-            messagingSenderId: "247840582286",
-            appId: "1:247840582286:web:5320cff622ffc8ab9377df"
+            projectId: "rossidj-chat"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let username = "";
+        
+        // Lista censura aggiornata con varianti venete
+        const paroleVietate = [
+            "dio", "madonna", "cristo", "gesu", "d1o", "m4donna", "cr1sto", "porco", "p0rco", 
+            "diocane", "dioporco", "diocan", "bostia", "ostia", "madon", "crist", "dioc", "diop",
+            "cazzo", "cazz0", "minchia", "stronzo", "stronz0", "puttana", "troia", "troi4", 
+            "vaffanculo", "vaffa", "fanculo", "merda", "scemo", "idiota", "bastardo", "coglione", 
+            "frocio", "negro", "culo", "figa", "fica", "mignotta", "sborra", "pompa", "figa de", 
+            "testa de", "mona", "m0na", "bocia", "pirla", "vacca", "vacca boia", "pota", "ciula"
+        ];
 
+        function censuraTesto(testo) {
+            let testoPulito = testo;
+            paroleVietate.forEach(parola => {
+                const regex = new RegExp("\\b" + parola + "\\b", "gi");
+                testoPulito = testoPulito.replace(regex, "***");
+            });
+            return testoPulito;
+        }
+
+        let username = "";
         function login() {
-            username = document.getElementById('usernameInput').value.trim();
-            if(username) {
+            let rawUsername = document.getElementById('usernameInput').value.trim();
+            if(rawUsername) {
+                username = censuraTesto(rawUsername);
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('chatScreen').style.display = 'flex';
                 document.getElementById('currentUser').innerText = "Tu: " + username;
@@ -162,37 +147,25 @@
         }
 
         document.getElementById('loginBtn').addEventListener('click', login);
-        document.getElementById('usernameInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') login(); });
+        document.getElementById('messageInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
         function sendMessage() {
             const msgInput = document.getElementById('messageInput');
             const msgText = msgInput.value.trim();
             if(msgText) {
-                push(ref(db, 'messages'), { 
-                    user: username, 
-                    text: msgText, 
-                    timestamp: Date.now(), 
-                    source: 'web' 
-                });
+                push(ref(db, 'messages'), { user: username, text: censuraTesto(msgText), timestamp: Date.now(), source: 'web' });
                 msgInput.value = '';
             }
         }
 
         document.getElementById('sendBtn').addEventListener('click', sendMessage);
-        document.getElementById('messageInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
         function loadMessages() {
             const messagesDiv = document.getElementById('messages');
             onChildAdded(ref(db, 'messages'), (snapshot) => {
                 const data = snapshot.val();
                 const msgDiv = document.createElement('div');
-                
-                if(data.source === 'twitch') {
-                    msgDiv.className = 'msg twitch';
-                } else {
-                    msgDiv.className = 'msg';
-                }
-                
+                msgDiv.className = data.source === 'twitch' ? 'msg twitch' : 'msg';
                 msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
                 messagesDiv.appendChild(msgDiv);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
