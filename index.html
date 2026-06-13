@@ -8,11 +8,6 @@
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-image: url('flx10live1.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
             background-color: #121212;
             color: #ffffff;
             margin: 0;
@@ -21,7 +16,31 @@
             align-items: center;
             min-height: 100vh;
             text-align: center;
+            /* Evita la comparsa di barre di scorrimento durante lo zoom */
+            overflow: hidden; 
         }
+
+        /* --- INIZIO EFFETTO SFONDO ANIMATO --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('flx10live1.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Mantiene l'immagine dietro a tutti i contenuti */
+            /* Animazione: durata 20s, fluida, ciclica e alternata (zoom in / zoom out) */
+            animation: respiroSfondo 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes respiroSfondo {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); } /* Ingrandisce dolcemente l'immagine del 15% */
+        }
+        /* --- FINE EFFETTO SFONDO ANIMATO --- */
         
         .container {
             max-width: 600px;
@@ -31,6 +50,9 @@
             border: 1px solid #444;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(4px);
+            /* Assicura che il contenitore stia sempre sopra lo sfondo animato */
+            position: relative; 
+            z-index: 1;
         }
         
         h1 { color: #00d4ff; text-transform: uppercase; }
@@ -45,13 +67,25 @@
             font-weight: bold;
             border-radius: 50px;
             font-size: 1.2rem;
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.2s;
             min-width: 250px;
         }
         
         .bottone-pagine:hover {
             transform: scale(1.05);
             background-color: #00b8e6;
+        }
+
+        /* Classe per far risaltare il pulsante della Live Chat */
+        .bottone-live {
+            background-color: #ff0055;
+            color: #ffffff;
+            border: 2px solid #ff0055;
+        }
+        
+        .bottone-live:hover {
+            background-color: #cc0044;
+            color: #ffffff;
         }
 
         .social-section {
@@ -99,6 +133,10 @@
         <h1>RossiDJ</h1>
         <p>Esperienze sonore uniche e dedicate per ogni evento, dal locale alla festa privata.</p>
 
+        <a href="live-chat.html" class="bottone-pagine bottone-live">
+            🔴 ENTRA NELLA LIVE CHAT
+        </a>
+        <br>
         <a href="richieste.html" class="bottone-pagine">
             🎵 RICHIEDI UNA CANZONE
         </a>
