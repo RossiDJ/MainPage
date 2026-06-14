@@ -9,10 +9,22 @@
         .bg-animato { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: 0; animation: respiroSfondo 20s ease-in-out infinite alternate; }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
         .page-overlay { background: rgba(0, 0, 0, 0.75); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
-        header { width: 100%; padding: 20px 0; background: rgba(0,0,0,0.85); text-align: center; border-bottom: 2px solid #ff0055; }
-        .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 75vh; display: flex; flex-direction: column; }
-        #messages { flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
-        .msg { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 4px solid #00d4ff; }
+        
+        /* Stili Header e Navigazione */
+        header { width: 100%; padding: 20px 0; background: rgba(0,0,0,0.85); text-align: center; border-bottom: 2px solid #ff0055; position: sticky; top: 0; z-index: 100; }
+        .dot { height: 10px; width: 10px; background-color: #ff0055; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.2;} 100% {opacity: 1;} }
+        .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .bottone-pagine { padding: 10px 25px; background: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s; }
+        .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
+        
+        .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 70vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
+        #messages { flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 12px; width: fit-content; max-width: 85%; border-left: 4px solid #00d4ff; }
+        .msg strong { color: #00d4ff; display: block; font-size: 0.85rem; text-transform: uppercase; }
+        .msg.twitch { border-left: 4px solid #9146FF; }
+        .msg.twitch strong { color: #9146FF; }
+        
         .btn-verifica { background: #888; color: #fff; padding: 15px; border-radius: 20px; border: none; font-weight: bold; width: 100%; transition: 0.3s; }
         .btn-verifica:disabled { cursor: not-allowed; opacity: 0.8; }
         #input-area { display: none; gap: 10px; margin-top: 10px; }
@@ -22,27 +34,38 @@
 
 <div class="bg-animato"></div>
 <div class="page-overlay">
-    <header><h1>LIVE CHAT</h1></header>
+    
+    <header>
+        <h1 style="color:#ff0055; margin:0; display:flex; justify-content:center; align-items:center; gap: 10px;">
+            <span class="dot"></span> LIVE CHAT
+        </h1>
+        <div class="nav-buttons">
+            <a href="index.html" class="bottone-pagine">🏠 Home</a>
+            <a href="richieste.html" class="bottone-pagine">🎶 Richieste</a>
+            <a href="eventi.html" class="bottone-pagine">📅 Eventi</a>
+        </div>
+    </header>
+
     <div class="container">
         <div id="messages"></div>
         
         <div id="verifica-container">
-            <div id="form-attivazione">
-                <input type="text" id="nick-scelto" placeholder="Inserisci un nickname per attivare la chat" style="padding:10px; width:95%; border-radius:10px; border:none; margin-bottom:10px;">
+            <div id="form-attivazione" style="display:flex; flex-direction:column; gap:10px;">
+                <input type="text" id="nick-scelto" placeholder="Inserisci un nickname per attivare la chat" style="padding:15px; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:1rem;">
                 <button id="btn-attivazione" onclick="inviaRichiestaWhatsApp()" class="btn-verifica" disabled>Minimo 3 caratteri</button>
             </div>
         </div>
 
         <div id="input-area">
-            <input type="text" id="messageInput" placeholder="Scrivi messaggio..." style="flex-grow:1; padding:10px; border-radius:10px; border:none;">
-            <button id="sendBtn" style="background:#ff0055; color:#fff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">INVIA</button>
+            <input type="text" id="messageInput" placeholder="Scrivi messaggio..." style="flex-grow:1; padding:15px; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:1rem;" autocomplete="off">
+            <button id="sendBtn" style="background:#ff0055; color:#fff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">INVIA</button>
         </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M",
@@ -57,26 +80,46 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const nomiRegistrati = new Set(); // Memoria dei nomi già presi
+    // Sistema Censura
+    const paroleVietate = [
+        "dio", "madonna", "cristo", "gesu", "d1o", "m4donna", "cr1sto", "porco", "p0rco", 
+        "diocane", "dioporco", "diocan", "bostia", "ostia", "madon", "crist", "dioc", "diop",
+        "cazzo", "cazz0", "minchia", "stronzo", "stronz0", "puttana", "troia", "troi4", 
+        "vaffanculo", "vaffa", "fanculo", "merda", "scemo", "idiota", "bastardo", "coglione", 
+        "frocio", "negro", "culo", "figa", "fica", "mignotta", "sborra", "pompa", "figa de", 
+        "testa de", "mona", "m0na", "bocia", "pirla", "vacca", "vacca boia", "pota", "ciula"
+    ];
+
+    function censuraTesto(testo) {
+        let testoPulito = testo;
+        paroleVietate.forEach(parola => {
+            const regex = new RegExp("\\b" + parola + "\\b", "gi");
+            testoPulito = testoPulito.replace(regex, "***");
+        });
+        return testoPulito;
+    }
+
+    const nomiRegistrati = new Set();
     const nickInput = document.getElementById('nick-scelto');
     const btnAttivazione = document.getElementById('btn-attivazione');
 
-    // Carica messaggi immediatamente e salva i nomi usati
+    // Caricamento dei messaggi in tempo reale e salvataggio nomi usati
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val();
         if(data.user) {
-            nomiRegistrati.add(data.user.toLowerCase()); // Salva il nome in minuscolo per il controllo
+            nomiRegistrati.add(data.user.toLowerCase());
         }
         
-        const div = document.createElement('div');
-        div.className = 'msg';
-        div.innerHTML = `<strong>${data.user}</strong>: ${data.text}`;
-        const msgDiv = document.getElementById('messages');
-        msgDiv.appendChild(div);
-        msgDiv.scrollTop = msgDiv.scrollHeight;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = data.source === 'twitch' ? 'msg twitch' : 'msg';
+        msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
+        
+        const containerMessaggi = document.getElementById('messages');
+        containerMessaggi.appendChild(msgDiv);
+        containerMessaggi.scrollTop = containerMessaggi.scrollHeight;
     });
 
-    // Controllo live del Nickname mentre si digita
+    // Controllo live del Nickname
     nickInput.addEventListener('input', () => {
         const nick = nickInput.value.trim();
         const nickLower = nick.toLowerCase();
@@ -88,25 +131,24 @@
             btnAttivazione.innerText = 'Minimo 3 caratteri';
         } else if (nomiRegistrati.has(nickLower)) {
             btnAttivazione.disabled = true;
-            btnAttivazione.style.background = '#ff0055'; // Rosso
+            btnAttivazione.style.background = '#ff0055'; 
             btnAttivazione.style.color = '#fff';
             btnAttivazione.innerText = '❌ Nome non disponibile';
         } else {
             btnAttivazione.disabled = false;
-            btnAttivazione.style.background = '#00ff00'; // Verde
+            btnAttivazione.style.background = '#00ff00'; 
             btnAttivazione.style.color = '#000';
             btnAttivazione.innerText = 'Attiva per commentare ✅';
         }
     });
 
-    // Sblocco se l'utente arriva dal link verificato di WhatsApp
+    // Riconoscimento sblocco da WhatsApp
     const urlParams = new URLSearchParams(window.location.search);
     if(urlParams.get('verified') === 'true') {
         document.getElementById('verifica-container').style.display = 'none';
         document.getElementById('input-area').style.display = 'flex';
     }
 
-    // Invia la richiesta via WhatsApp
     window.inviaRichiestaWhatsApp = () => {
         const nick = nickInput.value.trim();
         if(!btnAttivazione.disabled && nick.length >= 3) {
@@ -114,20 +156,28 @@
         }
     };
 
-    // Invio dei messaggi effettivi nella chat
-    document.getElementById('sendBtn').addEventListener('click', () => {
-        const msg = document.getElementById('messageInput').value;
-        const nick = urlParams.get('user'); // Recupera il nick concesso da WhatsApp
-        if(msg && nick) {
-            push(ref(db, 'messages'), { user: nick, text: msg, timestamp: Date.now() });
-            document.getElementById('messageInput').value = '';
+    // Invio dei messaggi con censura applicata
+    function sendMessage() {
+        const msgInput = document.getElementById('messageInput');
+        const msgTesto = msgInput.value.trim();
+        const nick = urlParams.get('user'); 
+        
+        if(msgTesto && nick) {
+            push(ref(db, 'messages'), { 
+                user: nick, 
+                text: censuraTesto(msgTesto), 
+                timestamp: Date.now(), 
+                source: 'web' 
+            });
+            msgInput.value = '';
         }
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
     });
 
-    // Consente l'invio col tasto Invio
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') document.getElementById('sendBtn').click();
-    });
 </script>
 </body>
 </html>
