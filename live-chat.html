@@ -18,19 +18,38 @@
         .bottone-pagine { padding: 10px 25px; background: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s; }
         .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
         
-        .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 70vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
+        .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 75vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
+        
+        /* Sezione Admin */
+        .admin-section { padding-bottom: 15px; border-bottom: 1px solid #444; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .hidden { display: none !important; }
+        .admin-input { padding: 10px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; width: 100%; box-sizing: border-box; }
+        .btn-admin-login { background: #555; color: #fff; padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-svuota { background: #ff4d4d; color: #fff; padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 5px; }
+        .btn-esci { background: transparent; color: #ff4d4d; border: none; cursor: pointer; text-decoration: underline; }
+
         #messages { flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 12px; width: fit-content; max-width: 85%; border-left: 4px solid #00d4ff; }
+        
+        /* Struttura Messaggi */
+        .msg-container { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+        .msg { background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 12px; flex-grow: 1; max-width: 85%; border-left: 4px solid #00d4ff; word-break: break-word; }
         .msg strong { color: #00d4ff; display: block; font-size: 0.85rem; text-transform: uppercase; }
+        
+        /* Stili speciali per fonti diverse */
         .msg.twitch { border-left: 4px solid #9146FF; }
         .msg.twitch strong { color: #9146FF; }
+        .msg.admin { border-left: 4px solid #ff0055; background: rgba(255, 0, 85, 0.15); }
+        .msg.admin strong { color: #ff0055; }
         
+        .btn-elimina-msg { background: #ff4d4d; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; font-size: 0.9rem; align-self: center; }
+        .gestione-attiva .btn-elimina-msg { display: block; }
+
         .btn-verifica { background: #888; color: #fff; padding: 15px; border-radius: 20px; border: none; font-weight: bold; width: 100%; transition: 0.3s; }
         .btn-verifica:disabled { cursor: not-allowed; opacity: 0.8; }
         #input-area { display: none; gap: 10px; margin-top: 10px; }
     </style>
 </head>
-<body>
+<body id="main-body">
 
 <div class="bg-animato"></div>
 <div class="page-overlay">
@@ -47,6 +66,20 @@
     </header>
 
     <div class="container">
+        
+        <div id="login-admin-area" class="admin-section">
+             <div style="display:flex; gap:10px;">
+                 <input type="password" id="passInputChat" class="admin-input" placeholder="Password DJ">
+                 <button onclick="sbloccaAdminChat()" class="btn-admin-login">ACCEDI</button>
+             </div>
+        </div>
+
+        <div id="controlli-admin-area" class="admin-section hidden">
+            <h4 style="color:#ff4d4d; margin: 0 0 10px 0; text-align:center;">🔴 PANNELLO CONTROLLO DJ</h4>
+            <button onclick="svuotaChatGlobale()" class="btn-svuota">💣 SVUOTA TUTTA LA CHAT</button>
+            <button onclick="chiudiAdminChat()" class="btn-esci">Esci dalla modalità DJ</button>
+        </div>
+
         <div id="messages"></div>
         
         <div id="verifica-container">
@@ -65,7 +98,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M",
@@ -80,7 +113,65 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Sistema Censura
+    const urlParams = new URLSearchParams(window.location.search);
+    let isUserVerified = urlParams.get('verified') === 'true';
+    let currentNickname = isUserVerified ? urlParams.get('user') : null;
+    let isAdminActive = false;
+
+    // --- LOGICA ADMIN ---
+    window.sbloccaAdminChat = () => {
+        if(document.getElementById('passInputChat').value === 'Screb/735') {
+            document.getElementById('login-admin-area').classList.add('hidden');
+            document.getElementById('controlli-admin-area').classList.remove('hidden');
+            document.getElementById('main-body').classList.add('gestione-attiva');
+            
+            // Attiva i poteri di scrittura come RossiDJ
+            isAdminActive = true;
+            currentNickname = 'RossiDJ';
+            document.getElementById('verifica-container').style.display = 'none';
+            document.getElementById('input-area').style.display = 'flex';
+        } else {
+            alert('Password Errata!');
+        }
+    };
+
+    window.chiudiAdminChat = () => {
+        document.getElementById('login-admin-area').classList.remove('hidden');
+        document.getElementById('controlli-admin-area').classList.add('hidden');
+        document.getElementById('main-body').classList.remove('gestione-attiva');
+        document.getElementById('passInputChat').value = '';
+        
+        isAdminActive = false;
+        
+        // Ripristina lo stato precedente (se era verificato come utente normale o meno)
+        if (isUserVerified) {
+            currentNickname = urlParams.get('user');
+        } else {
+            currentNickname = null;
+            document.getElementById('verifica-container').style.display = 'block';
+            document.getElementById('input-area').style.display = 'none';
+        }
+    };
+
+    window.eliminaSingoloMessaggio = (messageId) => {
+        if(confirm("Vuoi eliminare questo messaggio?")) {
+            remove(ref(db, 'messages/' + messageId)).catch(err => alert("Errore: " + err));
+        }
+    };
+
+    window.svuotaChatGlobale = () => {
+        if(confirm("ATTENZIONE! Eliminare TUTTI i messaggi? L'operazione è irreversibile.")) {
+            if(confirm("Confermi lo svuotamento totale?")) {
+                remove(ref(db, 'messages')).then(() => {
+                    document.getElementById('messages').innerHTML = ''; 
+                    nomiRegistrati.clear(); 
+                    alert("Chat svuotata!");
+                });
+            }
+        }
+    };
+
+    // --- SISTEMA CENSURA ---
     const paroleVietate = [
         "dio", "madonna", "cristo", "gesu", "d1o", "m4donna", "cr1sto", "porco", "p0rco", 
         "diocane", "dioporco", "diocan", "bostia", "ostia", "madon", "crist", "dioc", "diop",
@@ -103,23 +194,49 @@
     const nickInput = document.getElementById('nick-scelto');
     const btnAttivazione = document.getElementById('btn-attivazione');
 
-    // Caricamento dei messaggi in tempo reale e salvataggio nomi usati
+    // --- CARICAMENTO MESSAGGI ---
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val();
-        if(data.user) {
-            nomiRegistrati.add(data.user.toLowerCase());
-        }
+        const messageId = snapshot.key; 
+        
+        if(data.user) nomiRegistrati.add(data.user.toLowerCase());
+        
+        const wrapperDiv = document.createElement('div');
+        wrapperDiv.className = 'msg-container';
+        wrapperDiv.id = 'msg-' + messageId; 
         
         const msgDiv = document.createElement('div');
-        msgDiv.className = data.source === 'twitch' ? 'msg twitch' : 'msg';
+        
+        // Applica stili speciali se è Twitch o Admin
+        if (data.user === 'RossiDJ' || data.source === 'admin') {
+            msgDiv.className = 'msg admin';
+        } else if (data.source === 'twitch') {
+            msgDiv.className = 'msg twitch';
+        } else {
+            msgDiv.className = 'msg';
+        }
+        
         msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
         
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-elimina-msg';
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.onclick = () => window.eliminaSingoloMessaggio(messageId);
+
+        wrapperDiv.appendChild(msgDiv);
+        wrapperDiv.appendChild(deleteBtn);
+        
         const containerMessaggi = document.getElementById('messages');
-        containerMessaggi.appendChild(msgDiv);
+        containerMessaggi.appendChild(wrapperDiv);
         containerMessaggi.scrollTop = containerMessaggi.scrollHeight;
     });
 
-    // Controllo live del Nickname
+    onChildRemoved(ref(db, 'messages'), (snapshot) => {
+        const msgElement = document.getElementById('msg-' + snapshot.key);
+        if (msgElement) msgElement.remove(); 
+    });
+
+    // --- GESTIONE NICKNAME ---
     nickInput.addEventListener('input', () => {
         const nick = nickInput.value.trim();
         const nickLower = nick.toLowerCase();
@@ -129,7 +246,7 @@
             btnAttivazione.style.background = '#888';
             btnAttivazione.style.color = '#fff';
             btnAttivazione.innerText = 'Minimo 3 caratteri';
-        } else if (nomiRegistrati.has(nickLower)) {
+        } else if (nomiRegistrati.has(nickLower) || nickLower === 'rossidj') { // Blocca anche chi prova a chiamarsi RossiDJ
             btnAttivazione.disabled = true;
             btnAttivazione.style.background = '#ff0055'; 
             btnAttivazione.style.color = '#fff';
@@ -142,9 +259,8 @@
         }
     });
 
-    // Riconoscimento sblocco da WhatsApp
-    const urlParams = new URLSearchParams(window.location.search);
-    if(urlParams.get('verified') === 'true') {
+    // --- SETUP INIZIALE ---
+    if(isUserVerified) {
         document.getElementById('verifica-container').style.display = 'none';
         document.getElementById('input-area').style.display = 'flex';
     }
@@ -156,18 +272,17 @@
         }
     };
 
-    // Invio dei messaggi con censura applicata
+    // --- INVIO MESSAGGI ---
     function sendMessage() {
         const msgInput = document.getElementById('messageInput');
         const msgTesto = msgInput.value.trim();
-        const nick = urlParams.get('user'); 
         
-        if(msgTesto && nick) {
+        if(msgTesto && currentNickname) {
             push(ref(db, 'messages'), { 
-                user: nick, 
+                user: currentNickname, 
                 text: censuraTesto(msgTesto), 
                 timestamp: Date.now(), 
-                source: 'web' 
+                source: isAdminActive ? 'admin' : 'web' 
             });
             msgInput.value = '';
         }
