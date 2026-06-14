@@ -272,14 +272,35 @@
         }
     };
 
-    // --- INVIO MESSAGGI ---
+// --- FUNZIONE SEND MESSAGGIO (SOSTITUISCI QUESTA NEL TUO FILE) ---
     function sendMessage() {
         const msgInput = document.getElementById('messageInput');
         const msgTesto = msgInput.value.trim();
         
-        if(msgTesto && currentNickname) {
+        // 1. Logica Token Blindato (senza toccare variabili globali esterne)
+        const secretKey = "RossiDJ_Music_2026!";
+        const urlParams = new URLSearchParams(window.location.search);
+        let nickVerificato = currentNickname; // Usa la variabile globale già esistente
+        
+        const token = urlParams.get('token');
+        if (token) {
+            try {
+                let decoded = atob(token.split('').reverse().join(''));
+                let nickDaToken = decoded.replace(secretKey, "");
+                if (nickDaToken) nickVerificato = nickDaToken;
+            } catch(e) { /* se il token è errato, usiamo il nick standard */ }
+        }
+
+        // 2. Controllo sicurezza: se non c'è nick (né da login né da token), blocca
+        if (!nickVerificato) {
+            alert("⚠️ Devi effettuare la verifica WhatsApp per poter scrivere!");
+            return;
+        }
+        
+        // 3. Invio al Database (usando la logica originale della tua pagina)
+        if(msgTesto && nickVerificato) {
             push(ref(db, 'messages'), { 
-                user: currentNickname, 
+                user: nickVerificato, 
                 text: censuraTesto(msgTesto), 
                 timestamp: Date.now(), 
                 source: isAdminActive ? 'admin' : 'web' 
