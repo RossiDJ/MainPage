@@ -5,48 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Chat - Rossi DJ</title>
     <style>
+        /* --- STILI BASE --- */
         body, html { margin: 0; padding: 0; min-height: 100%; overflow-x: hidden; font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; color: #fff; }
         .bg-animato { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: 0; animation: respiroSfondo 20s ease-in-out infinite alternate; }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
         .page-overlay { background: rgba(0, 0, 0, 0.75); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
         
-        /* Stili Header e Navigazione */
         header { width: 100%; padding: 20px 0; background: rgba(0,0,0,0.85); text-align: center; border-bottom: 2px solid #ff0055; position: sticky; top: 0; z-index: 100; }
         .dot { height: 10px; width: 10px; background-color: #ff0055; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.2;} 100% {opacity: 1;} }
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .bottone-pagine { padding: 10px 25px; background: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s; }
-        .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
         
         .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 75vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
         
-        /* Sezione Admin */
+        /* --- STILI ADMIN & MESSAGGI --- */
         .admin-section { padding-bottom: 15px; border-bottom: 1px solid #444; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
         .hidden { display: none !important; }
         .admin-input { padding: 10px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; width: 100%; box-sizing: border-box; }
         .btn-admin-login { background: #555; color: #fff; padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; width: 100%; }
-        .btn-svuota { background: #ff4d4d; color: #fff; padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 5px; }
-        .btn-esci { background: transparent; color: #ff4d4d; border: none; cursor: pointer; text-decoration: underline; }
-
-        #messages { flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
         
-        /* Struttura Messaggi */
+        #messages { flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
         .msg-container { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
         .msg { background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 12px; flex-grow: 1; max-width: 85%; border-left: 4px solid #00d4ff; word-break: break-word; }
         .msg strong { color: #00d4ff; display: block; font-size: 0.85rem; text-transform: uppercase; }
-        
-        /* Stili speciali per fonti diverse */
-        .msg.twitch { border-left: 4px solid #9146FF; }
-        .msg.twitch strong { color: #9146FF; }
         .msg.admin { border-left: 4px solid #ff0055; background: rgba(255, 0, 85, 0.15); }
         .msg.admin strong { color: #ff0055; }
-        
         .btn-elimina-msg { background: #ff4d4d; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; font-size: 0.9rem; align-self: center; }
         .gestione-attiva .btn-elimina-msg { display: block; }
 
-        .btn-verifica { background: #888; color: #fff; padding: 15px; border-radius: 20px; border: none; font-weight: bold; width: 100%; transition: 0.3s; }
-        .btn-verifica:disabled { cursor: not-allowed; opacity: 0.8; }
-        #input-area { display: none; gap: 10px; margin-top: 10px; }
+        /* --- STILI LOGIN UTENTI --- */
+        .auth-container { display: flex; flex-direction: column; gap: 15px; justify-content: center; height: 100%; }
+        .btn-login { background: #00d4ff; color: #000; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .btn-login:hover { background: #00b8e6; }
+        .btn-whatsapp { background: #25D366; color: #fff; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; text-decoration: none; text-align: center; }
+        
+        #chat-interface { display: none; flex-direction: column; height: 100%; }
+        #input-area { display: flex; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body id="main-body">
@@ -67,6 +62,7 @@
 
     <div class="container">
         
+        <!-- SEZIONE ADMIN DJ -->
         <div id="login-admin-area" class="admin-section">
              <div style="display:flex; gap:10px;">
                  <input type="password" id="passInputChat" class="admin-input" placeholder="Password DJ">
@@ -75,30 +71,44 @@
         </div>
 
         <div id="controlli-admin-area" class="admin-section hidden">
-            <h4 style="color:#ff4d4d; margin: 0 0 10px 0; text-align:center;">🔴 PANNELLO CONTROLLO DJ</h4>
-            <button onclick="svuotaChatGlobale()" class="btn-svuota">💣 SVUOTA TUTTA LA CHAT</button>
-            <button onclick="chiudiAdminChat()" class="btn-esci">Esci dalla modalità DJ</button>
+            <h4 style="color:#ff4d4d; margin: 0 0 10px 0; text-align:center;">🔴 PANNELLO DJ</h4>
+            <button onclick="window.svuotaChatGlobale()" style="background: #ff4d4d; color: #fff; padding: 10px; border-radius: 10px; border: none; cursor: pointer; width: 100%; margin-bottom: 5px;">💣 SVUOTA CHAT</button>
+            <button onclick="chiudiAdminChat()" style="background: transparent; color: #ff4d4d; border: none; cursor: pointer; text-decoration: underline;">Esci dalla modalità DJ</button>
         </div>
 
-        <div id="messages"></div>
-        
-        <div id="verifica-container">
-            <div id="form-attivazione" style="display:flex; flex-direction:column; gap:10px;">
-                <input type="text" id="nick-scelto" placeholder="Inserisci un nickname per attivare la chat" style="padding:15px; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:1rem;">
-                <button id="btn-attivazione" onclick="inviaRichiestaWhatsApp()" class="btn-verifica" disabled>Minimo 3 caratteri</button>
+        <!-- SCHERMATA LOGIN -->
+        <div id="verifica-container" class="auth-container">
+            <h3 style="text-align: center; color: #00d4ff; margin-top: 0;">Accesso Chat VIP</h3>
+            
+            <input type="text" id="user-input" placeholder="Nome Utente" class="admin-input">
+            <input type="password" id="pass-input" placeholder="Password" class="admin-input">
+            <button id="btn-login-custom" class="btn-login">Accedi</button>
+            
+            <div style="text-align: center; margin: 15px 0; border-bottom: 1px solid #444; line-height: 0.1em;">
+                <span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Non hai i dati?</span>
+            </div>
+            
+            <button onclick="richiediAccountWhatsApp()" class="btn-whatsapp">📲 Richiedi Account via WhatsApp</button>
+            <button id="btn-google-login" style="background: #fff; color: #000; padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px;">O entra con Google</button>
+        </div>
+
+        <!-- INTERFACCIA CHAT -->
+        <div id="chat-interface">
+            <div id="messages"></div>
+            <div id="input-area">
+                <input type="text" id="messageInput" placeholder="Scrivi messaggio..." style="flex-grow:1; padding:15px; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:1rem;" autocomplete="off">
+                <button id="sendBtn" style="background:#ff0055; color:#fff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">INVIA</button>
+                <button id="btnLogout" title="Disconnettiti" style="background:#444; color:#fff; border:none; padding:10px; border-radius:10px; cursor:pointer;">🚪</button>
             </div>
         </div>
 
-        <div id="input-area">
-            <input type="text" id="messageInput" placeholder="Scrivi messaggio..." style="flex-grow:1; padding:15px; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:1rem;" autocomplete="off">
-            <button id="sendBtn" style="background:#ff0055; color:#fff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">INVIA</button>
-        </div>
     </div>
 </div>
 
-<script type="module">
+<script id="codice-credenziali" type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M",
@@ -112,24 +122,85 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    let isUserVerified = urlParams.get('verified') === 'true';
-    let currentNickname = isUserVerified ? urlParams.get('user') : null;
+    let currentUserNick = null;
     let isAdminActive = false;
 
-    // --- LOGICA ADMIN ---
+    // --- RICHIESTA ACCOUNT WHATSAPP ---
+    window.richiediAccountWhatsApp = () => {
+        const nickScelto = prompt("Con che nome utente vorresti farti chiamare in chat?");
+        if (nickScelto) {
+            const messaggio = `Ciao Rossi DJ, vorrei registrarmi alla live chat. Il nome utente che vorrei è: ${nickScelto}`;
+            window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
+        }
+    };
+
+    // --- LOGIN CON USERNAME E PASSWORD ---
+    document.getElementById('btn-login-custom').addEventListener('click', () => {
+        let username = document.getElementById('user-input').value.trim();
+        const password = document.getElementById('pass-input').value.trim();
+
+        if (username && password) {
+            // Rimuoviamo gli spazi e lo forziamo a minuscolo per evitare errori
+            username = username.toLowerCase().replace(/\s/g, '');
+            // Creiamo l'email fittizia
+            const fakeEmail = `${username}@rossidj.it`;
+
+            signInWithEmailAndPassword(auth, fakeEmail, password)
+                .catch((error) => {
+                    console.error("Errore:", error);
+                    alert("Nome utente o password errati!");
+                });
+        } else {
+            alert("Inserisci Nome Utente e Password");
+        }
+    });
+
+    // --- LOGIN CON GOOGLE (Opzionale, mantenuto per comodità) ---
+    document.getElementById('btn-google-login').addEventListener('click', () => {
+        signInWithPopup(auth, googleProvider).catch(err => alert("Errore Google"));
+    });
+
+    // --- GESTIONE LOGOUT ---
+    document.getElementById('btnLogout').addEventListener('click', () => {
+        signOut(auth);
+    });
+
+    // --- CONTROLLO STATO UTENTE ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Estrae il nome utente dall'email (togliendo @rossidj.it)
+            currentUserNick = user.displayName || user.email.split('@')[0];
+            attivaChatWeb();
+        } else {
+            currentUserNick = null;
+            disattivaChatWeb();
+        }
+    });
+
+    function attivaChatWeb() {
+        document.getElementById('verifica-container').style.display = 'none';
+        document.getElementById('chat-interface').style.display = 'flex';
+    }
+
+    function disattivaChatWeb() {
+        document.getElementById('verifica-container').style.display = 'flex';
+        document.getElementById('chat-interface').style.display = 'none';
+        document.getElementById('user-input').value = '';
+        document.getElementById('pass-input').value = '';
+    }
+
+    // --- LOGICA ADMIN (Rossi DJ) ---
     window.sbloccaAdminChat = () => {
         if(document.getElementById('passInputChat').value === 'Screb/735') {
             document.getElementById('login-admin-area').classList.add('hidden');
             document.getElementById('controlli-admin-area').classList.remove('hidden');
             document.getElementById('main-body').classList.add('gestione-attiva');
-            
-            // Attiva i poteri di scrittura come RossiDJ
             isAdminActive = true;
-            currentNickname = 'RossiDJ';
-            document.getElementById('verifica-container').style.display = 'none';
-            document.getElementById('input-area').style.display = 'flex';
+            currentUserNick = 'RossiDJ';
+            attivaChatWeb();
         } else {
             alert('Password Errata!');
         }
@@ -140,180 +211,58 @@
         document.getElementById('controlli-admin-area').classList.add('hidden');
         document.getElementById('main-body').classList.remove('gestione-attiva');
         document.getElementById('passInputChat').value = '';
-        
         isAdminActive = false;
-        
-        // Ripristina lo stato precedente (se era verificato come utente normale o meno)
-        if (isUserVerified) {
-            currentNickname = urlParams.get('user');
-        } else {
-            currentNickname = null;
-            document.getElementById('verifica-container').style.display = 'block';
-            document.getElementById('input-area').style.display = 'none';
-        }
-    };
-
-    window.eliminaSingoloMessaggio = (messageId) => {
-        if(confirm("Vuoi eliminare questo messaggio?")) {
-            remove(ref(db, 'messages/' + messageId)).catch(err => alert("Errore: " + err));
-        }
+        if (auth.currentUser) { currentUserNick = auth.currentUser.email.split('@')[0]; } 
+        else { disattivaChatWeb(); }
     };
 
     window.svuotaChatGlobale = () => {
-        if(confirm("ATTENZIONE! Eliminare TUTTI i messaggi? L'operazione è irreversibile.")) {
-            if(confirm("Confermi lo svuotamento totale?")) {
-                remove(ref(db, 'messages')).then(() => {
-                    document.getElementById('messages').innerHTML = ''; 
-                    nomiRegistrati.clear(); 
-                    alert("Chat svuotata!");
-                });
-            }
+        if(confirm("Svuotare tutta la chat? L'operazione è irreversibile.")) {
+            remove(ref(db, 'messages')).then(() => {
+                document.getElementById('messages').innerHTML = ''; 
+                alert("Chat svuotata!");
+            });
         }
     };
 
-    // --- SISTEMA CENSURA ---
-    const paroleVietate = [
-        "dio", "madonna", "cristo", "gesu", "d1o", "m4donna", "cr1sto", "porco", "p0rco", 
-        "diocane", "dioporco", "diocan", "bostia", "ostia", "madon", "crist", "dioc", "diop",
-        "cazzo", "cazz0", "minchia", "stronzo", "stronz0", "puttana", "troia", "troi4", 
-        "vaffanculo", "vaffa", "fanculo", "merda", "scemo", "idiota", "bastardo", "coglione", 
-        "frocio", "negro", "culo", "figa", "fica", "mignotta", "sborra", "pompa", "figa de", 
-        "testa de", "mona", "m0na", "bocia", "pirla", "vacca", "vacca boia", "pota", "ciula"
-    ];
+    // --- MESSAGGI ---
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
-    function censuraTesto(testo) {
-        let testoPulito = testo;
-        paroleVietate.forEach(parola => {
-            const regex = new RegExp("\\b" + parola + "\\b", "gi");
-            testoPulito = testoPulito.replace(regex, "***");
-        });
-        return testoPulito;
+    function sendMessage() {
+        const msgInput = document.getElementById('messageInput');
+        const text = msgInput.value.trim();
+        if(text && currentUserNick) {
+            push(ref(db, 'messages'), { user: currentUserNick, text: text, timestamp: Date.now(), source: isAdminActive ? 'admin' : 'web' });
+            msgInput.value = '';
+        }
     }
 
-    const nomiRegistrati = new Set();
-    const nickInput = document.getElementById('nick-scelto');
-    const btnAttivazione = document.getElementById('btn-attivazione');
-
-    // --- CARICAMENTO MESSAGGI ---
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val();
-        const messageId = snapshot.key; 
-        
-        if(data.user) nomiRegistrati.add(data.user.toLowerCase());
-        
         const wrapperDiv = document.createElement('div');
         wrapperDiv.className = 'msg-container';
-        wrapperDiv.id = 'msg-' + messageId; 
+        wrapperDiv.id = 'msg-' + snapshot.key; 
         
         const msgDiv = document.createElement('div');
-        
-        // Applica stili speciali se è Twitch o Admin
-        if (data.user === 'RossiDJ' || data.source === 'admin') {
-            msgDiv.className = 'msg admin';
-        } else if (data.source === 'twitch') {
-            msgDiv.className = 'msg twitch';
-        } else {
-            msgDiv.className = 'msg';
-        }
-        
+        msgDiv.className = (data.user.toLowerCase() === 'rossidj' || data.source === 'admin') ? 'msg admin' : 'msg';
         msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
         
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn-elimina-msg';
         deleteBtn.innerHTML = '🗑️';
-        deleteBtn.onclick = () => window.eliminaSingoloMessaggio(messageId);
+        deleteBtn.onclick = () => { if(confirm("Eliminare?")) remove(ref(db, 'messages/' + snapshot.key)); };
 
         wrapperDiv.appendChild(msgDiv);
         wrapperDiv.appendChild(deleteBtn);
-        
-        const containerMessaggi = document.getElementById('messages');
-        containerMessaggi.appendChild(wrapperDiv);
-        containerMessaggi.scrollTop = containerMessaggi.scrollHeight;
+        document.getElementById('messages').appendChild(wrapperDiv);
+        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
     });
 
     onChildRemoved(ref(db, 'messages'), (snapshot) => {
         const msgElement = document.getElementById('msg-' + snapshot.key);
         if (msgElement) msgElement.remove(); 
     });
-
-    // --- GESTIONE NICKNAME ---
-    nickInput.addEventListener('input', () => {
-        const nick = nickInput.value.trim();
-        const nickLower = nick.toLowerCase();
-
-        if (nick.length < 3) {
-            btnAttivazione.disabled = true;
-            btnAttivazione.style.background = '#888';
-            btnAttivazione.style.color = '#fff';
-            btnAttivazione.innerText = 'Minimo 3 caratteri';
-        } else if (nomiRegistrati.has(nickLower) || nickLower === 'rossidj') { // Blocca anche chi prova a chiamarsi RossiDJ
-            btnAttivazione.disabled = true;
-            btnAttivazione.style.background = '#ff0055'; 
-            btnAttivazione.style.color = '#fff';
-            btnAttivazione.innerText = '❌ Nome non disponibile';
-        } else {
-            btnAttivazione.disabled = false;
-            btnAttivazione.style.background = '#00ff00'; 
-            btnAttivazione.style.color = '#000';
-            btnAttivazione.innerText = 'Attiva per commentare ✅';
-        }
-    });
-
-    // --- SETUP INIZIALE ---
-    if(isUserVerified) {
-        document.getElementById('verifica-container').style.display = 'none';
-        document.getElementById('input-area').style.display = 'flex';
-    }
-
-    window.inviaRichiestaWhatsApp = () => {
-        const nick = nickInput.value.trim();
-        if(!btnAttivazione.disabled && nick.length >= 3) {
-            window.open(`https://wa.me/393466045298?text=Verifica:%20${encodeURIComponent(nick)}`, '_blank');
-        }
-    };
-
-// --- FUNZIONE SEND MESSAGGIO (SOSTITUISCI QUESTA NEL TUO FILE) ---
-    function sendMessage() {
-        const msgInput = document.getElementById('messageInput');
-        const msgTesto = msgInput.value.trim();
-        
-        // 1. Logica Token Blindato (senza toccare variabili globali esterne)
-        const secretKey = "RossiDJ_Music_2026!";
-        const urlParams = new URLSearchParams(window.location.search);
-        let nickVerificato = currentNickname; // Usa la variabile globale già esistente
-        
-        const token = urlParams.get('token');
-        if (token) {
-            try {
-                let decoded = atob(token.split('').reverse().join(''));
-                let nickDaToken = decoded.replace(secretKey, "");
-                if (nickDaToken) nickVerificato = nickDaToken;
-            } catch(e) { /* se il token è errato, usiamo il nick standard */ }
-        }
-
-        // 2. Controllo sicurezza: se non c'è nick (né da login né da token), blocca
-        if (!nickVerificato) {
-            alert("⚠️ Devi effettuare la verifica WhatsApp per poter scrivere!");
-            return;
-        }
-        
-        // 3. Invio al Database (usando la logica originale della tua pagina)
-        if(msgTesto && nickVerificato) {
-            push(ref(db, 'messages'), { 
-                user: nickVerificato, 
-                text: censuraTesto(msgTesto), 
-                timestamp: Date.now(), 
-                source: isAdminActive ? 'admin' : 'web' 
-            });
-            msgInput.value = '';
-        }
-    }
-
-    document.getElementById('sendBtn').addEventListener('click', sendMessage);
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-
 </script>
 </body>
 </html>
