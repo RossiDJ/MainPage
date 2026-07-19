@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Live Chat - Rossi DJ</title>
     <style>
         /* --- STILI BASE --- */
@@ -11,13 +11,15 @@
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
         .page-overlay { background: rgba(0, 0, 0, 0.75); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
         
+        /* HEADER CON POSITION RELATIVE PER IL TASTO LOGOUT */
         header { width: 100%; padding: 20px 0; background: rgba(0,0,0,0.85); text-align: center; border-bottom: 2px solid #ff0055; position: sticky; top: 0; z-index: 100; }
         .dot { height: 10px; width: 10px; background-color: #ff0055; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.2;} 100% {opacity: 1;} }
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .bottone-pagine { padding: 10px 25px; background: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s; }
         
-        .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 75vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
+        /* ALTEZZA E MARGINI MODIFICATI PER SMARTPHONE */
+        .container { width: 90%; max-width: 550px; margin: 20px auto 60px auto; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 65vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
         
         /* --- STILI ADMIN & MESSAGGI --- */
         .admin-section { padding-bottom: 15px; border-bottom: 1px solid #444; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
@@ -49,7 +51,10 @@
 <div class="bg-animato"></div>
 <div class="page-overlay">
     
-    <header>
+    <header style="position: relative;">
+        <!-- TASTO LOGOUT SPOSTATO QUI -->
+        <button id="btnLogout" style="position: absolute; right: 15px; top: 15px; background: #444; color: #fff; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; z-index: 101;">Logout</button>
+        
         <h1 style="color:#ff0055; margin:0; display:flex; justify-content:center; align-items:center; gap: 10px;">
             <span class="dot"></span> LIVE CHAT
         </h1>
@@ -95,17 +100,17 @@
         <!-- INTERFACCIA CHAT -->
         <div id="chat-interface">
             <div id="messages"></div>
+            <!-- ZONA INPUT -->
             <div id="input-area">
                 <input type="text" id="messageInput" placeholder="Scrivi messaggio..." style="flex-grow:1; padding:15px; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:1rem;" autocomplete="off">
                 <button id="sendBtn" style="background:#ff0055; color:#fff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">INVIA</button>
-                <button id="btnLogout" title="Disconnettiti" style="background:#444; color:#fff; border:none; padding:10px; border-radius:10px; cursor:pointer;">🚪</button>
             </div>
         </div>
 
     </div>
 </div>
 
-<script id="codice-credenziali" type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -128,13 +133,25 @@
     let currentUserNick = null;
     let isAdminActive = false;
 
-    // --- RICHIESTA ACCOUNT WHATSAPP ---
+    // --- RICHIESTA ACCOUNT WHATSAPP AUTOMATIZZATA ---
     window.richiediAccountWhatsApp = () => {
         const nickScelto = prompt("Con che nome utente vorresti farti chiamare in chat?");
-        if (nickScelto) {
-            const messaggio = `Ciao Rossi DJ, vorrei registrarmi alla live chat. Il nome utente che vorrei è: ${nickScelto}`;
-            window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
+        if (!nickScelto) return;
+        
+        const passScelta = prompt("Scegli una password per il tuo account (minimo 6 caratteri):");
+        if (!passScelta || passScelta.length < 6) {
+            alert("La password deve essere di almeno 6 caratteri!");
+            return;
         }
+
+        // Rimuoviamo gli spazi dall'username
+        const usernamePulito = nickScelto.toLowerCase().replace(/\s/g, '');
+        
+        // Uniamo le stringhe e le codifichiamo in Base64 (es: bHVjYWRqOm11c2ljYTEyMw==)
+        const datiCodificati = btoa(`${usernamePulito}:${passScelta}`);
+        
+        const messaggio = `CREA_ACCOUNT:${datiCodificati}`;
+        window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
     };
 
     // --- LOGIN CON USERNAME E PASSWORD ---
@@ -143,9 +160,7 @@
         const password = document.getElementById('pass-input').value.trim();
 
         if (username && password) {
-            // Rimuoviamo gli spazi e lo forziamo a minuscolo per evitare errori
             username = username.toLowerCase().replace(/\s/g, '');
-            // Creiamo l'email fittizia
             const fakeEmail = `${username}@rossidj.it`;
 
             signInWithEmailAndPassword(auth, fakeEmail, password)
@@ -158,7 +173,7 @@
         }
     });
 
-    // --- LOGIN CON GOOGLE (Opzionale, mantenuto per comodità) ---
+    // --- LOGIN CON GOOGLE ---
     document.getElementById('btn-google-login').addEventListener('click', () => {
         signInWithPopup(auth, googleProvider).catch(err => alert("Errore Google"));
     });
@@ -171,7 +186,6 @@
     // --- CONTROLLO STATO UTENTE ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Estrae il nome utente dall'email (togliendo @rossidj.it)
             currentUserNick = user.displayName || user.email.split('@')[0];
             attivaChatWeb();
         } else {
@@ -183,6 +197,7 @@
     function attivaChatWeb() {
         document.getElementById('verifica-container').style.display = 'none';
         document.getElementById('chat-interface').style.display = 'flex';
+        document.getElementById('btnLogout').style.display = 'block'; // Mostra Tasto Logout
     }
 
     function disattivaChatWeb() {
@@ -190,6 +205,7 @@
         document.getElementById('chat-interface').style.display = 'none';
         document.getElementById('user-input').value = '';
         document.getElementById('pass-input').value = '';
+        document.getElementById('btnLogout').style.display = 'none'; // Nascondi Tasto Logout
     }
 
     // --- LOGICA ADMIN (Rossi DJ) ---
