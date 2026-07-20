@@ -5,21 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Live Chat - Rossi DJ</title>
     <style>
-        /* --- STILI BASE --- */
-        body, html { margin: 0; padding: 0; min-height: 100%; overflow-x: hidden; font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; color: #fff; }
-        .bg-animato { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: 0; animation: respiroSfondo 20s ease-in-out infinite alternate; }
-        @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-        .page-overlay { background: rgba(0, 0, 0, 0.75); min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        /* --- STILI BASE E LAYOUT --- */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100%; 
+            overflow-x: hidden; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: #121212; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
         
-        /* HEADER CON POSITION RELATIVE PER IL TASTO LOGOUT */
+        /* --- INIZIO EFFETTO SFONDO ANIMATO --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('flx10live1.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; 
+            animation: respiroSfondo 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes respiroSfondo {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+        /* --- FINE EFFETTO SFONDO ANIMATO --- */
+        
+        /* HEADER */
         header { width: 100%; padding: 20px 0; background: rgba(0,0,0,0.85); text-align: center; border-bottom: 2px solid #ff0055; position: sticky; top: 0; z-index: 100; }
         .dot { height: 10px; width: 10px; background-color: #ff0055; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.2;} 100% {opacity: 1;} }
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .bottone-pagine { padding: 10px 25px; background: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s; }
         
-        /* ALTEZZA E MARGINI MODIFICATI PER SMARTPHONE */
-        .container { width: 90%; max-width: 550px; margin: 20px auto 60px auto; background: rgba(0, 0, 0, 0.85); padding: 25px; border-radius: 20px; border: 2px solid #ff0055; height: 65vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
+        /* CONTAINER PRINCIPALE */
+        .container { 
+            width: 90%; 
+            max-width: 550px; 
+            margin: 20px auto 60px auto; 
+            background: rgba(0, 0, 0, 0.75); 
+            padding: 25px; 
+            border-radius: 20px; 
+            border: 1px solid #444; 
+            height: 65vh; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            position: relative; 
+            z-index: 1; 
+        }
         
         /* --- STILI ADMIN & MESSAGGI --- */
         .admin-section { padding-bottom: 15px; border-bottom: 1px solid #444; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
@@ -27,7 +71,10 @@
         .admin-input { padding: 10px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; width: 100%; box-sizing: border-box; }
         .btn-admin-login { background: #555; color: #fff; padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; width: 100%; }
         
-        #messages { flex-grow: 1; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
+        /* MODIFICA: flex: 1 e min-height: 0 per evitare che la chat esca dal contenitore */
+        #chat-interface { display: none; flex-direction: column; flex: 1; min-height: 0; }
+        #messages { flex: 1; min-height: 0; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
+        
         .msg-container { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
         .msg { background: rgba(0, 0, 0, 0.6); padding: 10px 15px; border-radius: 12px; flex-grow: 1; max-width: 85%; border-left: 4px solid #00d4ff; word-break: break-word; }
         .msg strong { color: #00d4ff; display: block; font-size: 0.85rem; text-transform: uppercase; }
@@ -41,18 +88,16 @@
         .btn-login { background: #00d4ff; color: #000; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
         .btn-login:hover { background: #00b8e6; }
         .btn-whatsapp { background: #25D366; color: #fff; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; text-decoration: none; text-align: center; }
+        .btn-recupero { background: #ff4d4d; color: #fff; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; text-align: center; }
+        .btn-google { background: #4285F4; color: #fff; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
         
-        #chat-interface { display: none; flex-direction: column; height: 100%; }
         #input-area { display: flex; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body id="main-body">
 
-<div class="bg-animato"></div>
-<div class="page-overlay">
-    
     <header style="position: relative;">
-        <!-- TASTO LOGOUT SPOSTATO QUI -->
+        <!-- TASTO LOGOUT -->
         <button id="btnLogout" style="position: absolute; right: 15px; top: 15px; background: #444; color: #fff; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; z-index: 101;">Logout</button>
         
         <h1 style="color:#ff0055; margin:0; display:flex; justify-content:center; align-items:center; gap: 10px;">
@@ -90,11 +135,23 @@
             <button id="btn-login-custom" class="btn-login">Accedi</button>
             
             <div style="text-align: center; margin: 15px 0; border-bottom: 1px solid #444; line-height: 0.1em;">
-                <span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Non hai i dati?</span>
+                <span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Gestione Account</span>
             </div>
             
-            <button onclick="richiediAccountWhatsApp()" class="btn-whatsapp">📲 Richiedi Account via WhatsApp</button>
-            <button id="btn-google-login" style="background: #fff; color: #000; padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px;">O entra con Google</button>
+            <button onclick="richiediAccountWhatsApp()" class="btn-whatsapp">📲 Registrati via WhatsApp</button>
+            <button onclick="recuperaCredenzialiWhatsApp()" class="btn-recupero">🔴 Recupera Credenziali</button>
+            
+            <div style="text-align: center; margin: 15px 0; border-bottom: 1px solid #444; line-height: 0.1em;">
+                <span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Oppure</span>
+            </div>
+
+            <!-- TASTO GOOGLE -->
+            <button id="btn-google-login" class="btn-google">
+                <svg width="20" height="20" viewBox="0 0 48 48">
+                    <path fill="#ffffff" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                </svg>
+                Entra con Google
+            </button>
         </div>
 
         <!-- INTERFACCIA CHAT -->
@@ -108,7 +165,6 @@
         </div>
 
     </div>
-</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -144,13 +200,15 @@
             return;
         }
 
-        // Rimuoviamo gli spazi dall'username
         const usernamePulito = nickScelto.toLowerCase().replace(/\s/g, '');
-        
-        // Uniamo le stringhe e le codifichiamo in Base64 (es: bHVjYWRqOm11c2ljYTEyMw==)
         const datiCodificati = btoa(`${usernamePulito}:${passScelta}`);
-        
         const messaggio = `CREA_ACCOUNT:${datiCodificati}`;
+        window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
+    };
+
+    // --- RECUPERA CREDENZIALI WHATSAPP ---
+    window.recuperaCredenzialiWhatsApp = () => {
+        const messaggio = `RECUPERO_ACCOUNT`;
         window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
     };
 
@@ -197,7 +255,7 @@
     function attivaChatWeb() {
         document.getElementById('verifica-container').style.display = 'none';
         document.getElementById('chat-interface').style.display = 'flex';
-        document.getElementById('btnLogout').style.display = 'block'; // Mostra Tasto Logout
+        document.getElementById('btnLogout').style.display = 'block';
     }
 
     function disattivaChatWeb() {
@@ -205,7 +263,7 @@
         document.getElementById('chat-interface').style.display = 'none';
         document.getElementById('user-input').value = '';
         document.getElementById('pass-input').value = '';
-        document.getElementById('btnLogout').style.display = 'none'; // Nascondi Tasto Logout
+        document.getElementById('btnLogout').style.display = 'none';
     }
 
     // --- LOGICA ADMIN (Rossi DJ) ---
@@ -254,6 +312,7 @@
         }
     }
 
+    // MODIFICA: Inversione dell'ordine dei messaggi
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val();
         const wrapperDiv = document.createElement('div');
@@ -271,8 +330,9 @@
 
         wrapperDiv.appendChild(msgDiv);
         wrapperDiv.appendChild(deleteBtn);
-        document.getElementById('messages').appendChild(wrapperDiv);
-        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        
+        // Usiamo prepend() per posizionare il messaggio in alto
+        document.getElementById('messages').prepend(wrapperDiv);
     });
 
     onChildRemoved(ref(db, 'messages'), (snapshot) => {

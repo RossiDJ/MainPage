@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galleria - Rossi DJ</title>
+    <style>
+        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background-color: #121212; color: #fff; }
+        
+        /* Sfondo Animato Corretto (si adatta e non sparisce) */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background-image: url('flx10live1.jpg'); background-size: cover; background-position: center;
+            z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate;
+        }
+        @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+        
+        /* Header con effetto trasparenza e vetro */
+        header { 
+            width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.4); 
+            text-align: center; border-bottom: 2px solid #9900ff; backdrop-filter: blur(5px); 
+        }
+        .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
+        .btn-nav { padding: 10px 20px; background: #9900ff; color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
+        
+        /* Container con effetto trasparenza e vetro */
+        .container { 
+            width: 90%; max-width: 800px; margin: 20px auto; 
+            background: rgba(0, 0, 0, 0.5); padding: 25px; border-radius: 20px; 
+            border: 1px solid #444; backdrop-filter: blur(8px); 
+        }
+        
+        /* Griglia e Card */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: #222; padding: 10px; border-radius: 10px; border: 1px solid #444; text-align: center; cursor: pointer; transition: transform 0.2s; }
+        .card:hover { transform: scale(1.05); border-color: #00d4ff; }
+        .card img, .card video { border-radius: 5px; object-fit: cover; max-height: 150px; width: 100%; pointer-events: none; }
+        .card-title { font-size: 0.9rem; margin-top: 8px; color: #00d4ff; font-weight: bold; word-wrap: break-word; }
+        
+        /* Pulsanti e Input */
+        .btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px; background: #9900ff; color: #fff; }
+        .btn-danger { background: #ff0055; }
+        .btn-success { background: #00cc66; }
+        input, select { padding: 8px; background: #222; color: #fff; border: 1px solid #555; border-radius: 5px; margin: 5px; }
+        
+        /* Pannello Admin */
+        #admin-panel { border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; background: rgba(0,0,0,0.9); border-radius: 10px; }
+        .admin-row { display: flex; align-items: center; gap: 10px; background: #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .admin-row img, .admin-row video { max-height: 50px; border-radius: 5px; }
+        .section-box { border: 1px dashed #777; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+
+        /* Lightbox Modal per ingrandire foto e video */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95); justify-content: center; align-items: center; flex-direction: column;
+        }
+        .modal-content { max-width: 90%; max-height: 80vh; border-radius: 10px; box-shadow: 0 0 20px rgba(0,212,255,0.5); }
+        .close-btn { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; cursor: pointer; font-weight: bold; transition: color 0.2s; }
+        .close-btn:hover { color: #ff0055; }
+        .modal-title { color: #00d4ff; margin-top: 15px; font-size: 1.5rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- Lightbox Modal (Nascosto di default) -->
+    <div id="mediaModal" class="modal">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div id="modalMediaContainer"></div>
+        <div id="modalTitle" class="modal-title"></div>
+    </div>
+
+    <header>
+        <h1 style="color:#9900ff; margin:0;">📸 GALLERIA EVENTI</h1>
+        <div class="nav-buttons">
+            <a href="index.html" class="btn-nav">🏠 Home</a>
+            <a href="live-chat.html" class="btn-nav">💬 Live Chat</a>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Login Area -->
+        <div id="login-box" class="section-box" style="text-align: center;">
+            <h3>Accedi per caricare contenuti</h3>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="pass" placeholder="Password">
+            <br>
+            <button class="btn" onclick="loginEmail()">Login</button>
+            <button class="btn" style="background:#4285F4;" onclick="loginGoogle()">Accedi con Google</button>
+        </div>
+
+        <!-- Upload Area (Visibile solo ai loggati) -->
+        <div id="upload-box" class="section-box" style="display:none; text-align: center;">
+            <input type="text" id="photoTitle" placeholder="Titolo foto/video (Opzionale)">
+            <input type="file" id="fileInput" accept="image/*,video/*">
+            <button class="btn" style="background:#00d4ff; color:#000;" onclick="uploadFile()">Carica File</button>
+        </div>
+
+        <!-- Login DJ -->
+        <div style="margin-top:20px; text-align: right;">
+            <input type="password" id="adminPass" placeholder="Password DJ">
+            <button class="btn btn-danger" onclick="checkAdmin()">Pannello DJ</button>
+        </div>
+        
+        <!-- Pannello Amministratore DJ -->
+        <div id="admin-panel">
+            <h2 style="color:#ff0055; margin-top:0;">🔴 Moderazione DJ</h2>
+            
+            <div class="section-box">
+                <h4>📁 Gestione Cartelle</h4>
+                <input type="text" id="newAlbumName" placeholder="Nuovo nome cartella...">
+                <button class="btn" onclick="aggiungiCartella()">Crea Cartella</button>
+                <br><br>
+                Rinomina esistente: 
+                <select id="renameFolderSelect"></select>
+                <input type="text" id="renameFolderInput" placeholder="Nuovo nome...">
+                <button class="btn btn-success" onclick="rinominaCartella()">Rinomina</button>
+            </div>
+
+            <h3>⏳ In Attesa di Approvazione</h3>
+            <div id="pending-queue">Nessun file in attesa.</div>
+            
+            <h3>✅ Archivio Pubblico (Modifica/Sposta/Elimina)</h3>
+            <div id="approved-queue"></div>
+        </div>
+
+        <!-- Filtro Pubblico -->
+        <div style="margin-top:20px; background: rgba(34, 34, 34, 0.8); padding: 10px; border-radius: 10px;">
+            <label style="font-weight: bold;">Filtra per Evento:</label> 
+            <select id="filterSelect" onchange="renderPublicGallery()">
+                <option value="Home" selected>Home</option>
+                <option value="Tutti">Mostra Tutti</option>
+            </select>
+        </div>
+
+        <!-- Griglia Galleria Pubblica -->
+        <div id="gallery" class="grid"></div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+    // --- CONFIGURAZIONE FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M",
+        authDomain: "rossidj-chat.firebaseapp.com",
+        databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "rossidj-chat",
+        storageBucket: "rossidj-chat.firebasestorage.app",
+        messagingSenderId: "247840582286",
+        appId: "1:247840582286:web:5320cff622ffc8ab9377df"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    let galleryData = {};
+    let customFolders = new Set(["Home", "Generale"]);
+
+    // --- AUTENTICAZIONE ---
+    window.loginEmail = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value).catch(e => alert(e.message));
+    window.loginGoogle = () => signInWithPopup(auth, provider).catch(e => alert(e.message));
+
+    onAuthStateChanged(auth, (user) => {
+        document.getElementById('login-box').style.display = user ? 'none' : 'block';
+        document.getElementById('upload-box').style.display = user ? 'block' : 'none';
+    });
+
+    // --- UPLOAD CLOUDINARY ---
+    window.uploadFile = async () => {
+        const file = document.getElementById('fileInput').files[0];
+        const title = document.getElementById('photoTitle').value || "Senza Titolo";
+        if (!file) return alert("Seleziona un file!");
+
+        const fd = new FormData(); 
+        fd.append("file", file); 
+        fd.append("upload_preset", "daapprovare");
+
+        try {
+            const res = await fetch("https://api.cloudinary.com/v1_1/fyiatbs6/upload", { method: "POST", body: fd });
+            const data = await res.json();
+            push(ref(db, 'gallery'), { 
+                url: data.secure_url, 
+                type: file.type.includes('video') ? 'video' : 'image', 
+                status: 'pending', 
+                album: 'Home',
+                title: title,
+                uploader: auth.currentUser ? auth.currentUser.email : 'Sconosciuto'
+            });
+            alert("Caricato con successo! In attesa di approvazione.");
+            document.getElementById('photoTitle').value = ""; 
+        } catch (error) {
+            alert("Errore durante l'upload.");
+        }
+    };
+
+    // --- LETTURA DATI IN TEMPO REALE ---
+    onValue(ref(db, 'gallery'), (snap) => {
+        galleryData = snap.val() || {};
+        aggiornaListaCartelle();
+        renderPublicGallery();
+        renderAdmin();
+    });
+
+    function aggiornaListaCartelle() {
+        customFolders = new Set(["Home", "Generale"]);
+        Object.values(galleryData).forEach(item => { if(item.album) customFolders.add(item.album); });
+        
+        const currentFilter = document.getElementById('filterSelect').value;
+        let filterHtml = '<option value="Tutti">Mostra Tutti</option>';
+        customFolders.forEach(folder => { filterHtml += `<option value="${folder}">${folder}</option>`; });
+        document.getElementById('filterSelect').innerHTML = filterHtml;
+        document.getElementById('filterSelect').value = currentFilter || 'Home';
+
+        let renameHtml = '';
+        customFolders.forEach(folder => { renameHtml += `<option value="${folder}">${folder}</option>`; });
+        document.getElementById('renameFolderSelect').innerHTML = renameHtml;
+    }
+
+    // --- RENDER GALLERIA PUBBLICA E LIGHTBOX ---
+    window.renderPublicGallery = () => {
+        const gal = document.getElementById('gallery');
+        const filter = document.getElementById('filterSelect').value;
+        gal.innerHTML = '';
+        
+        Object.keys(galleryData).forEach(id => {
+            const item = galleryData[id];
+            if(item.status === 'approved' && (filter === 'Tutti' || item.album === filter)) {
+                const safeTitle = (item.title || 'Senza Titolo').replace(/'/g, "\\'");
+                const media = item.type === 'video' 
+                    ? `<video src="${item.url}"></video>` 
+                    : `<img src="${item.url}">`;
+                
+                gal.innerHTML += `
+                    <div class="card" onclick="openModal('${item.url}', '${item.type}', '${safeTitle}')">
+                        ${media}
+                        <div class="card-title">🔍 ${item.title || 'Senza Titolo'}</div>
+                    </div>`;
+            }
+        });
+    };
+
+    // Funzioni Lightbox (Modal)
+    window.openModal = (url, type, title) => {
+        const modal = document.getElementById('mediaModal');
+        const container = document.getElementById('modalMediaContainer');
+        document.getElementById('modalTitle').innerText = title;
+        
+        if (type === 'video') {
+            container.innerHTML = `<video src="${url}" class="modal-content" controls autoplay></video>`;
+        } else {
+            container.innerHTML = `<img src="${url}" class="modal-content">`;
+        }
+        modal.style.display = 'flex';
+    };
+
+    window.closeModal = () => {
+        document.getElementById('mediaModal').style.display = 'none';
+        document.getElementById('modalMediaContainer').innerHTML = ''; // Rimuove il video in riproduzione
+    };
+
+    // --- RENDER PANNELLO DJ ---
+    window.renderAdmin = () => {
+        const pendingDiv = document.getElementById('pending-queue');
+        const approvedDiv = document.getElementById('approved-queue');
+        pendingDiv.innerHTML = '';
+        approvedDiv.innerHTML = '';
+
+        let folderOptions = '';
+        customFolders.forEach(f => folderOptions += `<option value="${f}">${f}</option>`);
+
+        Object.keys(galleryData).forEach(id => {
+            const item = galleryData[id];
+            const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`;
+            
+            const htmlRow = `
+                <div class="admin-row">
+                    ${media}
+                    <input type="text" id="title-${id}" value="${item.title || 'Senza Titolo'}" placeholder="Nome foto">
+                    <select id="sel-${id}">
+                        <option value="${item.album}" selected>In: ${item.album}</option>
+                        ${folderOptions}
+                    </select>
+                    <button class="btn btn-success" onclick="gestisciSingolo('${id}', 'approve')">✅ Salva</button>
+                    <button class="btn btn-danger" onclick="gestisciSingolo('${id}', 'delete')">❌ Elimina</button>
+                </div>`;
+                
+            if(item.status === 'pending') pendingDiv.innerHTML += htmlRow;
+            else approvedDiv.innerHTML += htmlRow;
+        });
+
+        if(pendingDiv.innerHTML === '') pendingDiv.innerHTML = '<p>Nessun file in attesa.</p>';
+    };
+    
+    // --- FUNZIONI DI GESTIONE DJ ---
+    window.checkAdmin = () => {
+        if(document.getElementById('adminPass').value === 'Screb/735') {
+            document.getElementById('admin-panel').style.display = 'block';
+        } else { alert("Password DJ errata!"); }
+    };
+
+    window.gestisciSingolo = (id, action) => {
+        if (action === 'delete') {
+            if(confirm("Sei sicuro di voler eliminare questo file?")) remove(ref(db, 'gallery/' + id));
+        } else {
+            const nuovoTitolo = document.getElementById(`title-${id}`).value;
+            const nuovoAlbum = document.getElementById(`sel-${id}`).value;
+            update(ref(db, 'gallery/' + id), { status: 'approved', album: nuovoAlbum, title: nuovoTitolo });
+        }
+    };
+
+    window.aggiungiCartella = () => {
+        const nome = document.getElementById('newAlbumName').value.trim();
+        if(nome && !customFolders.has(nome)) {
+            customFolders.add(nome);
+            aggiornaListaCartelle(); 
+            renderAdmin(); 
+            alert("Cartella creata! Ora puoi selezionarla dai menu a tendina delle foto.");
+            document.getElementById('newAlbumName').value = "";
+        }
+    };
+
+    window.rinominaCartella = async () => {
+        const oldName = document.getElementById('renameFolderSelect').value;
+        const newName = document.getElementById('renameFolderInput').value.trim();
+        
+        if(!newName || oldName === newName) return alert("Inserisci un nuovo nome valido!");
+        if(confirm(`Spostare tutti i file da "${oldName}" a "${newName}"?`)) {
+            const updates = {};
+            Object.keys(galleryData).forEach(id => {
+                if(galleryData[id].album === oldName) {
+                    updates[`gallery/${id}/album`] = newName;
+                }
+            });
+            await update(ref(db), updates);
+            document.getElementById('renameFolderInput').value = "";
+            alert("Cartella rinominata con successo!");
+        }
+    };
+</script>
+</body>
+</html>
