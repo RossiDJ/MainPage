@@ -15,7 +15,7 @@
         }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
         
-        /* Header con effetto trasparenza e vetro */
+        /* Header */
         header { 
             width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.4); 
             text-align: center; border-bottom: 2px solid #9900ff; backdrop-filter: blur(5px); 
@@ -23,14 +23,14 @@
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
         .btn-nav { padding: 10px 20px; background: #9900ff; color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
         
-        /* Container principale trasparente */
+        /* Container principale */
         .container { 
             width: 90%; max-width: 800px; margin: 20px auto; 
             background: rgba(0, 0, 0, 0.4); padding: 25px; border-radius: 20px; 
             border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); 
         }
         
-        /* Box interni (Login, Upload, Filtro) trasparenti */
+        /* Box interni */
         .section-box { 
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1); 
@@ -38,7 +38,7 @@
             backdrop-filter: blur(5px);
         }
         
-        /* Griglia e Card trasparenti */
+        /* Griglia e Card */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
         .card { 
             background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 10px; 
@@ -48,6 +48,21 @@
         .card:hover { transform: scale(1.05); border-color: #00d4ff; background: rgba(0, 0, 0, 0.5); }
         .card img, .card video { border-radius: 5px; object-fit: cover; max-height: 150px; width: 100%; pointer-events: none; }
         .card-title { font-size: 0.9rem; margin-top: 8px; color: #00d4ff; font-weight: bold; word-wrap: break-word; }
+
+        /* --- NUOVO: Stile per le Cartelle Eventi --- */
+        .event-folder {
+            background: linear-gradient(135deg, rgba(153, 0, 255, 0.4), rgba(0, 212, 255, 0.4));
+            padding: 20px 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.3);
+            text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 120px; backdrop-filter: blur(5px);
+        }
+        .event-folder:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,212,255,0.4); }
+        .event-folder-icon { font-size: 3rem; margin-bottom: 10px; }
+        .event-folder-title { font-weight: bold; font-size: 1.1rem; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        .folders-container { margin-top: 40px; border-top: 2px dashed rgba(255,255,255,0.2); padding-top: 20px; }
+        .folders-container h3 { text-align: center; color: #00d4ff; font-size: 1.5rem; margin-bottom: 10px; }
+        /* ------------------------------------------- */
         
         /* Pulsanti e Input */
         .btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px; background: #9900ff; color: #fff; }
@@ -55,7 +70,7 @@
         .btn-success { background: #00cc66; }
         input, select { padding: 8px; background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid #555; border-radius: 5px; margin: 5px; }
         
-        /* Pannello Admin trasparente */
+        /* Pannello Admin */
         #admin-panel { 
             border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; 
             background: rgba(0, 0, 0, 0.5); border-radius: 10px; backdrop-filter: blur(8px);
@@ -80,7 +95,6 @@
 </head>
 <body>
 
-    <!-- Lightbox Modal -->
     <div id="mediaModal" class="modal">
         <span class="close-btn" onclick="closeModal()">&times;</span>
         <div id="modalMediaContainer"></div>
@@ -143,7 +157,7 @@
         </div>
 
         <!-- Filtro Pubblico -->
-        <div class="section-box" style="margin-top:20px; padding: 10px; text-align: center;">
+        <div class="section-box" id="filtriAncora" style="margin-top:20px; padding: 10px; text-align: center;">
             <label style="font-weight: bold;">Filtra per Evento:</label> 
             <select id="filterSelect" onchange="renderPublicGallery()">
                 <option value="Home" selected>Home</option>
@@ -177,7 +191,7 @@
     const provider = new GoogleAuthProvider();
     
     let galleryData = {};
-    let customFolders = new Set(["Home", "Generale"]); // Il Set non viene più resettato brutalmente
+    let customFolders = new Set(["Home", "Generale"]);
 
     // --- AUTENTICAZIONE ---
     window.loginEmail = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value).catch(e => alert(e.message));
@@ -188,7 +202,7 @@
         document.getElementById('upload-box').style.display = user ? 'block' : 'none';
     });
 
-    // --- UPLOAD CLOUDINARY ---
+    // --- UPLOAD ---
     window.uploadFile = async () => {
         const file = document.getElementById('fileInput').files[0];
         const title = document.getElementById('photoTitle').value || "Senza Titolo";
@@ -202,21 +216,15 @@
             const res = await fetch("https://api.cloudinary.com/v1_1/fyiatbs6/upload", { method: "POST", body: fd });
             const data = await res.json();
             push(ref(db, 'gallery'), { 
-                url: data.secure_url, 
-                type: file.type.includes('video') ? 'video' : 'image', 
-                status: 'pending', 
-                album: 'Home',
-                title: title,
-                uploader: auth.currentUser ? auth.currentUser.email : 'Sconosciuto'
+                url: data.secure_url, type: file.type.includes('video') ? 'video' : 'image', 
+                status: 'pending', album: 'Home', title: title
             });
             alert("Caricato con successo! In attesa di approvazione.");
             document.getElementById('photoTitle').value = ""; 
-        } catch (error) {
-            alert("Errore durante l'upload.");
-        }
+        } catch (error) { alert("Errore durante l'upload."); }
     };
 
-    // --- LETTURA DATI IN TEMPO REALE ---
+    // --- DATI REALTIME ---
     onValue(ref(db, 'gallery'), (snap) => {
         galleryData = snap.val() || {};
         aggiornaListaCartelle();
@@ -224,16 +232,10 @@
         renderAdmin();
     });
 
-    // --- IL FIX È QUI! Non resettiamo più customFolders ---
     function aggiornaListaCartelle() {
-        // Aggiungiamo sempre i valori base
         customFolders.add("Home");
         customFolders.add("Generale");
-        
-        // Aggiungiamo le cartelle presenti nel database senza cancellare quelle appena create
-        Object.values(galleryData).forEach(item => { 
-            if(item.album) customFolders.add(item.album); 
-        });
+        Object.values(galleryData).forEach(item => { if(item.album) customFolders.add(item.album); });
         
         const currentFilter = document.getElementById('filterSelect').value;
         let filterHtml = '<option value="Tutti">Mostra Tutti</option>';
@@ -246,42 +248,70 @@
         document.getElementById('renameFolderSelect').innerHTML = renameHtml;
     }
 
-    // --- RENDER GALLERIA PUBBLICA E LIGHTBOX ---
+    // --- RENDER GALLERIA PUBBLICA ---
     window.renderPublicGallery = () => {
         const gal = document.getElementById('gallery');
         const filter = document.getElementById('filterSelect').value;
-        gal.innerHTML = '';
+        let photosHtml = '';
         
+        // Disegna le foto/video
         Object.keys(galleryData).forEach(id => {
             const item = galleryData[id];
             if(item.status === 'approved' && (filter === 'Tutti' || item.album === filter)) {
                 const safeTitle = (item.title || 'Senza Titolo').replace(/'/g, "\\'");
-                const media = item.type === 'video' 
-                    ? `<video src="${item.url}"></video>` 
-                    : `<img src="${item.url}">`;
+                const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`;
                 
-                gal.innerHTML += `
+                photosHtml += `
                     <div class="card" onclick="openModal('${item.url}', '${item.type}', '${safeTitle}')">
                         ${media}
                         <div class="card-title">🔍 ${item.title || 'Senza Titolo'}</div>
                     </div>`;
             }
         });
+
+        // Disegna le cartelle/eventi in fondo (visibili solo se siamo in Home o Tutti)
+        let foldersHtml = '';
+        if (filter === 'Home' || filter === 'Tutti') {
+            customFolders.forEach(folder => {
+                if (folder !== 'Home' && folder !== 'Generale') {
+                    foldersHtml += `
+                        <div class="event-folder" onclick="apriCartellaEvento('${folder}')">
+                            <div class="event-folder-icon">🎟️</div>
+                            <div class="event-folder-title">${folder}</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Assembla tutto
+        gal.innerHTML = photosHtml;
+        if (foldersHtml !== '') {
+            gal.innerHTML += `
+                <div style="grid-column: 1 / -1;" class="folders-container">
+                    <h3>📅 Altri Eventi</h3>
+                    <div class="grid" style="margin-top:10px;">
+                        ${foldersHtml}
+                    </div>
+                </div>
+            `;
+        }
     };
 
+    // Funzione per cliccare sulla cartella e filtrare
+    window.apriCartellaEvento = (nomeCartella) => {
+        document.getElementById('filterSelect').value = nomeCartella;
+        renderPublicGallery();
+        document.getElementById('filtriAncora').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    // Modal
     window.openModal = (url, type, title) => {
-        const modal = document.getElementById('mediaModal');
         const container = document.getElementById('modalMediaContainer');
         document.getElementById('modalTitle').innerText = title;
-        
-        if (type === 'video') {
-            container.innerHTML = `<video src="${url}" class="modal-content" controls autoplay></video>`;
-        } else {
-            container.innerHTML = `<img src="${url}" class="modal-content">`;
-        }
-        modal.style.display = 'flex';
+        container.innerHTML = type === 'video' ? `<video src="${url}" class="modal-content" controls autoplay></video>` : `<img src="${url}" class="modal-content">`;
+        document.getElementById('mediaModal').style.display = 'flex';
     };
-
     window.closeModal = () => {
         document.getElementById('mediaModal').style.display = 'none';
         document.getElementById('modalMediaContainer').innerHTML = ''; 
@@ -291,8 +321,7 @@
     window.renderAdmin = () => {
         const pendingDiv = document.getElementById('pending-queue');
         const approvedDiv = document.getElementById('approved-queue');
-        pendingDiv.innerHTML = '';
-        approvedDiv.innerHTML = '';
+        pendingDiv.innerHTML = ''; approvedDiv.innerHTML = '';
 
         let folderOptions = '';
         customFolders.forEach(f => folderOptions += `<option value="${f}">${f}</option>`);
@@ -322,9 +351,8 @@
     
     // --- FUNZIONI DI GESTIONE DJ ---
     window.checkAdmin = () => {
-        if(document.getElementById('adminPass').value === 'Screb/735') {
-            document.getElementById('admin-panel').style.display = 'block';
-        } else { alert("Password DJ errata!"); }
+        if(document.getElementById('adminPass').value === 'Screb/735') { document.getElementById('admin-panel').style.display = 'block'; } 
+        else { alert("Password DJ errata!"); }
     };
 
     window.gestisciSingolo = (id, action) => {
@@ -341,9 +369,8 @@
         const nome = document.getElementById('newAlbumName').value.trim();
         if(nome && !customFolders.has(nome)) {
             customFolders.add(nome);
-            aggiornaListaCartelle(); 
-            renderAdmin(); 
-            alert("Cartella creata! Ora puoi selezionarla dai menu a tendina delle foto.");
+            aggiornaListaCartelle(); renderAdmin(); renderPublicGallery();
+            alert("Cartella creata! Assicurati di approvare o spostare subito una foto in questa cartella per salvarla definitivamente.");
             document.getElementById('newAlbumName').value = "";
         }
     };
@@ -351,14 +378,11 @@
     window.rinominaCartella = async () => {
         const oldName = document.getElementById('renameFolderSelect').value;
         const newName = document.getElementById('renameFolderInput').value.trim();
-        
         if(!newName || oldName === newName) return alert("Inserisci un nuovo nome valido!");
         if(confirm(`Spostare tutti i file da "${oldName}" a "${newName}"?`)) {
             const updates = {};
             Object.keys(galleryData).forEach(id => {
-                if(galleryData[id].album === oldName) {
-                    updates[`gallery/${id}/album`] = newName;
-                }
+                if(galleryData[id].album === oldName) updates[`gallery/${id}/album`] = newName;
             });
             await update(ref(db), updates);
             document.getElementById('renameFolderInput').value = "";
