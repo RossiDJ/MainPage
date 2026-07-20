@@ -7,7 +7,7 @@
     <style>
         body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background-color: #121212; color: #fff; }
         
-        /* Sfondo Animato Corretto (si adatta e non sparisce) */
+        /* Sfondo Animato */
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
             background-image: url('flx10live1.jpg'); background-size: cover; background-position: center;
@@ -23,17 +23,29 @@
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
         .btn-nav { padding: 10px 20px; background: #9900ff; color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
         
-        /* Container con effetto trasparenza e vetro */
+        /* Container principale trasparente */
         .container { 
             width: 90%; max-width: 800px; margin: 20px auto; 
-            background: rgba(0, 0, 0, 0.5); padding: 25px; border-radius: 20px; 
-            border: 1px solid #444; backdrop-filter: blur(8px); 
+            background: rgba(0, 0, 0, 0.4); padding: 25px; border-radius: 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); 
         }
         
-        /* Griglia e Card */
+        /* Box interni (Login, Upload, Filtro) trasparenti */
+        .section-box { 
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 15px; border-radius: 10px; margin-bottom: 15px; 
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Griglia e Card trasparenti */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card { background: #222; padding: 10px; border-radius: 10px; border: 1px solid #444; text-align: center; cursor: pointer; transition: transform 0.2s; }
-        .card:hover { transform: scale(1.05); border-color: #00d4ff; }
+        .card { 
+            background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 10px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; cursor: pointer; 
+            transition: transform 0.2s; backdrop-filter: blur(5px); 
+        }
+        .card:hover { transform: scale(1.05); border-color: #00d4ff; background: rgba(0, 0, 0, 0.5); }
         .card img, .card video { border-radius: 5px; object-fit: cover; max-height: 150px; width: 100%; pointer-events: none; }
         .card-title { font-size: 0.9rem; margin-top: 8px; color: #00d4ff; font-weight: bold; word-wrap: break-word; }
         
@@ -41,15 +53,21 @@
         .btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px; background: #9900ff; color: #fff; }
         .btn-danger { background: #ff0055; }
         .btn-success { background: #00cc66; }
-        input, select { padding: 8px; background: #222; color: #fff; border: 1px solid #555; border-radius: 5px; margin: 5px; }
+        input, select { padding: 8px; background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid #555; border-radius: 5px; margin: 5px; }
         
-        /* Pannello Admin */
-        #admin-panel { border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; background: rgba(0,0,0,0.9); border-radius: 10px; }
-        .admin-row { display: flex; align-items: center; gap: 10px; background: #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        /* Pannello Admin trasparente */
+        #admin-panel { 
+            border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; 
+            background: rgba(0, 0, 0, 0.5); border-radius: 10px; backdrop-filter: blur(8px);
+        }
+        .admin-row { 
+            display: flex; align-items: center; gap: 10px; 
+            background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; 
+            margin-bottom: 10px; flex-wrap: wrap; border: 1px solid rgba(255, 255, 255, 0.1);
+        }
         .admin-row img, .admin-row video { max-height: 50px; border-radius: 5px; }
-        .section-box { border: 1px dashed #777; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
 
-        /* Lightbox Modal per ingrandire foto e video */
+        /* Lightbox Modal */
         .modal {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.95); justify-content: center; align-items: center; flex-direction: column;
@@ -62,7 +80,7 @@
 </head>
 <body>
 
-    <!-- Lightbox Modal (Nascosto di default) -->
+    <!-- Lightbox Modal -->
     <div id="mediaModal" class="modal">
         <span class="close-btn" onclick="closeModal()">&times;</span>
         <div id="modalMediaContainer"></div>
@@ -89,7 +107,7 @@
             <button class="btn" style="background:#4285F4;" onclick="loginGoogle()">Accedi con Google</button>
         </div>
 
-        <!-- Upload Area (Visibile solo ai loggati) -->
+        <!-- Upload Area -->
         <div id="upload-box" class="section-box" style="display:none; text-align: center;">
             <input type="text" id="photoTitle" placeholder="Titolo foto/video (Opzionale)">
             <input type="file" id="fileInput" accept="image/*,video/*">
@@ -125,7 +143,7 @@
         </div>
 
         <!-- Filtro Pubblico -->
-        <div style="margin-top:20px; background: rgba(34, 34, 34, 0.8); padding: 10px; border-radius: 10px;">
+        <div class="section-box" style="margin-top:20px; padding: 10px; text-align: center;">
             <label style="font-weight: bold;">Filtra per Evento:</label> 
             <select id="filterSelect" onchange="renderPublicGallery()">
                 <option value="Home" selected>Home</option>
@@ -157,8 +175,9 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+    
     let galleryData = {};
-    let customFolders = new Set(["Home", "Generale"]);
+    let customFolders = new Set(["Home", "Generale"]); // Il Set non viene più resettato brutalmente
 
     // --- AUTENTICAZIONE ---
     window.loginEmail = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value).catch(e => alert(e.message));
@@ -205,9 +224,16 @@
         renderAdmin();
     });
 
+    // --- IL FIX È QUI! Non resettiamo più customFolders ---
     function aggiornaListaCartelle() {
-        customFolders = new Set(["Home", "Generale"]);
-        Object.values(galleryData).forEach(item => { if(item.album) customFolders.add(item.album); });
+        // Aggiungiamo sempre i valori base
+        customFolders.add("Home");
+        customFolders.add("Generale");
+        
+        // Aggiungiamo le cartelle presenti nel database senza cancellare quelle appena create
+        Object.values(galleryData).forEach(item => { 
+            if(item.album) customFolders.add(item.album); 
+        });
         
         const currentFilter = document.getElementById('filterSelect').value;
         let filterHtml = '<option value="Tutti">Mostra Tutti</option>';
@@ -243,7 +269,6 @@
         });
     };
 
-    // Funzioni Lightbox (Modal)
     window.openModal = (url, type, title) => {
         const modal = document.getElementById('mediaModal');
         const container = document.getElementById('modalMediaContainer');
@@ -259,7 +284,7 @@
 
     window.closeModal = () => {
         document.getElementById('mediaModal').style.display = 'none';
-        document.getElementById('modalMediaContainer').innerHTML = ''; // Rimuove il video in riproduzione
+        document.getElementById('modalMediaContainer').innerHTML = ''; 
     };
 
     // --- RENDER PANNELLO DJ ---
