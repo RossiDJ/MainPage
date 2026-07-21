@@ -94,14 +94,16 @@
 
     <header style="position: relative;">
         <!-- TASTO NOTIFICHE (Sinistra) -->
-        <button id="btnNotifiche" onclick="toggleNotifications()" style="position: absolute; left: 15px; top: 15px; background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; z-index: 101; transition: 0.3s;">🔕 Notifiche OFF</button>
+        <button id="btnNotifiche" onclick="toggleNotifications()" style="position: absolute; left: 10px; top: 15px; background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; z-index: 101; transition: 0.3s; font-size: 0.85rem;">🔕 OFF</button>
         
         <!-- TASTO LOGOUT (Destra) -->
-        <button id="btnLogout" style="position: absolute; right: 15px; top: 15px; background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; z-index: 101; transition: 0.3s;">Logout</button>
+        <button id="btnLogout" style="position: absolute; right: 10px; top: 15px; background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; z-index: 101; transition: 0.3s; font-size: 0.85rem;">Esci</button>
         
-        <h1 style="color:#ff0055; margin:0; display:flex; justify-content:center; align-items:center; gap: 10px; text-shadow: 1px 1px 2px #000;">
+        <!-- TITOLO (con padding per non essere coperto dai tasti laterali) -->
+        <h1 style="color:#ff0055; margin:0; display:flex; justify-content:center; align-items:center; gap: 10px; text-shadow: 1px 1px 2px #000; padding: 0 80px; font-size: 1.5rem;">
             <span class="dot"></span> LIVE CHAT
         </h1>
+        
         <div class="nav-buttons">
             <a href="index.html" class="bottone-pagine">🏠 Home</a>
             <a href="richieste.html" class="bottone-pagine">🎶 Richieste</a>
@@ -187,9 +189,24 @@
     let currentUserNick = null;
     let isAdminActive = false;
     
-    // --- GESTIONE NOTIFICHE ---
+    // --- GESTIONE NOTIFICHE CON MEMORIA (LOCALSTORAGE) ---
     let pageLoadTime = Date.now();
-    window.notificationsEnabled = false;
+    
+    // Leggiamo la memoria per vedere se erano attive
+    window.notificationsEnabled = (localStorage.getItem('chatNotifiche') === 'true' && Notification.permission === "granted");
+
+    function updateNotificheBtn() {
+        const btn = document.getElementById('btnNotifiche');
+        if (window.notificationsEnabled) {
+            btn.innerHTML = "🔔 ON";
+            btn.style.backgroundColor = "rgba(0, 204, 102, 0.4)";
+            btn.style.borderColor = "#00cc66";
+        } else {
+            btn.innerHTML = "🔕 OFF";
+            btn.style.backgroundColor = "rgba(255,255,255,0.1)";
+            btn.style.borderColor = "rgba(255,255,255,0.2)";
+        }
+    }
 
     window.toggleNotifications = () => {
         if (!window.notificationsEnabled) {
@@ -200,20 +217,16 @@
             Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
                     window.notificationsEnabled = true;
-                    const btn = document.getElementById('btnNotifiche');
-                    btn.innerHTML = "🔔 Notifiche ON";
-                    btn.style.backgroundColor = "rgba(0, 204, 102, 0.4)";
-                    btn.style.borderColor = "#00cc66";
+                    localStorage.setItem('chatNotifiche', 'true'); // Salviamo in memoria
+                    updateNotificheBtn();
                 } else {
                     alert("Devi autorizzare le notifiche nelle impostazioni del browser.");
                 }
             });
         } else {
             window.notificationsEnabled = false;
-            const btn = document.getElementById('btnNotifiche');
-            btn.innerHTML = "🔕 Notifiche OFF";
-            btn.style.backgroundColor = "rgba(255,255,255,0.1)";
-            btn.style.borderColor = "rgba(255,255,255,0.2)";
+            localStorage.setItem('chatNotifiche', 'false'); // Salviamo in memoria
+            updateNotificheBtn();
         }
     };
 
@@ -247,6 +260,7 @@
         document.getElementById('chat-interface').style.display = 'flex'; 
         document.getElementById('btnLogout').style.display = 'block'; 
         document.getElementById('btnNotifiche').style.display = 'block'; 
+        updateNotificheBtn(); // Aggiorniamo il colore del tasto appena loggati
     }
     
     function disattivaChatWeb() { 
