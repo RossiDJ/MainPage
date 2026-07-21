@@ -7,62 +7,31 @@
     <style>
         /* --- STILI BASE E LAYOUT --- */
         body, html { 
-            margin: 0; 
-            padding: 0; 
-            min-height: 100%; 
-            overflow-x: hidden; 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background-color: #121212; 
-            color: #fff; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            margin: 0; padding: 0; min-height: 100%; overflow-x: hidden; 
+            font-family: 'Segoe UI', Arial, sans-serif; background-color: #121212; 
+            color: #fff; display: flex; flex-direction: column; align-items: center; 
         }
         
-        /* --- INIZIO EFFETTO SFONDO ANIMATO --- */
+        /* --- SFONDO ANIMATO --- */
         body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url('flx10live1.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: -1; 
-            animation: respiroSfondo 20s ease-in-out infinite alternate;
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url('flx10live1.jpg'); background-size: cover; background-position: center;
+            z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate;
         }
-
-        @keyframes respiroSfondo {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
-        }
-        /* --- FINE EFFETTO SFONDO ANIMATO --- */
+        @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
         
-        /* HEADER */
+        /* --- HEADER E CONTENITORE --- */
         header { width: 100%; padding: 20px 0; background: rgba(0,0,0,0.85); text-align: center; border-bottom: 2px solid #ff0055; position: sticky; top: 0; z-index: 100; }
         .dot { height: 10px; width: 10px; background-color: #ff0055; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
         @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.2;} 100% {opacity: 1;} }
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .bottone-pagine { padding: 10px 25px; background: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s; }
         
-        /* CONTAINER PRINCIPALE */
         .container { 
-            width: 90%; 
-            max-width: 550px; 
-            margin: 20px auto 60px auto; 
-            background: rgba(0, 0, 0, 0.75); 
-            padding: 25px; 
-            border-radius: 20px; 
-            border: 1px solid #444; 
-            height: 65vh; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
-            position: relative; 
-            z-index: 1; 
+            width: 90%; max-width: 550px; margin: 20px auto 60px auto; background: rgba(0, 0, 0, 0.75); 
+            padding: 25px; border-radius: 20px; border: 1px solid #444; height: 65vh; 
+            display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px); position: relative; z-index: 1; 
         }
         
         /* --- STILI ADMIN & MESSAGGI --- */
@@ -71,7 +40,6 @@
         .admin-input { padding: 10px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; width: 100%; box-sizing: border-box; }
         .btn-admin-login { background: #555; color: #fff; padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; width: 100%; }
         
-        /* MODIFICA: flex: 1 e min-height: 0 per evitare che la chat esca dal contenitore */
         #chat-interface { display: none; flex-direction: column; flex: 1; min-height: 0; }
         #messages { flex: 1; min-height: 0; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
         
@@ -82,6 +50,17 @@
         .msg.admin strong { color: #ff0055; }
         .btn-elimina-msg { background: #ff4d4d; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; font-size: 0.9rem; align-self: center; }
         .gestione-attiva .btn-elimina-msg { display: block; }
+
+        /* --- STILI LIKE CON ANIMAZIONE --- */
+        .like-btn-chat { 
+            cursor: pointer; display: inline-block; font-size: 0.9rem; 
+            background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 20px; 
+            margin-top: 5px; transition: transform 0.2s, background 0.2s; border: 1px solid #444;
+        }
+        .like-btn-chat:hover { background: rgba(255,0,85,0.2); }
+        .pulsate { animation: pulsate 0.5s ease-in-out; }
+        @keyframes pulsate { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+        .msg-footer { display: flex; justify-content: flex-end; }
 
         /* --- STILI LOGIN UTENTI --- */
         .auth-container { display: flex; flex-direction: column; gap: 15px; justify-content: center; height: 100%; }
@@ -97,7 +76,6 @@
 <body id="main-body">
 
     <header style="position: relative;">
-        <!-- TASTO LOGOUT -->
         <button id="btnLogout" style="position: absolute; right: 15px; top: 15px; background: #444; color: #fff; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; z-index: 101;">Logout</button>
         
         <h1 style="color:#ff0055; margin:0; display:flex; justify-content:center; align-items:center; gap: 10px;">
@@ -112,7 +90,6 @@
 
     <div class="container">
         
-        <!-- SEZIONE ADMIN DJ -->
         <div id="login-admin-area" class="admin-section">
              <div style="display:flex; gap:10px;">
                  <input type="password" id="passInputChat" class="admin-input" placeholder="Password DJ">
@@ -126,61 +103,36 @@
             <button onclick="chiudiAdminChat()" style="background: transparent; color: #ff4d4d; border: none; cursor: pointer; text-decoration: underline;">Esci dalla modalità DJ</button>
         </div>
 
-        <!-- SCHERMATA LOGIN -->
         <div id="verifica-container" class="auth-container">
             <h3 style="text-align: center; color: #00d4ff; margin-top: 0;">Accesso Chat VIP</h3>
-            
             <input type="text" id="user-input" placeholder="Nome Utente" class="admin-input">
             <input type="password" id="pass-input" placeholder="Password" class="admin-input">
             <button id="btn-login-custom" class="btn-login">Accedi</button>
             
-            <div style="text-align: center; margin: 15px 0; border-bottom: 1px solid #444; line-height: 0.1em;">
-                <span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Gestione Account</span>
-            </div>
+            <div style="text-align: center; margin: 15px 0; border-bottom: 1px solid #444; line-height: 0.1em;"><span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Gestione Account</span></div>
             
             <button onclick="richiediAccountWhatsApp()" class="btn-whatsapp">📲 Registrati via WhatsApp</button>
             <button onclick="recuperaCredenzialiWhatsApp()" class="btn-recupero">🔴 Recupera Credenziali</button>
             
-            <div style="text-align: center; margin: 15px 0; border-bottom: 1px solid #444; line-height: 0.1em;">
-                <span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Oppure</span>
-            </div>
-
-            <!-- TASTO GOOGLE -->
-            <button id="btn-google-login" class="btn-google">
-                <svg width="20" height="20" viewBox="0 0 48 48">
-                    <path fill="#ffffff" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                </svg>
-                Entra con Google
-            </button>
+            <div style="text-align: center; margin: 15px 0; border-bottom: 1px solid #444; line-height: 0.1em;"><span style="background: rgba(0,0,0,0.85); padding: 0 10px;">Oppure</span></div>
+            <button id="btn-google-login" class="btn-google">Entra con Google</button>
         </div>
 
-        <!-- INTERFACCIA CHAT -->
         <div id="chat-interface">
             <div id="messages"></div>
-            <!-- ZONA INPUT -->
             <div id="input-area">
                 <input type="text" id="messageInput" placeholder="Scrivi messaggio..." style="flex-grow:1; padding:15px; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:1rem;" autocomplete="off">
                 <button id="sendBtn" style="background:#ff0055; color:#fff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">INVIA</button>
             </div>
         </div>
-
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, remove, onChildRemoved, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M",
-        authDomain: "rossidj-chat.firebaseapp.com",
-        databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "rossidj-chat",
-        storageBucket: "rossidj-chat.firebasestorage.app",
-        messagingSenderId: "247840582286",
-        appId: "1:247840582286:web:5320cff622ffc8ab9377df"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M", authDomain: "rossidj-chat.firebaseapp.com", databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app", projectId: "rossidj-chat", storageBucket: "rossidj-chat.firebasestorage.app", messagingSenderId: "247840582286", appId: "1:247840582286:web:5320cff622ffc8ab9377df" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const auth = getAuth(app);
@@ -189,149 +141,114 @@
     let currentUserNick = null;
     let isAdminActive = false;
 
-    // --- RICHIESTA ACCOUNT WHATSAPP AUTOMATIZZATA ---
-    window.richiediAccountWhatsApp = () => {
-        const nickScelto = prompt("Con che nome utente vorresti farti chiamare in chat?");
-        if (!nickScelto) return;
-        
-        const passScelta = prompt("Scegli una password per il tuo account (minimo 6 caratteri):");
-        if (!passScelta || passScelta.length < 6) {
-            alert("La password deve essere di almeno 6 caratteri!");
-            return;
-        }
+    // --- AUTENTICAZIONE E LOGICA ACCOUNT ---
+    window.richiediAccountWhatsApp = () => { window.open(`https://wa.me/393466045298?text=Voglio%20creare%20un%20account`, '_blank'); };
+    window.recuperaCredenzialiWhatsApp = () => { window.open(`https://wa.me/393466045298?text=RECUPERO_ACCOUNT`, '_blank'); };
 
-        const usernamePulito = nickScelto.toLowerCase().replace(/\s/g, '');
-        const datiCodificati = btoa(`${usernamePulito}:${passScelta}`);
-        const messaggio = `CREA_ACCOUNT:${datiCodificati}`;
-        window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
-    };
-
-    // --- RECUPERA CREDENZIALI WHATSAPP ---
-    window.recuperaCredenzialiWhatsApp = () => {
-        const messaggio = `RECUPERO_ACCOUNT`;
-        window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
-    };
-
-    // --- LOGIN CON USERNAME E PASSWORD ---
     document.getElementById('btn-login-custom').addEventListener('click', () => {
         let username = document.getElementById('user-input').value.trim();
         const password = document.getElementById('pass-input').value.trim();
-
         if (username && password) {
-            username = username.toLowerCase().replace(/\s/g, '');
-            const fakeEmail = `${username}@rossidj.it`;
-
-            signInWithEmailAndPassword(auth, fakeEmail, password)
-                .catch((error) => {
-                    console.error("Errore:", error);
-                    alert("Nome utente o password errati!");
-                });
-        } else {
-            alert("Inserisci Nome Utente e Password");
-        }
+            signInWithEmailAndPassword(auth, `${username.toLowerCase().replace(/\s/g, '')}@rossidj.it`, password)
+                .catch(() => alert("Nome utente o password errati!"));
+        } else alert("Inserisci Nome Utente e Password");
     });
+    document.getElementById('btn-google-login').addEventListener('click', () => signInWithPopup(auth, googleProvider));
+    document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
 
-    // --- LOGIN CON GOOGLE ---
-    document.getElementById('btn-google-login').addEventListener('click', () => {
-        signInWithPopup(auth, googleProvider).catch(err => alert("Errore Google"));
-    });
-
-    // --- GESTIONE LOGOUT ---
-    document.getElementById('btnLogout').addEventListener('click', () => {
-        signOut(auth);
-    });
-
-    // --- CONTROLLO STATO UTENTE ---
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUserNick = user.displayName || user.email.split('@')[0];
-            attivaChatWeb();
-        } else {
-            currentUserNick = null;
-            disattivaChatWeb();
-        }
+        if (user) { currentUserNick = user.displayName || user.email.split('@')[0]; attivaChatWeb(); } 
+        else { currentUserNick = null; disattivaChatWeb(); }
     });
 
-    function attivaChatWeb() {
-        document.getElementById('verifica-container').style.display = 'none';
-        document.getElementById('chat-interface').style.display = 'flex';
-        document.getElementById('btnLogout').style.display = 'block';
-    }
+    function attivaChatWeb() { document.getElementById('verifica-container').style.display = 'none'; document.getElementById('chat-interface').style.display = 'flex'; document.getElementById('btnLogout').style.display = 'block'; }
+    function disattivaChatWeb() { document.getElementById('verifica-container').style.display = 'flex'; document.getElementById('chat-interface').style.display = 'none'; document.getElementById('btnLogout').style.display = 'none'; }
 
-    function disattivaChatWeb() {
-        document.getElementById('verifica-container').style.display = 'flex';
-        document.getElementById('chat-interface').style.display = 'none';
-        document.getElementById('user-input').value = '';
-        document.getElementById('pass-input').value = '';
-        document.getElementById('btnLogout').style.display = 'none';
-    }
-
-    // --- LOGICA ADMIN (Rossi DJ) ---
+    // --- LOGICA ADMIN E MESSAGGI ---
     window.sbloccaAdminChat = () => {
         if(document.getElementById('passInputChat').value === 'Screb/735') {
             document.getElementById('login-admin-area').classList.add('hidden');
             document.getElementById('controlli-admin-area').classList.remove('hidden');
             document.getElementById('main-body').classList.add('gestione-attiva');
-            isAdminActive = true;
-            currentUserNick = 'RossiDJ';
-            attivaChatWeb();
-        } else {
-            alert('Password Errata!');
-        }
+            isAdminActive = true; currentUserNick = 'RossiDJ'; attivaChatWeb();
+        } else alert('Password Errata!');
     };
-
     window.chiudiAdminChat = () => {
         document.getElementById('login-admin-area').classList.remove('hidden');
         document.getElementById('controlli-admin-area').classList.add('hidden');
         document.getElementById('main-body').classList.remove('gestione-attiva');
-        document.getElementById('passInputChat').value = '';
         isAdminActive = false;
-        if (auth.currentUser) { currentUserNick = auth.currentUser.email.split('@')[0]; } 
-        else { disattivaChatWeb(); }
+        if (auth.currentUser) currentUserNick = auth.currentUser.email.split('@')[0]; else disattivaChatWeb();
     };
+    window.svuotaChatGlobale = () => { if(confirm("Svuotare tutta la chat?")) { remove(ref(db, 'messages')).then(() => document.getElementById('messages').innerHTML = ''); } };
 
-    window.svuotaChatGlobale = () => {
-        if(confirm("Svuotare tutta la chat? L'operazione è irreversibile.")) {
-            remove(ref(db, 'messages')).then(() => {
-                document.getElementById('messages').innerHTML = ''; 
-                alert("Chat svuotata!");
-            });
-        }
-    };
-
-    // --- MESSAGGI ---
     document.getElementById('sendBtn').addEventListener('click', sendMessage);
     document.getElementById('messageInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
     function sendMessage() {
-        const msgInput = document.getElementById('messageInput');
-        const text = msgInput.value.trim();
+        const text = document.getElementById('messageInput').value.trim();
         if(text && currentUserNick) {
             push(ref(db, 'messages'), { user: currentUserNick, text: text, timestamp: Date.now(), source: isAdminActive ? 'admin' : 'web' });
-            msgInput.value = '';
+            document.getElementById('messageInput').value = '';
         }
     }
 
-    // MODIFICA: Inversione dell'ordine dei messaggi
+    // --- FUNZIONE LIKE MESSAGGI ---
+    window.mettiLikeMsg = (msgId, iconElement) => {
+        if (!auth.currentUser) return alert("Accedi per mettere like!");
+        const uid = auth.currentUser.uid.replace(/[^a-zA-Z0-9]/g, "");
+        const likeRef = ref(db, `messages/${msgId}/likes/${uid}`);
+        
+        iconElement.classList.remove('pulsate');
+        void iconElement.offsetWidth; // reset animazione
+        iconElement.classList.add('pulsate');
+        
+        onValue(likeRef, (snap) => {
+            if (snap.exists()) remove(likeRef);
+            else update(ref(db, `messages/${msgId}/likes`), {[uid]: true});
+        }, { onlyOnce: true });
+    };
+
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val();
+        const msgId = snapshot.key;
         const wrapperDiv = document.createElement('div');
         wrapperDiv.className = 'msg-container';
-        wrapperDiv.id = 'msg-' + snapshot.key; 
+        wrapperDiv.id = 'msg-' + msgId; 
         
         const msgDiv = document.createElement('div');
         msgDiv.className = (data.user.toLowerCase() === 'rossidj' || data.source === 'admin') ? 'msg admin' : 'msg';
-        msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
         
+        const textDiv = document.createElement('div');
+        textDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
+        
+        // Costruiamo il pulsante Like
+        const footerDiv = document.createElement('div');
+        footerDiv.className = 'msg-footer';
+        const likeBtn = document.createElement('div');
+        likeBtn.className = 'like-btn-chat';
+        likeBtn.innerHTML = `❤️ <span id="like-count-${msgId}">0</span>`;
+        likeBtn.onclick = () => mettiLikeMsg(msgId, likeBtn);
+        footerDiv.appendChild(likeBtn);
+
+        // Listener tempo reale SOLO per i like di questo messaggio
+        onValue(ref(db, `messages/${msgId}/likes`), (likeSnap) => {
+            const count = likeSnap.exists() ? Object.keys(likeSnap.val()).length : 0;
+            const counterElement = document.getElementById(`like-count-${msgId}`);
+            if (counterElement) counterElement.innerText = count;
+        });
+        
+        msgDiv.appendChild(textDiv);
+        msgDiv.appendChild(footerDiv);
+
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn-elimina-msg';
         deleteBtn.innerHTML = '🗑️';
-        deleteBtn.onclick = () => { if(confirm("Eliminare?")) remove(ref(db, 'messages/' + snapshot.key)); };
+        deleteBtn.onclick = () => { if(confirm("Eliminare?")) remove(ref(db, 'messages/' + msgId)); };
 
         wrapperDiv.appendChild(msgDiv);
         wrapperDiv.appendChild(deleteBtn);
         
-        // Usiamo prepend() per posizionare il messaggio in alto
         document.getElementById('messages').prepend(wrapperDiv);
     });
 
