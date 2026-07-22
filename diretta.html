@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>In Diretta - Rossi DJ</title>
+    <style>
+        /* --- STILI BASE E LAYOUT SPLIT --- */
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; color: #fff; overflow: hidden; }
+        
+        .main-layout { display: flex; height: 100vh; width: 100vw; flex-direction: row; }
+        
+        /* --- PARTE SINISTRA: PLAYER --- */
+        .player-section { flex: 7; position: relative; background-color: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 2px solid #ff0055; }
+        
+        /* Il contenitore che andrà in Fullscreen */
+        #video-wrapper { position: relative; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; }
+        
+        /* L'iframe del video (Mixcloud) */
+        #live-frame { width: 100%; height: 100%; border: none; z-index: 1; display: none; /* Nascosto di default finché la live non è ON */ }
+
+        /* Schermata Offline (Automatica) */
+        #offline-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; z-index: 2; flex-direction: column; }
+        .offline-box { background: rgba(0,0,0,0.8); padding: 30px; border-radius: 20px; border: 2px solid #ff0055; text-align: center; backdrop-filter: blur(5px); }
+
+        /* Tasto Home (Casetta) */
+        .btn-home { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.6); color: #00d4ff; text-decoration: none; font-size: 1.5rem; padding: 10px; border-radius: 50%; border: 2px solid #00d4ff; z-index: 10; transition: 0.3s; line-height: 1; }
+        .btn-home:hover { background: #00d4ff; color: #000; transform: scale(1.1); }
+
+        /* Tasto Fullscreen */
+        .btn-fullscreen-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 8px; cursor: pointer; z-index: 10; font-weight: bold; }
+        .btn-fullscreen-toggle:hover { background: rgba(255,0,85,0.8); border-color: #ff0055; }
+
+        /* --- UI IN SOVRIMPRESSIONE (Visibile solo in Fullscreen) --- */
+        #fs-overlay { display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
+        
+        #fs-chat-display { position: absolute; bottom: 20px; left: 20px; width: 60%; display: flex; flex-direction: column; gap: 5px; pointer-events: auto; }
+        .fs-msg { background: transparent; text-shadow: 1px 1px 3px rgba(0,0,0,1), -1px -1px 3px rgba(0,0,0,1); font-size: 1.1rem; line-height: 1.4; animation: fadeIn 0.3s ease-in-out; }
+        .fs-msg strong { color: #00d4ff; text-transform: uppercase; }
+
+        .fs-controls-right { position: absolute; bottom: 20px; right: 20px; pointer-events: auto; display: flex; align-items: flex-end; gap: 10px; }
+        
+        #fs-btn-open-chat { background: rgba(255,0,85,0.7); color: #fff; border: 2px solid #ff0055; font-size: 1.5rem; padding: 12px; border-radius: 50%; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s; }
+        #fs-btn-open-chat:hover { background: #ff0055; transform: scale(1.1); }
+
+        #fs-input-box { display: none; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px); align-items: center; gap: 8px; }
+        #fs-input-text { padding: 10px; border-radius: 10px; border: none; outline: none; background: rgba(255,255,255,0.9); width: 250px; font-size: 1rem; }
+        #fs-btn-send { background: #00d4ff; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        #fs-btn-close-chat { background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+
+        /* --- PARTE DESTRA: CHAT LATERALE (Desktop) --- */
+        .chat-section { flex: 3; background-color: rgba(18, 18, 18, 0.95); display: flex; flex-direction: column; position: relative; min-width: 300px; }
+        .chat-header { padding: 15px; background: rgba(0,0,0,0.8); text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #00d4ff; font-weight: bold; letter-spacing: 1px; }
+        #messages-sidebar { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .side-msg { background: rgba(0,0,0,0.6); padding: 10px; border-radius: 10px; border-left: 3px solid #00d4ff; font-size: 0.9rem; word-break: break-word; }
+        .side-msg strong { color: #00d4ff; display: block; font-size: 0.8rem; margin-bottom: 3px; }
+        
+        .chat-input-area { padding: 15px; background: rgba(0,0,0,0.8); border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; }
+        #side-input-text { flex: 1; padding: 12px; border-radius: 10px; border: none; background: #222; color: #fff; }
+        #side-btn-send { background: #ff0055; color: #fff; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .main-layout { flex-direction: column; }
+            .player-section { flex: 4; border-right: none; border-bottom: 2px solid #ff0055; }
+            .chat-section { flex: 6; min-width: 100%; }
+            #fs-input-text { width: 180px; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        
+        <!-- PARTE SINISTRA -->
+        <div id="video-wrapper" class="player-section">
+            <a href="index.html" class="btn-home" title="Torna alla Home">🏠</a>
+            <button class="btn-fullscreen-toggle" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
+
+            <!-- Schermata Offline Automatica -->
+            <div id="offline-screen">
+                <div class="offline-box">
+                    <h2 style="color: #ff0055; margin-top:0;">🔴 DIRETTA OFFLINE</h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">RossiDJ al momento non è in onda.</p>
+                    <p style="color: #00d4ff;">Resta nella chat a fare due chiacchiere,<br>o torna più tardi!</p>
+                </div>
+            </div>
+
+            <!-- IL TUO LINK FISSO (Andrà sostituito qui dentro src="" quando lo avrai da Mixcloud) -->
+            <iframe id="live-frame" src="https://www.youtube.com/embed/live_stream?channel=INSERISCI_ID_QUI" allow="autoplay; fullscreen"></iframe>
+
+            <!-- OVERLAY (Visibile solo in Fullscreen) -->
+            <div id="fs-overlay">
+                <div id="fs-chat-display"></div>
+                <div class="fs-controls-right">
+                    <button id="fs-btn-open-chat" onclick="openFsInput()">💬</button>
+                    <div id="fs-input-box">
+                        <input type="text" id="fs-input-text" placeholder="Scrivi un messaggio..." autocomplete="off">
+                        <button id="fs-btn-send" onclick="sendFsMessage()">Invia</button>
+                        <button id="fs-btn-close-chat" onclick="closeFsInput()">⤵️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PARTE DESTRA: CHAT LATERALE -->
+        <div class="chat-section">
+            <div class="chat-header">🔴 LIVE CHAT</div>
+            <div id="messages-sidebar"></div>
+            <div class="chat-input-area">
+                <input type="text" id="side-input-text" placeholder="Scrivi nella chat..." autocomplete="off">
+                <button id="side-btn-send" onclick="sendSideMessage()">INVIA</button>
+            </div>
+        </div>
+
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M", authDomain: "rossidj-chat.firebaseapp.com", databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app", projectId: "rossidj-chat", storageBucket: "rossidj-chat.firebasestorage.app", messagingSenderId: "247840582286", appId: "1:247840582286:web:5320cff622ffc8ab9377df" };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    let currentUserNick = null;
+    let ultimiMessaggi = [];
+
+    // --- AUTOMAZIONE: ONLINE / OFFLINE TRAMITE FIREBASE ---
+    onValue(ref(db, 'settings/liveStatus'), (snap) => {
+        const isLive = snap.val();
+        const frame = document.getElementById('live-frame');
+        const offlineScreen = document.getElementById('offline-screen');
+        const btnFs = document.getElementById('btn-fs');
+        
+        if(isLive) {
+            // Se la diretta è accesa nel Pannello DJ
+            frame.style.display = 'block';
+            offlineScreen.style.display = 'none';
+            btnFs.style.display = 'block'; // Mostra tasto fullscreen
+            // Ricarica l'iframe per assicurarsi che prenda lo stream dal vivo
+            frame.src = frame.src; 
+        } else {
+            // Se la diretta è spenta nel Pannello DJ
+            frame.style.display = 'none';
+            offlineScreen.style.display = 'flex';
+            btnFs.style.display = 'none'; // Nasconde tasto fullscreen (non serve se sei offline)
+            
+            // Se il DJ spegne la live mentre qualcuno è in fullscreen, lo fa uscire in automatico!
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) { 
+            currentUserNick = user.displayName || user.email.split('@')[0]; 
+            document.getElementById('side-input-text').placeholder = "Scrivi nella chat...";
+            document.getElementById('fs-input-text').placeholder = "Scrivi un messaggio...";
+        } else { 
+            currentUserNick = null; 
+            document.getElementById('side-input-text').placeholder = "Devi accedere per chattare!";
+            document.getElementById('fs-input-text').placeholder = "Devi accedere per chattare!";
+        }
+    });
+
+    function pubblicaMessaggio(testo) {
+        if (!currentUserNick) { alert("Torna alla Home ed effettua l'accesso alla Chat per poter scrivere!"); return; }
+        if (testo.trim() !== '') {
+            push(ref(db, 'messages'), { user: currentUserNick, text: testo.trim(), timestamp: Date.now(), source: 'web' });
+        }
+    }
+
+    window.sendSideMessage = () => {
+        const input = document.getElementById('side-input-text');
+        pubblicaMessaggio(input.value);
+        input.value = '';
+    };
+    document.getElementById('side-input-text').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.sendSideMessage(); });
+
+    window.sendFsMessage = () => {
+        const input = document.getElementById('fs-input-text');
+        pubblicaMessaggio(input.value);
+        input.value = '';
+        window.closeFsInput(); 
+    };
+    document.getElementById('fs-input-text').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.sendFsMessage(); });
+
+    onChildAdded(ref(db, 'messages'), (snapshot) => {
+        const data = snapshot.val();
+        
+        // Sidebar
+        const sideBox = document.getElementById('messages-sidebar');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'side-msg';
+        msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
+        sideBox.appendChild(msgDiv);
+        sideBox.scrollTop = sideBox.scrollHeight;
+
+        // Overlay Fullscreen
+        ultimiMessaggi.push(data);
+        if (ultimiMessaggi.length > 2) { ultimiMessaggi.shift(); }
+        
+        const fsBox = document.getElementById('fs-chat-display');
+        fsBox.innerHTML = '';
+        ultimiMessaggi.forEach(msg => {
+            const fsDiv = document.createElement('div');
+            fsDiv.className = 'fs-msg';
+            fsDiv.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}`;
+            fsBox.appendChild(fsDiv);
+        });
+    });
+
+    const videoWrapper = document.getElementById('video-wrapper');
+    const overlayUI = document.getElementById('fs-overlay');
+
+    window.toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            if (videoWrapper.requestFullscreen) { videoWrapper.requestFullscreen(); }
+            else if (videoWrapper.webkitRequestFullscreen) { videoWrapper.webkitRequestFullscreen(); } 
+            else if (videoWrapper.msRequestFullscreen) { videoWrapper.msRequestFullscreen(); } 
+        } else {
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+        }
+    };
+
+    document.addEventListener('fullscreenchange', handleFsChange);
+    document.addEventListener('webkitfullscreenchange', handleFsChange);
+    document.addEventListener('msfullscreenchange', handleFsChange);
+
+    function handleFsChange() {
+        if (document.fullscreenElement) {
+            overlayUI.style.display = 'block';
+            document.querySelector('.btn-home').style.display = 'none';
+            document.querySelector('.btn-fullscreen-toggle').style.display = 'none';
+        } else {
+            overlayUI.style.display = 'none';
+            document.querySelector('.btn-home').style.display = 'block';
+            document.querySelector('.btn-fullscreen-toggle').style.display = 'block';
+            window.closeFsInput(); 
+        }
+    }
+
+    window.openFsInput = () => {
+        document.getElementById('fs-btn-open-chat').style.display = 'none';
+        document.getElementById('fs-input-box').style.display = 'flex';
+        document.getElementById('fs-input-text').focus(); 
+    };
+
+    window.closeFsInput = () => {
+        document.getElementById('fs-input-box').style.display = 'none';
+        document.getElementById('fs-btn-open-chat').style.display = 'block';
+    };
+
+</script>
+</body>
+</html>

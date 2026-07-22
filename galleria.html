@@ -5,64 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galleria - Rossi DJ</title>
     <style>
-        /* Base e Sfondo animato */
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; overflow-x: hidden; }
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-image: url('flx10live1.jpg'); background-size: cover; background-position: center;
-            z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate;
-        }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate; }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-
-        /* Header */
         header { width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.75); text-align: center; border-bottom: 2px solid #9900ff; backdrop-filter: blur(4px); position: relative; z-index: 1; }
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
         .btn-nav { padding: 10px 20px; background: #9900ff; color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
-        
-        /* Container principale */
-        .container { 
-            width: 90%; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.75); 
-            padding: 25px; border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px); position: relative; z-index: 1;
-        }
-        
-        /* Box interni e Griglia */
+        .container { width: 90%; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.75); padding: 25px; border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); position: relative; z-index: 1; }
         .section-box { background: rgba(0, 0, 0, 0.5); border: 1px solid #444; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
         .card { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 10px; border: 1px solid #444; text-align: center; transition: transform 0.2s; }
         .card:hover { transform: scale(1.05); border-color: #00d4ff; background: rgba(0, 0, 0, 0.8); }
         .card img, .card video { border-radius: 5px; object-fit: cover; max-height: 150px; width: 100%; cursor: pointer; }
         .card-title { font-size: 0.9rem; margin-top: 8px; color: #00d4ff; font-weight: bold; word-wrap: break-word; }
-
-        /* Stile LIKE con ANIMAZIONE */
-        .like-btn { 
-            cursor: pointer; display: inline-block; font-size: 1.1rem; 
-            margin-top: 8px; background: rgba(0,0,0,0.5); padding: 5px 12px; 
-            border-radius: 20px; transition: background 0.2s; border: 1px solid #444; 
-        }
+        .like-btn { cursor: pointer; display: inline-block; font-size: 1.1rem; margin-top: 8px; background: rgba(0,0,0,0.5); padding: 5px 12px; border-radius: 20px; transition: background 0.2s; border: 1px solid #444; }
         .like-btn:hover { background: rgba(255,0,85,0.3); }
         .pulsate { animation: pulsate 0.5s ease-in-out; }
         @keyframes pulsate { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1); } }
-
-        /* Stile Cartelle */
         .event-folder { background: rgba(0, 0, 0, 0.6); padding: 20px 10px; border-radius: 15px; border: 1px solid #9900ff; text-align: center; cursor: pointer; transition: transform 0.2s, background 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 120px; }
         .event-folder:hover { transform: translateY(-5px); background: rgba(153, 0, 255, 0.3); }
         .event-folder-icon { font-size: 3rem; margin-bottom: 10px; }
         .event-folder-title { font-weight: bold; font-size: 1.1rem; color: #fff; }
         .folders-container { margin-top: 40px; border-top: 1px solid #444; padding-top: 20px; }
         .folders-container h3 { text-align: center; color: #00d4ff; font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase; }
-        
-        /* Controlli UI */
         .btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px; background: #00d4ff; color: #000; }
         .btn-danger { background: #ff0055; color: #fff; }
         .btn-success { background: #9900ff; color: #fff; }
         input, select { padding: 8px; background: #222; color: #fff; border: 1px solid #444; border-radius: 5px; margin: 5px; }
-        
         #admin-panel { border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; background: rgba(0, 0, 0, 0.8); border-radius: 10px; }
         .admin-row { display: flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 8px; margin-bottom: 10px; flex-wrap: wrap; border: 1px solid #444; }
         .admin-row img, .admin-row video { max-height: 50px; border-radius: 5px; }
-
-        /* Lightbox Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); justify-content: center; align-items: center; flex-direction: column; }
         .modal-content { max-width: 90%; max-height: 80vh; border-radius: 10px; box-shadow: 0 0 30px rgba(0,212,255,0.3); }
         .close-btn { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; cursor: pointer; font-weight: bold; transition: color 0.2s; }
@@ -72,11 +44,7 @@
 </head>
 <body>
 
-    <div id="mediaModal" class="modal">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <div id="modalMediaContainer"></div>
-        <div id="modalTitle" class="modal-title"></div>
-    </div>
+    <div id="mediaModal" class="modal"><span class="close-btn" onclick="closeModal()">&times;</span><div id="modalMediaContainer"></div><div id="modalTitle" class="modal-title"></div></div>
 
     <header>
         <h1 style="color:#00d4ff; margin:0; text-transform: uppercase;">📸 GALLERIA EVENTI</h1>
@@ -87,7 +55,6 @@
     </header>
 
     <div class="container">
-        
         <div id="login-box" class="section-box" style="text-align: center;">
             <h3>Accedi per caricare contenuti</h3>
             <input type="email" id="email" placeholder="Email">
@@ -96,7 +63,6 @@
             <button class="btn" style="background-color: #9900ff; color:#fff;" onclick="loginEmail()">Login</button>
             <button class="btn" style="background:#00d4ff; color:#000;" onclick="loginGoogle()">Accedi con Google</button>
         </div>
-
         <div id="upload-box" class="section-box" style="display:none; text-align: center;">
             <input type="text" id="photoTitle" placeholder="Titolo foto/video (Opzionale)">
             <input type="file" id="fileInput" accept="image/*,video/*">
@@ -127,18 +93,14 @@
 
         <div class="section-box" id="filtriAncora" style="margin-top:20px; text-align: center;">
             <label style="font-weight: bold;">Filtra per Evento:</label> 
-            <select id="filterSelect" onchange="renderPublicGallery()">
-                <option value="Home" selected>Home</option>
-                <option value="Tutti">Mostra Tutti</option>
-            </select>
+            <select id="filterSelect" onchange="renderPublicGallery()"><option value="Home" selected>Home</option><option value="Tutti">Mostra Tutti</option></select>
         </div>
-
         <div id="gallery" class="grid"></div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update, remove, get, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M", authDomain: "rossidj-chat.firebaseapp.com", databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app", projectId: "rossidj-chat", storageBucket: "rossidj-chat.firebasestorage.app", messagingSenderId: "247840582286", appId: "1:247840582286:web:5320cff622ffc8ab9377df" };
@@ -146,97 +108,51 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
-    
-    let galleryData = {};
-    let customFolders = new Set(["Home", "Generale"]);
+    let galleryData = {}; let customFolders = new Set(["Home", "Generale"]);
 
     window.loginEmail = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('pass').value).catch(e => alert(e.message));
     window.loginGoogle = () => signInWithPopup(auth, provider).catch(e => alert(e.message));
 
-    onAuthStateChanged(auth, (user) => {
-        document.getElementById('login-box').style.display = user ? 'none' : 'block';
-        document.getElementById('upload-box').style.display = user ? 'block' : 'none';
-    });
+    onAuthStateChanged(auth, (user) => { document.getElementById('login-box').style.display = user ? 'none' : 'block'; document.getElementById('upload-box').style.display = user ? 'block' : 'none'; });
 
     window.uploadFile = async () => {
-        const file = document.getElementById('fileInput').files[0];
-        const title = document.getElementById('photoTitle').value || "Senza Titolo";
+        const file = document.getElementById('fileInput').files[0]; const title = document.getElementById('photoTitle').value || "Senza Titolo";
         if (!file) return alert("Seleziona un file!");
         const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", "daapprovare");
-        try {
-            const res = await fetch("https://api.cloudinary.com/v1_1/fyiatbs6/upload", { method: "POST", body: fd });
-            const data = await res.json();
-            push(ref(db, 'gallery'), { url: data.secure_url, type: file.type.includes('video') ? 'video' : 'image', status: 'pending', album: 'Home', title: title });
-            alert("Caricato con successo!"); document.getElementById('photoTitle').value = ""; 
-        } catch (error) { alert("Errore durante l'upload."); }
+        try { const res = await fetch("https://api.cloudinary.com/v1_1/fyiatbs6/upload", { method: "POST", body: fd }); const data = await res.json(); push(ref(db, 'gallery'), { url: data.secure_url, type: file.type.includes('video') ? 'video' : 'image', status: 'pending', album: 'Home', title: title }); alert("Caricato con successo!"); document.getElementById('photoTitle').value = ""; } catch (error) { alert("Errore durante l'upload."); }
     };
 
-    onValue(ref(db, 'gallery'), (snap) => {
-        galleryData = snap.val() || {};
-        aggiornaListaCartelle(); renderPublicGallery(); renderAdmin();
-    });
+    onValue(ref(db, 'gallery'), (snap) => { galleryData = snap.val() || {}; aggiornaListaCartelle(); renderPublicGallery(); renderAdmin(); });
 
-    // --- FUNZIONE LIKE GALLERIA ---
     window.mettiLikeMedia = (mediaId, iconElement) => {
         if (!auth.currentUser) return alert("Accedi per mettere like!");
-        const uid = auth.currentUser.uid.replace(/[^a-zA-Z0-9]/g, "");
-        const likeRef = ref(db, `gallery/${mediaId}/likes/${uid}`);
-        
-        iconElement.classList.remove('pulsate');
-        void iconElement.offsetWidth;
-        iconElement.classList.add('pulsate');
-        
-        onValue(likeRef, (snap) => {
-            if (snap.exists()) remove(likeRef);
-            else update(ref(db, `gallery/${mediaId}/likes`), {[uid]: true});
-        }, { onlyOnce: true });
+        const uid = auth.currentUser.uid.replace(/[^a-zA-Z0-9]/g, ""); const likeRef = ref(db, `gallery/${mediaId}/likes/${uid}`);
+        iconElement.classList.remove('pulsate'); void iconElement.offsetWidth; iconElement.classList.add('pulsate');
+        onValue(likeRef, (snap) => { if (snap.exists()) remove(likeRef); else update(ref(db, `gallery/${mediaId}/likes`), {[uid]: true}); }, { onlyOnce: true });
     };
 
     function aggiornaListaCartelle() {
         customFolders.add("Home"); customFolders.add("Generale");
         Object.values(galleryData).forEach(item => { if(item.album) customFolders.add(item.album); });
         const currentFilter = document.getElementById('filterSelect').value;
-        let filterHtml = '<option value="Tutti">Mostra Tutti</option>';
-        customFolders.forEach(folder => { filterHtml += `<option value="${folder}">${folder}</option>`; });
+        let filterHtml = '<option value="Tutti">Mostra Tutti</option>'; customFolders.forEach(folder => { filterHtml += `<option value="${folder}">${folder}</option>`; });
         document.getElementById('filterSelect').innerHTML = filterHtml; document.getElementById('filterSelect').value = currentFilter || 'Home';
         let renameHtml = ''; customFolders.forEach(folder => { renameHtml += `<option value="${folder}">${folder}</option>`; });
         document.getElementById('renameFolderSelect').innerHTML = renameHtml;
     }
 
     window.renderPublicGallery = () => {
-        const gal = document.getElementById('gallery');
-        const filter = document.getElementById('filterSelect').value;
-        let photosHtml = '';
-        
+        const gal = document.getElementById('gallery'); const filter = document.getElementById('filterSelect').value; let photosHtml = '';
         Object.keys(galleryData).forEach(id => {
             const item = galleryData[id];
             if(item.status === 'approved' && (filter === 'Tutti' || item.album === filter)) {
-                const safeTitle = (item.title || 'Senza Titolo').replace(/'/g, "\\'");
-                const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`;
-                const likesCount = item.likes ? Object.keys(item.likes).length : 0;
-                
-                photosHtml += `
-                    <div class="card">
-                        <div onclick="openModal('${item.url}', '${item.type}', '${safeTitle}')">
-                            ${media}
-                            <div class="card-title">🔍 ${item.title || 'Senza Titolo'}</div>
-                        </div>
-                        <div class="like-btn" onclick="mettiLikeMedia('${id}', this)">❤️ ${likesCount}</div>
-                    </div>`;
+                const safeTitle = (item.title || 'Senza Titolo').replace(/'/g, "\\'"); const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`; const likesCount = item.likes ? Object.keys(item.likes).length : 0;
+                photosHtml += `<div class="card"><div onclick="openModal('${item.url}', '${item.type}', '${safeTitle}')">${media}<div class="card-title">🔍 ${item.title || 'Senza Titolo'}</div></div><div class="like-btn" onclick="mettiLikeMedia('${id}', this)">❤️ ${likesCount}</div></div>`;
             }
         });
-
         let foldersHtml = '';
-        if (filter === 'Home' || filter === 'Tutti') {
-            customFolders.forEach(folder => {
-                if (folder !== 'Home' && folder !== 'Generale') {
-                    foldersHtml += `<div class="event-folder" onclick="apriCartellaEvento('${folder}')"><div class="event-folder-icon">🎟️</div><div class="event-folder-title">${folder}</div></div>`;
-                }
-            });
-        }
-
-        gal.innerHTML = photosHtml;
-        if (foldersHtml !== '') gal.innerHTML += `<div style="grid-column: 1 / -1;" class="folders-container"><h3>📅 Altri Eventi</h3><div class="grid" style="margin-top:10px;">${foldersHtml}</div></div>`;
+        if (filter === 'Home' || filter === 'Tutti') { customFolders.forEach(folder => { if (folder !== 'Home' && folder !== 'Generale') { foldersHtml += `<div class="event-folder" onclick="apriCartellaEvento('${folder}')"><div class="event-folder-icon">🎟️</div><div class="event-folder-title">${folder}</div></div>`; } }); }
+        gal.innerHTML = photosHtml; if (foldersHtml !== '') gal.innerHTML += `<div style="grid-column: 1 / -1;" class="folders-container"><h3>📅 Altri Eventi</h3><div class="grid" style="margin-top:10px;">${foldersHtml}</div></div>`;
     };
 
     window.apriCartellaEvento = (nomeCartella) => { document.getElementById('filterSelect').value = nomeCartella; renderPublicGallery(); document.getElementById('filtriAncora').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
@@ -245,19 +161,27 @@
 
     window.renderAdmin = () => {
         const pendingDiv = document.getElementById('pending-queue'); const approvedDiv = document.getElementById('approved-queue');
-        pendingDiv.innerHTML = ''; approvedDiv.innerHTML = '';
-        let folderOptions = ''; customFolders.forEach(f => folderOptions += `<option value="${f}">${f}</option>`);
-
+        pendingDiv.innerHTML = ''; approvedDiv.innerHTML = ''; let folderOptions = ''; customFolders.forEach(f => folderOptions += `<option value="${f}">${f}</option>`);
         Object.keys(galleryData).forEach(id => {
-            const item = galleryData[id];
-            const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`;
+            const item = galleryData[id]; const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`;
             const htmlRow = `<div class="admin-row">${media}<input type="text" id="title-${id}" value="${item.title || 'Senza Titolo'}" placeholder="Nome foto"><select id="sel-${id}"><option value="${item.album}" selected>In: ${item.album}</option>${folderOptions}</select><button class="btn btn-success" onclick="gestisciSingolo('${id}', 'approve')">✅ Salva</button><button class="btn btn-danger" onclick="gestisciSingolo('${id}', 'delete')">❌ Elimina</button></div>`;
             if(item.status === 'pending') pendingDiv.innerHTML += htmlRow; else approvedDiv.innerHTML += htmlRow;
         });
         if(pendingDiv.innerHTML === '') pendingDiv.innerHTML = '<p>Nessun file in attesa.</p>';
     };
     
-    window.checkAdmin = () => { if(document.getElementById('adminPass').value === 'Screb/735') { document.getElementById('admin-panel').style.display = 'block'; } else { alert("Password DJ errata!"); } };
+    // --- NUOVO CONTROLLO PASSWORD ---
+    window.checkAdmin = () => { 
+        const inputPass = document.getElementById('adminPass').value;
+        get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
+            if(snapshot.exists() && snapshot.val() === inputPass) { 
+                document.getElementById('admin-panel').style.display = 'block'; 
+            } else { 
+                alert("Password DJ errata!"); 
+            } 
+        });
+    };
+    
     window.gestisciSingolo = (id, action) => { if (action === 'delete') { if(confirm("Eliminare file?")) remove(ref(db, 'gallery/' + id)); } else { update(ref(db, 'gallery/' + id), { status: 'approved', album: document.getElementById(`sel-${id}`).value, title: document.getElementById(`title-${id}`).value }); } };
     window.aggiungiCartella = () => { const nome = document.getElementById('newAlbumName').value.trim(); if(nome && !customFolders.has(nome)) { customFolders.add(nome); aggiornaListaCartelle(); renderAdmin(); renderPublicGallery(); alert("Cartella creata!"); document.getElementById('newAlbumName').value = ""; } };
     window.rinominaCartella = async () => { const oldName = document.getElementById('renameFolderSelect').value; const newName = document.getElementById('renameFolderInput').value.trim(); if(!newName || oldName === newName) return alert("Inserisci nome valido!"); if(confirm(`Spostare tutto da "${oldName}" a "${newName}"?`)) { const updates = {}; Object.keys(galleryData).forEach(id => { if(galleryData[id].album === oldName) updates[`gallery/${id}/album`] = newName; }); await update(ref(db), updates); document.getElementById('renameFolderInput').value = ""; alert("Cartella rinominata!"); } };

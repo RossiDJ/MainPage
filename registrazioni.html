@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vecchie Registrazioni - Rossi DJ</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; overflow-x: hidden; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate; }
+        @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        header { width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.75); text-align: center; border-bottom: 2px solid #ff9900; backdrop-filter: blur(4px); position: relative; z-index: 1; }
+        .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
+        .btn-nav { padding: 10px 20px; background: #ff9900; color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
+        
+        .container { width: 90%; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.75); padding: 25px; border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); position: relative; z-index: 1; }
+        
+        .section-box { background: rgba(0, 0, 0, 0.5); border: 1px solid #444; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        
+        /* Griglia delle registrazioni */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .card { background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 12px; border: 1px solid #444; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s; }
+        .card:hover { transform: translateY(-5px); border-color: #ff9900; background: rgba(0, 0, 0, 0.8); }
+        .card-title { font-size: 1.1rem; margin-bottom: 15px; color: #ff9900; font-weight: bold; word-wrap: break-word; }
+        
+        /* Controlli UI e Pannello DJ */
+        .btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px; background: #00d4ff; color: #000; }
+        .btn-danger { background: #ff0055; color: #fff; }
+        .btn-success { background: #ff9900; color: #fff; }
+        input { padding: 10px; background: #222; color: #fff; border: 1px solid #444; border-radius: 5px; margin: 5px; width: calc(100% - 20px); box-sizing: border-box; }
+        
+        #admin-panel { border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; background: rgba(0, 0, 0, 0.85); border-radius: 10px; }
+        .admin-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 style="color:#ff9900; margin:0; text-transform: uppercase;">📼 VECCHIE REGISTRAZIONI</h1>
+        <div class="nav-buttons">
+            <a href="index.html" class="btn-nav" style="background-color: #00d4ff; color: #000;">🏠 Home</a>
+            <a href="live-chat.html" class="btn-nav" style="background-color: #ff0055;">💬 Live Chat</a>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Pulsante per aprire il Pannello DJ -->
+        <div style="text-align: right; margin-bottom: 15px;">
+            <input type="password" id="adminPass" placeholder="Password DJ" style="width: 200px; display: inline-block;">
+            <button class="btn btn-danger" onclick="checkAdmin()">Pannello DJ</button>
+        </div>
+        
+        <!-- Pannello DJ Nascosto -->
+        <div id="admin-panel">
+            <h2 style="color:#ff0055; margin-top:0;">🔴 Gestione Registrazioni</h2>
+            <div class="section-box">
+                <h4>Aggiungi Nuovo Set</h4>
+                <input type="text" id="newTitle" placeholder="Titolo del set (es. Live set @ Discoteca)">
+                <input type="text" id="newLink" placeholder="Link Mixcloud (es. https://www.mixcloud.com/...)">
+                <button class="btn btn-success" onclick="aggiungiRegistrazione()">Pubblica Registrazione</button>
+            </div>
+            <h3>Elenco Registrazioni</h3>
+            <div id="admin-list">Nessuna registrazione presente.</div>
+        </div>
+
+        <!-- Sezione Pubblica -->
+        <div class="section-box">
+            <h3 style="text-align: center; color: #ff9900; margin-top:0;">Riascolta i set precedenti</h3>
+            <div id="registrazioni-grid" class="grid">
+                <p style="grid-column: 1 / -1; text-align: center; color: #888;">Caricamento registrazioni in corso...</p>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, get, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M", authDomain: "rossidj-chat.firebaseapp.com", databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app", projectId: "rossidj-chat", storageBucket: "rossidj-chat.firebasestorage.app", messagingSenderId: "247840582286", appId: "1:247840582286:web:5320cff622ffc8ab9377df" };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let regData = {};
+
+    // Legge in tempo reale le registrazioni da Firebase (cartella 'registrazioni')
+    onValue(ref(db, 'registrazioni'), (snap) => {
+        regData = snap.val() || {};
+        renderPublic();
+        renderAdminList();
+    });
+
+    // Mostra le registrazioni agli utenti
+    function renderPublic() {
+        const grid = document.getElementById('registrazioni-grid');
+        grid.innerHTML = '';
+        
+        const keys = Object.keys(regData);
+        if (keys.length === 0) {
+            grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888;">Nessuna registrazione disponibile al momento.</p>';
+            return;
+        }
+
+        keys.forEach(id => {
+            const item = regData[id];
+            grid.innerHTML += `
+                <div class="card">
+                    <div>
+                        <div class="card-title">🎵 ${item.title}</div>
+                    </div>
+                    <div>
+                        <a href="${item.link}" target="_blank" class="btn btn-success" style="display: block; text-decoration: none; text-align: center;">▶️ Riascolta su Mixcloud</a>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // Mostra la lista nel pannello di controllo DJ
+    function renderAdminList() {
+        const adminList = document.getElementById('admin-list');
+        adminList.innerHTML = '';
+        
+        const keys = Object.keys(regData);
+        if (keys.length === 0) {
+            adminList.innerHTML = '<p>Nessuna registrazione.</p>';
+            return;
+        }
+
+        keys.forEach(id => {
+            const item = regData[id];
+            adminList.innerHTML += `
+                <div class="admin-row">
+                    <div><strong>${item.title}</strong><br><small style="color:#aaa;">${item.link}</small></div>
+                    <button class="btn btn-danger" onclick="eliminaRegistrazione('${id}')">🗑️ Elimina</button>
+                </div>`;
+        });
+    }
+
+    // Controllo Password DJ tramite Firebase
+    window.checkAdmin = () => {
+        const inputPass = document.getElementById('adminPass').value;
+        get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
+            if(snapshot.exists() && snapshot.val() === inputPass) {
+                document.getElementById('admin-panel').style.display = 'block';
+            } else {
+                alert("Password DJ errata!");
+            }
+        });
+    };
+
+    // Aggiungi nuova registrazione
+    window.aggiungiRegistrazione = () => {
+        const title = document.getElementById('newTitle').value.trim();
+        const link = document.getElementById('newLink').value.trim();
+        if (!title || !link) return alert("Inserisci sia il titolo che il link!");
+
+        push(ref(db, 'registrazioni'), { title: title, link: link })
+            .then(() => {
+                alert("Registrazione pubblicata con successo!");
+                document.getElementById('newTitle').value = '';
+                document.getElementById('newLink').value = '';
+            })
+            .catch(e => alert("Errore: " + e.message));
+    };
+
+    // Elimina registrazione
+    window.eliminaRegistrazione = (id) => {
+        if (confirm("Vuoi eliminare questa registrazione?")) {
+            remove(ref(db, `registrazioni/${id}`));
+        }
+    };
+</script>
+</body>
+</html>
