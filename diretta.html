@@ -24,7 +24,7 @@
         .btn-home { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.6); color: #00d4ff; text-decoration: none; font-size: 1.5rem; padding: 10px; border-radius: 50%; border: 2px solid #00d4ff; z-index: 10; transition: 0.3s; line-height: 1; }
         .btn-home:hover { background: #00d4ff; color: #000; transform: scale(1.1); }
 
-        /* Nuovo Tasto Vai su Mixcloud */
+        /* Tasto Vai su Mixcloud */
         .btn-mixcloud { position: absolute; top: 15px; left: 75px; background: rgba(0,0,0,0.6); color: #fff; text-decoration: none; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); z-index: 10; font-weight: bold; transition: 0.3s; line-height: 1.4; display: none; }
         .btn-mixcloud:hover { background: #5000ff; border-color: #5000ff; transform: scale(1.05); }
 
@@ -80,7 +80,7 @@
         <!-- PARTE SINISTRA -->
         <div id="video-wrapper" class="player-section">
             
-            <!-- Bottoni in alto (Vengono nascosti in fullscreen) -->
+            <!-- Bottoni in alto -->
             <a href="index.html" class="btn-home hide-in-fs" title="Torna alla Home">🏠</a>
             <a href="https://www.mixcloud.com/live/RossiDJ" target="_blank" class="btn-mixcloud hide-in-fs" id="btn-mixcloud-link" title="Guarda su Mixcloud">☁️ Vai su Mixcloud</a>
             <button class="btn-fullscreen-toggle hide-in-fs" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
@@ -94,8 +94,8 @@
                 </div>
             </div>
 
-            <!-- IL TUO LINK FISSO (Incolla l'URL di Mixcloud dentro src="") -->
-            <iframe id="live-frame" src="https://www.mixcloud.com/widget/iframe/?feed=%2Flive%2FRossiDJ%2F" allow="autoplay; fullscreen"></iframe>
+            <!-- LINK WIDGET CORRETTO PER ROSSIDJ -->
+            <iframe id="live-frame" src="https://www.mixcloud.com/live/RossiDJ/" allow="autoplay; fullscreen" frameborder="0"></iframe>
 
             <!-- OVERLAY (Visibile solo in Fullscreen) -->
             <div id="fs-overlay">
@@ -148,13 +148,13 @@
             frame.style.display = 'block';
             offlineScreen.style.display = 'none';
             btnFs.style.display = 'block'; 
-            btnMix.style.display = 'block'; // Mostra il tasto Mixcloud solo quando sei live
+            btnMix.style.display = 'block'; 
             frame.src = frame.src; 
         } else {
             frame.style.display = 'none';
             offlineScreen.style.display = 'flex';
             btnFs.style.display = 'none'; 
-            btnMix.style.display = 'none'; // Nasconde il tasto Mixcloud se offline
+            btnMix.style.display = 'none'; 
             
             if (document.fullscreenElement) {
                 document.exitFullscreen();
