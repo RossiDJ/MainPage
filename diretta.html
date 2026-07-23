@@ -13,13 +13,10 @@
         /* --- PARTE SINISTRA: PLAYER --- */
         .player-section { flex: 7; position: relative; background-color: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 2px solid #ff0055; }
         
-        /* Il contenitore che andrà in Fullscreen */
         #video-wrapper { position: relative; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; }
         
-        /* L'iframe del video (Mixcloud) */
-        #live-frame { width: 100%; height: 100%; border: none; z-index: 1; display: none; /* Nascosto di default finché la live non è ON */ }
+        #live-frame { width: 100%; height: 100%; border: none; z-index: 1; display: none; }
 
-        /* Schermata Offline (Automatica) */
         #offline-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; z-index: 2; flex-direction: column; }
         .offline-box { background: rgba(0,0,0,0.8); padding: 30px; border-radius: 20px; border: 2px solid #ff0055; text-align: center; backdrop-filter: blur(5px); }
 
@@ -27,9 +24,16 @@
         .btn-home { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.6); color: #00d4ff; text-decoration: none; font-size: 1.5rem; padding: 10px; border-radius: 50%; border: 2px solid #00d4ff; z-index: 10; transition: 0.3s; line-height: 1; }
         .btn-home:hover { background: #00d4ff; color: #000; transform: scale(1.1); }
 
+        /* Nuovo Tasto Vai su Mixcloud */
+        .btn-mixcloud { position: absolute; top: 15px; left: 75px; background: rgba(0,0,0,0.6); color: #fff; text-decoration: none; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); z-index: 10; font-weight: bold; transition: 0.3s; line-height: 1.4; display: none; }
+        .btn-mixcloud:hover { background: #5000ff; border-color: #5000ff; transform: scale(1.05); }
+
         /* Tasto Fullscreen */
         .btn-fullscreen-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 8px; cursor: pointer; z-index: 10; font-weight: bold; }
         .btn-fullscreen-toggle:hover { background: rgba(255,0,85,0.8); border-color: #ff0055; }
+
+        /* --- CLASSE PER NASCONDERE I BOTTONI IN FULLSCREEN --- */
+        .fullscreen-active .hide-in-fs { display: none !important; }
 
         /* --- UI IN SOVRIMPRESSIONE (Visibile solo in Fullscreen) --- */
         #fs-overlay { display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
@@ -75,8 +79,11 @@
         
         <!-- PARTE SINISTRA -->
         <div id="video-wrapper" class="player-section">
-            <a href="index.html" class="btn-home" title="Torna alla Home">🏠</a>
-            <button class="btn-fullscreen-toggle" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
+            
+            <!-- Bottoni in alto (Vengono nascosti in fullscreen) -->
+            <a href="index.html" class="btn-home hide-in-fs" title="Torna alla Home">🏠</a>
+            <a href="https://www.mixcloud.com/live/RossiDJ" target="_blank" class="btn-mixcloud hide-in-fs" id="btn-mixcloud-link" title="Guarda su Mixcloud">☁️ Vai su Mixcloud</a>
+            <button class="btn-fullscreen-toggle hide-in-fs" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
 
             <!-- Schermata Offline Automatica -->
             <div id="offline-screen">
@@ -87,8 +94,8 @@
                 </div>
             </div>
 
-            <!-- IL TUO LINK FISSO (Andrà sostituito qui dentro src="" quando lo avrai da Mixcloud) -->
-            <iframe id="live-frame" src="https://www.youtube.com/embed/live_stream?channel=INSERISCI_ID_QUI" allow="autoplay; fullscreen"></iframe>
+            <!-- IL TUO LINK FISSO (Incolla l'URL di Mixcloud dentro src="") -->
+            <iframe id="live-frame" src="https://www.mixcloud.com/widget/iframe/?feed=%2Flive%2FRossiDJ%2F" allow="autoplay; fullscreen"></iframe>
 
             <!-- OVERLAY (Visibile solo in Fullscreen) -->
             <div id="fs-overlay">
@@ -135,21 +142,20 @@
         const frame = document.getElementById('live-frame');
         const offlineScreen = document.getElementById('offline-screen');
         const btnFs = document.getElementById('btn-fs');
+        const btnMix = document.getElementById('btn-mixcloud-link');
         
         if(isLive) {
-            // Se la diretta è accesa nel Pannello DJ
             frame.style.display = 'block';
             offlineScreen.style.display = 'none';
-            btnFs.style.display = 'block'; // Mostra tasto fullscreen
-            // Ricarica l'iframe per assicurarsi che prenda lo stream dal vivo
+            btnFs.style.display = 'block'; 
+            btnMix.style.display = 'block'; // Mostra il tasto Mixcloud solo quando sei live
             frame.src = frame.src; 
         } else {
-            // Se la diretta è spenta nel Pannello DJ
             frame.style.display = 'none';
             offlineScreen.style.display = 'flex';
-            btnFs.style.display = 'none'; // Nasconde tasto fullscreen (non serve se sei offline)
+            btnFs.style.display = 'none'; 
+            btnMix.style.display = 'none'; // Nasconde il tasto Mixcloud se offline
             
-            // Se il DJ spegne la live mentre qualcuno è in fullscreen, lo fa uscire in automatico!
             if (document.fullscreenElement) {
                 document.exitFullscreen();
             }
@@ -235,12 +241,10 @@
     function handleFsChange() {
         if (document.fullscreenElement) {
             overlayUI.style.display = 'block';
-            document.querySelector('.btn-home').style.display = 'none';
-            document.querySelector('.btn-fullscreen-toggle').style.display = 'none';
+            videoWrapper.classList.add('fullscreen-active');
         } else {
             overlayUI.style.display = 'none';
-            document.querySelector('.btn-home').style.display = 'block';
-            document.querySelector('.btn-fullscreen-toggle').style.display = 'block';
+            videoWrapper.classList.remove('fullscreen-active');
             window.closeFsInput(); 
         }
     }
