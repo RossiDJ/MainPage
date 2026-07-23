@@ -6,21 +6,47 @@
     <title>RossiDJ - Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; overflow: hidden; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; overflow-x: hidden; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate; }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-        .container { max-width: 600px; padding: 40px; background: rgba(0, 0, 0, 0.75); border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); position: relative; z-index: 1; }
-        h1 { color: #00d4ff; text-transform: uppercase; }
-        .bottone-pagine { display: inline-block; margin: 10px 0; padding: 15px 40px; background-color: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; font-size: 1.2rem; transition: transform 0.2s, background-color 0.2s; min-width: 250px; }
+        
+        .container { max-width: 600px; width: 90%; padding: 40px 20px; background: rgba(0, 0, 0, 0.75); border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); position: relative; z-index: 1; box-sizing: border-box; margin: 20px 0; }
+        h1 { color: #00d4ff; text-transform: uppercase; margin-top: 0; }
+        
+        .bottone-pagine { 
+            display: inline-block; 
+            margin: 10px auto; 
+            padding: 15px 20px; 
+            background-color: #00d4ff; 
+            color: #000; 
+            text-decoration: none; 
+            font-weight: bold; 
+            border-radius: 50px; 
+            font-size: 1.1rem; 
+            transition: transform 0.2s, background-color 0.2s; 
+            width: 100%;
+            max-width: 320px;
+            box-sizing: border-box;
+
+            /* FIX PER iOS (iPhone/iPad) */
+            -webkit-appearance: none;
+            appearance: none;
+            touch-action: pan-y;
+        }
         .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
+        
         .bottone-live { background-color: #ff0055; color: #ffffff; border: 2px solid #ff0055; }
         .bottone-live:hover { background-color: #cc0044; color: #ffffff; }
+        
         @keyframes pulsateLive { 0% { transform: scale(1); box-shadow: 0 0 10px #ff0055; } 50% { transform: scale(1.05); box-shadow: 0 0 20px #ff0055; } 100% { transform: scale(1); box-shadow: 0 0 10px #ff0055; } }
         .btn-pulsante { animation: pulsateLive 2s infinite; }
+        
         .social-section { margin-top: 25px; display: flex; justify-content: center; gap: 20px; }
         .social-icon { font-size: 2rem; color: #ffffff; transition: color 0.3s, transform 0.2s; text-decoration: none; }
         .social-icon:hover { color: #00d4ff; transform: translateY(-3px); }
-        .contact-info { margin-top: 30px; font-size: 0.9rem; color: #e0e0e0; border-top: 1px solid #444; padding-top: 20px; }
+        
+        /* SEZIONE CONTATTI AGGIORNATA */
+        .contact-info { margin-top: 30px; font-size: 1rem; color: #e0e0e0; border-top: 1px solid #444; padding-top: 20px; display: flex; flex-direction: column; gap: 10px; }
         .contact-info a { color: #20c997; text-decoration: none; font-weight: bold; transition: color 0.2s; }
         .contact-info a:hover { color: #00d4ff; }
     </style>
@@ -39,16 +65,16 @@
         <a href="registrazioni.html" class="bottone-pagine" style="background-color: #ff9900; color: #fff; border: 2px solid #ff9900;">
             📼 VECCHIE REGISTRAZIONI
         </a>
-        <br>
+        
         <a href="live-chat.html" class="bottone-pagine">💬 ENTRA NELLA LIVE CHAT</a>
-        <br>
-        <a href="richieste.html" class="bottone-pagine">🎶 RICHIEDI UNA CANZONE</a>
-        <br>
+        
+        <a href="richieste.html" class="bottone-pagine">🎵 RICHIEDI UNA CANZONE</a>
+        
         <a href="eventi.html" class="bottone-pagine">📅 PROSSIMI EVENTI</a>
-        <br>
+        
         <a href="galleria.html" class="bottone-pagine" style="background-color: #9900ff; color: #fff;">📸 GALLERIA FOTO & VIDEO</a>
-        <br>
-        <a href="prenotazioni.html" class="bottone-pagine">🎉 PRENOTA IL TUO EVENTO</a>
+        
+        <a href="prenotazioni.html" class="bottone-pagine">🎟️ PRENOTA IL TUO EVENTO</a>
 
         <div class="social-section">
             <a href="https://www.facebook.com/share/1HtZxnxUDJ/" target="_blank" class="social-icon" title="Facebook">
@@ -61,12 +87,13 @@
                 <i class="fab fa-mixcloud"></i>
             </a>
         </div>
-        </div>
+        
+        <!-- SEZIONE CONTATTI -->
         <div class="contact-info">
             <div>Email: <a href="mailto:RossiDJ@live.it">RossiDJ@live.it</a></div>
-            <div>Tel: +39 3466045298</div>
+            <div>Tel: <a href="tel:+393466045298">+39 3466045298</a></div>
         </div>
-    </div>
+    </div> <!-- Fine del contenitore corretto -->
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
