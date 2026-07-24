@@ -318,7 +318,9 @@ if (!data || !data.user || !data.text) return;
     window.toggleFsFullChat = () => {
         if (fullChatOverlay.style.display === 'none' || fullChatOverlay.style.display === '') {
             fullChatOverlay.style.display = 'flex';
-            fullChatOverlay.scrollTop = fullChatOverlay.scrollHeight;
+            setTimeout(() => {
+                fullChatOverlay.scrollTop = fullChatOverlay.scrollHeight;
+            }, 50);
         } else {
             fullChatOverlay.style.display = 'none';
         }
