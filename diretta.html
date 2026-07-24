@@ -2,19 +2,19 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>In Diretta - Rossi DJ</title>
     <style>
-        /* --- STILI BASE E LAYOUT SPLIT (Altezze Fisse = No Rimbalzi) --- */
-        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; color: #fff; overflow: hidden; }
+        /* --- STILI BASE E LAYOUT SPLIT --- */
+        body, html { margin: 0; padding: 0; height: 100dvh; width: 100vw; font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; color: #fff; overflow: hidden; }
         
         .main-layout { display: flex; flex-direction: row; height: 100%; width: 100%; }
         
         /* --- PARTE SINISTRA: PLAYER --- */
-        .player-section { flex: 7; position: relative; background-color: #000; border-right: 2px solid #ff0055; }
+        .player-section { flex: 1; position: relative; background-color: #000; border-right: 2px solid #ff0055; overflow: hidden; }
         #video-wrapper { position: relative; width: 100%; height: 100%; background: #000; overflow: hidden; }
         
-        /* --- LA MASCHERA DI RITAGLIO INTELLIGENTE --- */
+        /* --- LA MASCHERA DI RITAGLIO --- */
         #iframe-cropper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
         
         #live-frame { 
@@ -22,23 +22,20 @@
             border: none; 
             z-index: 1; 
             display: none; 
-            
-            /* IMPOSTAZIONE DI DEFAULT: Orizzontale / Desktop (Nasconde l'Header sopra e la Chat a Destra) */
+            /* Taglio standard per Desktop / Orizzontale */
             top: -65px; 
             left: 0; 
             width: calc(100% + 350px); 
             height: calc(100% + 65px); 
         }
 
-        /* IMPOSTAZIONE PORTRAIT: Se lo schermo è verticale, Mixcloud mette la chat in basso. Cambiamo il taglio! */
+        /* Taglio Perfetto per Mobile Verticale (Confermato da te) */
         @media (max-aspect-ratio: 1/1) {
-            #live-frame {
-                top: -65px;
-                left: 0;
-                width: 100%; /* La chat non è a destra, non serve allargare */
-                height: calc(100% + 300px); /* Allunghiamo per nascondere la chat sotto */
-            }
+            #live-frame { top: -65px; left: 0; width: 100%; height: calc(100% + 300px); }
         }
+
+        /* SCUDO ANTI-FULLSCREEN NATIVO: Blocca il clic in basso a destra sul player di Mixcloud */
+        .block-native-fullscreen { position: absolute; bottom: 0; right: 0; width: 150px; height: 60px; z-index: 5; }
 
         /* --- SCHERMATA OFFLINE ED ELEMENTI UI --- */
         #offline-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; z-index: 5; flex-direction: column; }
@@ -50,29 +47,42 @@
         
         .fullscreen-active .hide-in-fs { display: none !important; }
 
-        /* --- UI IN FULLSCREEN (Solo Sovrimpressione) --- */
+        /* --- UI IN FULLSCREEN (Tutto orientato a DESTRA) --- */
         #fs-overlay { display: none; position: absolute; inset: 0; pointer-events: none; z-index: 20; }
         
-        #fs-chat-display { position: absolute; bottom: 80px; left: 15px; width: 75%; display: flex; flex-direction: column; gap: 5px; pointer-events: none; }
-        .fs-msg-mini { background: transparent; color: #fff; text-shadow: 2px 2px 4px #000, -2px -2px 4px #000; font-size: 1.1rem; line-height: 1.3; animation: fadeIn 0.3s; }
-        .fs-msg-mini strong { color: #00d4ff; }
+        /* Chat Completa Overlay (Sulla Destra) */
+        #fs-full-chat-overlay { 
+            display: flex; /* La rendiamo sempre visibile in FS se non viene chiusa */
+            position: absolute; 
+            top: 20px; 
+            right: 20px; /* Spostata a destra */
+            bottom: 90px; /* Lascia spazio ai bottoni sotto */
+            width: 300px; 
+            overflow-y: auto; 
+            pointer-events: auto; 
+            flex-direction: column; 
+            gap: 6px; 
+            background: rgba(0,0,0,0.4); /* Leggero sfondo per leggibilità */
+            padding: 15px;
+            border-radius: 15px;
+            border-right: 3px solid #ff0055;
+            backdrop-filter: blur(2px);
+        }
+        .fs-full-msg { background: transparent; color: #fff; text-shadow: 1px 1px 3px #000; font-size: 1.05rem; line-height: 1.3; }
+        .fs-full-msg strong { color: #00d4ff; }
 
-        #fs-full-chat-overlay { display: none; position: absolute; top: 60px; bottom: 130px; left: 15px; width: 80%; max-width: 400px; overflow-y: auto; pointer-events: auto; flex-direction: column; gap: 6px; background: transparent; }
-        .fs-full-msg { background: transparent; color: #fff; text-shadow: 2px 2px 4px #000, -2px -2px 4px #000; font-size: 1.1rem; line-height: 1.3; }
-        .fs-full-msg strong { color: #ff0055; }
-
-        /* Controlli in basso in Fullscreen */
-        .fs-controls-bottom { position: absolute; bottom: 15px; left: 15px; right: 15px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; pointer-events: auto; gap: 10px; }
+        /* Controlli in basso in Fullscreen (Sempre orientati a destra) */
+        .fs-controls-bottom { position: absolute; bottom: 15px; right: 20px; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: flex-end; pointer-events: auto; gap: 10px; width: 100%; }
         
-        .fs-btn-circle { background: rgba(0,0,0,0.7); border: 2px solid rgba(255,255,255,0.5); color: #fff; font-size: 1.4rem; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .fs-btn-circle { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: #fff; font-size: 1.4rem; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .fs-btn-circle:hover { background: #ff0055; border-color: #ff0055; }
         
-        #fs-input-box { display: none; flex: 1; min-width: 200px; background: rgba(0,0,0,0.85); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); align-items: center; gap: 8px; }
+        #fs-input-box { display: none; background: rgba(0,0,0,0.9); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); align-items: center; gap: 8px; width: 300px; }
         #fs-input-text { flex: 1; padding: 10px; border-radius: 8px; border: none; outline: none; font-size: 1rem; }
         #fs-btn-send { background: #00d4ff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         /* --- PARTE DESTRA: CHAT LATERALE (Desktop) --- */
-        .chat-section { flex: 3; background-color: rgba(18, 18, 18, 0.95); display: flex; flex-direction: column; position: relative; min-width: 300px; border-left: 2px solid #ff0055; }
+        .chat-section { width: 350px; flex-shrink: 0; background-color: rgba(18, 18, 18, 0.95); display: flex; flex-direction: column; position: relative; border-left: 2px solid #ff0055; }
         .chat-header { padding: 15px; background: rgba(0,0,0,0.8); text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); color: #00d4ff; font-weight: bold; letter-spacing: 1px; }
         #messages-sidebar { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .side-msg { background: rgba(0,0,0,0.6); padding: 10px; border-radius: 10px; border-left: 3px solid #00d4ff; font-size: 0.9rem; word-break: break-word; }
@@ -85,9 +95,13 @@
         /* --- MOBILE VERTICALE --- */
         @media (max-width: 768px) {
             .main-layout { flex-direction: column; }
-            /* Altezze rigide 40/60 per non far ricalcolare mai le dimensioni al browser (Evita il rimbalzo!) */
-            .player-section { flex: none; height: 40vh; width: 100%; border-right: none; border-bottom: 2px solid #ff0055; }
-            .chat-section { flex: none; height: 60vh; width: 100%; border-left: none; }
+            
+            /* Ripristinato il blocco esatto delle misure in Verticale */
+            .player-section { width: 100%; height: 40dvh; flex: none; border-right: none; border-bottom: 2px solid #ff0055; }
+            .chat-section { width: 100%; height: 60dvh; flex: none; border-left: none; }
+            
+            #fs-full-chat-overlay { width: calc(100% - 40px); background: rgba(0,0,0,0.6); }
+            #fs-input-box { width: 100%; }
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -100,7 +114,7 @@
         <!-- PARTE PLAYER -->
         <div id="video-wrapper" class="player-section">
             
-            <!-- Bottoni standard (Scompaiono in FS) -->
+            <!-- Bottoni standard -->
             <a href="index.html" class="btn-home hide-in-fs" title="Torna alla Home">🏠</a>
             <a href="https://www.mixcloud.com/live/RossiDJ" target="_blank" class="btn-mixcloud hide-in-fs" id="btn-mixcloud-link" title="Guarda su Mixcloud">☁️ Vai su Mixcloud</a>
             <button class="btn-fullscreen-toggle hide-in-fs" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
@@ -113,37 +127,37 @@
                 </div>
             </div>
 
-            <!-- CROPPER INFALLIBILE -->
+            <!-- CROPPER -->
             <div id="iframe-cropper">
                 <iframe id="live-frame" src="https://www.mixcloud.com/live/RossiDJ/" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-playsinline frameborder="0"></iframe>
+                <!-- Lo SCUDO ANTI-FULLSCREEN NATIVO (Nasconde e blocca il clic sul bottoncino originale in basso a destra) -->
+                <div class="block-native-fullscreen"></div>
             </div>
 
-            <!-- OVERLAY FULLSCREEN -->
+            <!-- OVERLAY FULLSCREEN (Orientato a Destra) -->
             <div id="fs-overlay">
-                <!-- Chat Mini (Ultime 2 righe) -->
-                <div id="fs-chat-display"></div>
                 
-                <!-- Chat Completa Espansa (Senza sfondo) -->
+                <!-- Chat Completa (Di default VISIBILE a Destra) -->
                 <div id="fs-full-chat-overlay"></div>
 
-                <!-- Controlli in basso (scorrono sulla tastiera) -->
+                <!-- Controlli in basso a Destra -->
                 <div class="fs-controls-bottom">
                     <div style="display:flex; gap:10px;" id="fs-primary-buttons">
-                        <button class="fs-btn-circle" onclick="toggleFsFullChat()" title="Mostra tutta la chat">📜</button>
-                        <button class="fs-btn-circle" onclick="openFsInput()" title="Scrivi messaggio">💬</button>
-                        <button class="fs-btn-circle" onclick="toggleFullscreen()" style="border-color:#ff0055; color:#ff0055;" title="Esci">❌</button>
+                        <button class="fs-btn-circle" onclick="toggleFsFullChat()" title="Mostra/Nascondi Chat">💬</button>
+                        <button class="fs-btn-circle" onclick="openFsInput()" title="Scrivi messaggio">✏️</button>
+                        <button class="fs-btn-circle" onclick="toggleFullscreen()" style="border-color:#ff0055; color:#ff0055;" title="Esci da Schermo Intero">❌</button>
                     </div>
 
                     <div id="fs-input-box">
                         <input type="text" id="fs-input-text" placeholder="Scrivi un messaggio..." autocomplete="off">
                         <button id="fs-btn-send" onclick="sendFsMessage()">Invia</button>
-                        <button class="fs-btn-circle" onclick="closeFsInput()" style="border:none;">⤵️</button>
+                        <button class="fs-btn-circle" onclick="closeFsInput()" style="border:none; width:35px; height:35px; font-size:1rem;">⤵️</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- PARTE CHAT NATIVA (Sempre visibile a destra o sotto) -->
+        <!-- PARTE CHAT NATIVA (A destra su PC, Sotto su Mobile) -->
         <div class="chat-section">
             <div class="chat-header">🔴 LIVE CHAT</div>
             <div id="messages-sidebar"></div>
@@ -166,7 +180,6 @@
     const auth = getAuth(app);
 
     let currentUserNick = null;
-    let ultimiDueMessaggi = [];
 
     // --- ACCENSIONE / SPEGNIMENTO ---
     onValue(ref(db, 'settings/liveStatus'), (snap) => {
@@ -226,7 +239,7 @@
     };
     document.getElementById('fs-input-text').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.sendFsMessage(); });
 
-    // Gestione Inserimento Messaggi nelle 3 Viste
+    // Gestione Inserimento Messaggi nelle 2 Viste (Base e Fullscreen)
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val();
         
@@ -238,31 +251,19 @@
         sideBox.appendChild(msgDiv);
         sideBox.scrollTop = sideBox.scrollHeight;
 
-        // 2. Fullscreen Chat Completa (Testo puro)
+        // 2. Fullscreen Chat Overlay (A destra)
         const fsFullBox = document.getElementById('fs-full-chat-overlay');
         const fsFullDiv = document.createElement('div');
         fsFullDiv.className = 'fs-full-msg';
         fsFullDiv.innerHTML = `<strong>${data.user}</strong>: ${data.text}`;
         fsFullBox.appendChild(fsFullDiv);
         fsFullBox.scrollTop = fsFullBox.scrollHeight;
-
-        // 3. Fullscreen Chat Mini (Ultimi 2 messaggi)
-        ultimiDueMessaggi.push(data);
-        if (ultimiDueMessaggi.length > 2) { ultimiDueMessaggi.shift(); }
-        
-        const fsMiniBox = document.getElementById('fs-chat-display');
-        fsMiniBox.innerHTML = '';
-        ultimiDueMessaggi.forEach(msg => {
-            const fsDiv = document.createElement('div');
-            fsDiv.className = 'fs-msg-mini';
-            fsDiv.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}`;
-            fsMiniBox.appendChild(fsDiv);
-        });
     });
 
     // --- FULLSCREEN E BLOCCO ROTAZIONE ---
     const videoWrapper = document.getElementById('video-wrapper');
     const overlayUI = document.getElementById('fs-overlay');
+    const fullChatOverlay = document.getElementById('fs-full-chat-overlay');
 
     window.toggleFullscreen = async () => {
         if (!document.fullscreenElement) {
@@ -270,7 +271,6 @@
                 if (videoWrapper.requestFullscreen) { await videoWrapper.requestFullscreen(); }
                 else if (videoWrapper.webkitRequestFullscreen) { await videoWrapper.webkitRequestFullscreen(); } 
                 
-                // Forza rotazione orizzontale se supportata
                 if (screen.orientation && screen.orientation.lock) {
                     await screen.orientation.lock('landscape').catch(e => console.log("Rotazione manuale necessaria."));
                 }
@@ -288,11 +288,13 @@
         if (document.fullscreenElement) {
             overlayUI.style.display = 'block';
             videoWrapper.classList.add('fullscreen-active');
+            // La chat si mostra automaticamente quando si entra in Fullscreen
+            fullChatOverlay.style.display = 'flex';
         } else {
             overlayUI.style.display = 'none';
             videoWrapper.classList.remove('fullscreen-active');
             window.closeFsInput(); 
-            document.getElementById('fs-full-chat-overlay').style.display = 'none';
+            fullChatOverlay.style.display = 'none';
         }
     }
 
@@ -312,16 +314,11 @@
     };
 
     window.toggleFsFullChat = () => {
-        const fullChat = document.getElementById('fs-full-chat-overlay');
-        const miniChat = document.getElementById('fs-chat-display');
-        
-        if (fullChat.style.display === 'none' || fullChat.style.display === '') {
-            fullChat.style.display = 'flex';
-            miniChat.style.display = 'none';
-            fullChat.scrollTop = fullChat.scrollHeight;
+        if (fullChatOverlay.style.display === 'none' || fullChatOverlay.style.display === '') {
+            fullChatOverlay.style.display = 'flex';
+            fullChatOverlay.scrollTop = fullChatOverlay.scrollHeight;
         } else {
-            fullChat.style.display = 'none';
-            miniChat.style.display = 'flex';
+            fullChatOverlay.style.display = 'none';
         }
     };
 </script>
