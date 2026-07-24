@@ -320,7 +320,7 @@ if (!data || !data.user || !data.text) return;
             fullChatOverlay.style.display = 'flex';
             setTimeout(() => {
                 fullChatOverlay.scrollTop = fullChatOverlay.scrollHeight;
-            }, 50);
+            }, 1000);
         } else {
             fullChatOverlay.style.display = 'none';
         }
