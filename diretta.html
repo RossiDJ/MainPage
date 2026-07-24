@@ -105,16 +105,7 @@
             #fs-input-box { width: 100%; }
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }    
-        @keyframes pulsateFullscreen { 
-            0% { transform: scale(1); box-shadow: 0 0 10px #ff0055; } 
-            50% { transform: scale(1.05); box-shadow: 0 0 20px #ff0055; } 
-            100% { transform: scale(1); box-shadow: 0 0 10px #ff0055; } 
-        }
-        .btn-pulsante-fs { 
-            animation: pulsateFullscreen 2s infinite; 
-            border-color: #ff0055 !important; 
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -155,7 +146,7 @@
                     <div style="display:flex; gap:10px;" id="fs-primary-buttons">
                         <button class="fs-btn-circle" onclick="toggleFsFullChat()" title="Mostra/Nascondi Chat">💬</button>
                         <button class="fs-btn-circle" onclick="openFsInput()" title="Scrivi messaggio">✏️</button>
-                        <button class="btn-fullscreen-toggle hide-in-fs btn-pulsante-fs" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
+                        <button class="fs-btn-circle" onclick="toggleFullscreen()" style="border-color:#ff0055; color:#ff0055;" title="Esci da Schermo Intero">❌</button>
                     </div>
 
                     <div id="fs-input-box">
@@ -277,31 +268,17 @@ if (!data || !data.user || !data.text) return;
     const overlayUI = document.getElementById('fs-overlay');
     const fullChatOverlay = document.getElementById('fs-full-chat-overlay');
 
-    const videoWrapper = document.getElementById('video-wrapper');
-
     window.toggleFullscreen = async () => {
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (!document.fullscreenElement) {
             try {
-                if (videoWrapper.requestFullscreen) {
-                    await videoWrapper.requestFullscreen();
-                } else if (videoWrapper.webkitRequestFullscreen) {
-                    await videoWrapper.webkitRequestFullscreen(); 
-                }
-            } catch (e) {
-                console.error("Errore nell'attivazione dello schermo intero: ", e);
-            }
+                if (videoWrapper.requestFullscreen) { await videoWrapper.requestFullscreen(); }
+                else if (videoWrapper.webkitRequestFullscreen) { await videoWrapper.webkitRequestFullscreen(); } 
+            } catch(e) { console.error(e); }
         } else {
-            try {
-                if (document.exitFullscreen) {
-                    await document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    await document.webkitExitFullscreen();
-                }
-            } catch (e) {
-                console.error("Errore nella chiusura dello schermo intero: ", e);
-            }
+            if (document.exitFullscreen) { await document.exitFullscreen(); }
         }
     };
+
     document.addEventListener('fullscreenchange', handleFsChange);
     document.addEventListener('webkitfullscreenchange', handleFsChange);
 
