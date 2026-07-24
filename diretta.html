@@ -274,7 +274,7 @@ if (!data || !data.user || !data.text) return;
                 else if (videoWrapper.webkitRequestFullscreen) { await videoWrapper.webkitRequestFullscreen(); } 
                 
                 if (screen.orientation && screen.orientation.lock) {
-                    await screen.orientation.lock('landscape').catch(e => console.log("Rotazione manuale necessaria."));
+                    await screen.orientation.lock('landscape').catch(e => console.log("Blocco rotazione non supportato."));
                 }
             } catch(e) { console.error(e); }
         } else {
