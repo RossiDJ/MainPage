@@ -51,22 +51,22 @@
         #fs-overlay { display: none; position: absolute; inset: 0; pointer-events: none; z-index: 20; }
         
         /* Chat Completa Overlay (Sulla Destra) */
-        #fs-full-chat-overlay { 
-            display: flex; /* La rendiamo sempre visibile in FS se non viene chiusa */
+       #fs-full-chat-overlay { 
+            display: flex; 
             position: absolute; 
-            top: 20px; 
-            right: 20px; /* Spostata a destra */
-            bottom: 90px; /* Lascia spazio ai bottoni sotto */
+            top: 25%; /* Scende esattamente al 25% dall'alto dello schermo, perfetto in verticale */
+            right: 5%; /* Si posiziona in percentuale dal bordo destro */
+            bottom: 15%; /* Lascia lo spazio percentuale per i bottoni in basso */
             width: 300px; 
             overflow-y: auto; 
             pointer-events: auto; 
             flex-direction: column; 
             gap: 6px; 
-            background: rgba(0,0,0,0.4); /* Leggero sfondo per leggibilità */
+            background: transparent; /* Trasparenza pura senza sfondi grigi */
             padding: 15px;
             border-radius: 15px;
             border-right: 3px solid #ff0055;
-            backdrop-filter: blur(2px);
+            backdrop-filter: none; 
         }
         .fs-full-msg { background: transparent; color: #fff; text-shadow: 1px 1px 3px #000; font-size: 1.05rem; line-height: 1.3; }
         .fs-full-msg strong { color: #00d4ff; }
@@ -242,6 +242,8 @@
     // Gestione Inserimento Messaggi nelle 2 Viste (Base e Fullscreen)
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val();
+
+if (!data || !data.user || !data.text) return;
         
         // 1. Sidebar Standard
         const sideBox = document.getElementById('messages-sidebar');
