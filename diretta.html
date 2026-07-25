@@ -139,7 +139,7 @@
         #side-input-text { flex: 1; padding: 12px; border-radius: 10px; border: none; background: #222; color: #fff; font-size: 1rem; }
         #side-btn-send { background: #ff0055; color: #fff; border: none; padding: 12px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-	#messages-sidebar, #fs-full-chat-overlay {
+        #messages-sidebar, #fs-full-chat-overlay {
             scroll-behavior: smooth;
         }
 
@@ -151,10 +151,11 @@
             #fs-full-chat-overlay { width: calc(100% - 40px); background: rgba(0,0,0,0.6); }
             #fs-input-box { width: 100%; }
         }
-	/* NUOVO: Nuvoletta specchio per testo su Smartphone */
+        
+        /* NUOVO: Nuvoletta specchio per testo su Smartphone */
         #typing-mirror {
             display: none;
-            position: fixed;
+            position: absolute;
             top: 15px;
             left: 50%;
             transform: translateX(-50%);
@@ -177,13 +178,13 @@
 </head>
 <body>
 
-    <!-- Specchio del testo in digitazione (Anti-Tastiera) -->
-    <div id="typing-mirror"><strong>Stai scrivendo:</strong> <span id="mirror-text">...</span></div>
-
     <div class="main-layout">
         
         <!-- PARTE PLAYER -->
         <div id="video-wrapper" class="player-section">
+
+            <!-- Specchio del testo in digitazione (Anti-Tastiera) SPOSTATO QUI DENTRO -->
+            <div id="typing-mirror"><strong>Stai scrivendo:</strong> <span id="mirror-text">...</span></div>
             
             <!-- Bottoni standard (Aggiunta la classe btn-pulsante-fs) -->
             <a href="index.html" class="btn-home hide-in-fs" title="Torna alla Home">🏠</a>
@@ -228,7 +229,8 @@
                     <div id="fs-input-box">
                         <input type="text" id="fs-input-text" placeholder="Scrivi un messaggio..." autocomplete="off">
                         <button id="fs-btn-send" onclick="sendFsMessage()">Invia</button>
-                        <button class="fs-btn-circle" onclick="closeFsInput()" style="border:none; width:35px; height:35px; font-size:1rem;">⤵️</button>
+                        <!-- Pulsante annulla ingrandito e allineato -->
+                        <button onclick="closeFsInput()" style="background: rgba(255,0,85,0.8); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;" title="Annulla">❌</button>
                     </div>
                 </div>
             </div>
