@@ -165,10 +165,20 @@
             return;
         }
 
-        const testoMessaggio = encodeURIComponent(`Ciao! Vorrei registrare un account per la chat.\nUser: ${user}\nPassword: ${pass}`);
-        window.open(`https://wa.me/393466045298?text=${testoMessaggio}`, '_blank');
+        if (pass.length < 6) {
+            alert("La password deve essere di almeno 6 caratteri!");
+            return;
+        }
+
+        const usernamePulito = user.toLowerCase().replace(/\s/g, '');
+        const datiCodificati = btoa(`${usernamePulito}:${pass}`);
+        const messaggio = `CREA_ACCOUNT:${datiCodificati}`;
+        
+        window.open(`https://wa.me/393466045298?text=${encodeURIComponent(messaggio)}`, '_blank');
         chiudiModalWhatsApp();
-    };    window.recuperaCredenzialiWhatsApp = () => { window.open(`https://wa.me/393466045298?text=RECUPERO_ACCOUNT`, '_blank'); };
+    };
+
+    window.recuperaCredenzialiWhatsApp = () => { window.open(`https://wa.me/393466045298?text=RECUPERO_ACCOUNT`, '_blank'); };
 
     document.getElementById('btn-login-custom').addEventListener('click', () => {
         let username = document.getElementById('user-input').value.trim();
