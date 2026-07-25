@@ -145,8 +145,30 @@
         } else { window.notificationsEnabled = false; localStorage.setItem('chatNotifiche', 'false'); updateNotificheBtn(); }
     };
 
-    window.richiediAccountWhatsApp = () => { window.open(`https://wa.me/393466045298?text=Voglio%20creare%20un%20account`, '_blank'); };
-    window.recuperaCredenzialiWhatsApp = () => { window.open(`https://wa.me/393466045298?text=RECUPERO_ACCOUNT`, '_blank'); };
+// --- GESTIONE POPUP REGISTRAZIONE WHATSAPP ---
+    window.richiediAccountWhatsApp = () => {
+        document.getElementById('modal-whatsapp').style.display = 'flex';
+    };
+
+    window.chiudiModalWhatsApp = () => {
+        document.getElementById('modal-whatsapp').style.display = 'none';
+        document.getElementById('wa-new-user').value = '';
+        document.getElementById('wa-new-pass').value = '';
+    };
+
+    window.inviaRichiestaWhatsApp = () => {
+        const user = document.getElementById('wa-new-user').value.trim();
+        const pass = document.getElementById('wa-new-pass').value.trim();
+
+        if (!user || !pass) {
+            alert("Inserisci sia il nome utente che la password desiderati!");
+            return;
+        }
+
+        const testoMessaggio = encodeURIComponent(`Ciao! Vorrei registrare un account per la chat.\nUser: ${user}\nPassword: ${pass}`);
+        window.open(`https://wa.me/393466045298?text=${testoMessaggio}`, '_blank');
+        chiudiModalWhatsApp();
+    };    window.recuperaCredenzialiWhatsApp = () => { window.open(`https://wa.me/393466045298?text=RECUPERO_ACCOUNT`, '_blank'); };
 
     document.getElementById('btn-login-custom').addEventListener('click', () => {
         let username = document.getElementById('user-input').value.trim();
@@ -235,5 +257,20 @@
     });
     onChildRemoved(ref(db, 'messages'), (snapshot) => { const msgElement = document.getElementById('msg-' + snapshot.key); if (msgElement) msgElement.remove(); });
 </script>
+<!-- MODALE REGISTRAZIONE WHATSAPP -->
+    <div id="modal-whatsapp" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+        <div style="background:rgba(20,20,20,0.95); border:2px solid #25D366; padding:25px; border-radius:15px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+            <h3 style="color:#25D366; margin-top:0; text-align:center;">Registrazione WhatsApp</h3>
+            <p style="font-size:0.9rem; color:#ccc; text-align:center; margin-bottom:15px;">Scegli il nome utente e la password che desideri registrare:</p>
+            
+            <input type="text" id="wa-new-user" placeholder="Nome utente desiderato" class="admin-input" style="margin-bottom:12px;">
+            <input type="password" id="wa-new-pass" placeholder="Password desiderata" class="admin-input" style="margin-bottom:20px;">
+            
+            <div style="display:flex; gap:10px;">
+                <button onclick="inviaRichiestaWhatsApp()" style="background:#25D366; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; flex:1; cursor:pointer;">Procedi</button>
+                <button onclick="chiudiModalWhatsApp()" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">Annulla</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
