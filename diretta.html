@@ -42,7 +42,7 @@
         .btn-mixcloud { position: absolute; top: 15px; left: 75px; background: rgba(0,0,0,0.6); color: #fff; text-decoration: none; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); z-index: 10; font-weight: bold; display: none; }
         .btn-fullscreen-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; z-index: 10; font-weight: bold; }
         
-        /* NUOVO: Effetto Pulsante per lo Schermo Intero */
+        /* Effetto Pulsante per lo Schermo Intero */
         @keyframes pulsateFullscreen { 
             0% { transform: scale(1); box-shadow: 0 0 10px #ff0055; } 
             50% { transform: scale(1.05); box-shadow: 0 0 20px #ff0055; } 
@@ -55,7 +55,7 @@
 
         .fullscreen-active .hide-in-fs { display: none !important; }
 
-        /* --- NUOVO: NUVOLETTA DI BENVENUTO (Solo Mobile) --- */
+        /* --- NUOVO: NUVOLETTA DI BENVENUTO CON TASTO X --- */
         #welcome-toast {
             display: none;
             position: absolute;
@@ -64,7 +64,7 @@
             transform: translateX(-50%);
             background: rgba(0, 212, 255, 0.95);
             color: #000;
-            padding: 15px;
+            padding: 15px 15px 15px 20px;
             border-radius: 12px;
             text-align: center;
             font-weight: bold;
@@ -73,12 +73,22 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             opacity: 0;
             transition: opacity 0.5s ease;
-            pointer-events: none;
             width: 80%;
             max-width: 300px;
         }
+        #close-toast {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+        }
         @media (max-width: 768px) {
-            #welcome-toast { display: block; } /* Lo rendiamo visibile solo su schermi piccoli */
+            #welcome-toast { display: block; }
         }
 
         /* --- UI IN FULLSCREEN (Tutto orientato a DESTRA) --- */
@@ -102,17 +112,17 @@
             border-radius: 15px;
             border-right: 3px solid #ff0055;
             backdrop-filter: none;
-            transition: all 0.3s ease; /* Transizione morbida per la riduzione */
+            transition: all 0.3s ease;
         }
 
-        /* NUOVO: Stato Chat Ridotta a 3 righe */
+        /* STATO CHAT RIDOTTA: Sfondo completamente TRASPARENTE come richiesto */
         #fs-full-chat-overlay.minimized-chat {
             top: auto !important;
             bottom: 80px !important;
-            height: 90px !important; /* Abbastanza per ~3 righe */
-            background: rgba(0,0,0,0.6) !important; /* Leggero sfondo per leggibilità */
-            border: 1px solid rgba(255,0,85,0.5);
-            backdrop-filter: blur(3px);
+            height: 90px !important; 
+            background: transparent !important; /* Sfondo 100% trasparente */
+            border: 1px solid rgba(255,0,85,0.4);
+            backdrop-filter: none !important;
         }
 
         .fs-full-msg { background: transparent; color: #fff; text-shadow: 1px 1px 3px #000; font-size: 1.05rem; line-height: 1.3; }
@@ -148,11 +158,11 @@
             .main-layout { flex-direction: column; }
             .player-section { width: 100%; height: 40dvh; flex: none; border-right: none; border-bottom: 2px solid #ff0055; }
             .chat-section { width: 100%; height: 60dvh; flex: none; border-left: none; }
-            #fs-full-chat-overlay { width: calc(100% - 40px); background: rgba(0,0,0,0.6); }
+            #fs-full-chat-overlay { width: calc(100% - 40px); background: transparent; } /* Trasparente anche in verticale */
             #fs-input-box { width: 100%; }
         }
         
-        /* NUOVO: Nuvoletta specchio per testo su Smartphone (Cliccabile) */
+        /* Nuvoletta specchio per testo su Smartphone (Cliccabile) */
         #typing-mirror {
             display: none;
             position: absolute;
@@ -172,7 +182,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            pointer-events: auto; /* ORA È CLICCABILE! */
+            pointer-events: auto;
         }
         .mirror-content { flex: 1; text-align: left; word-break: break-word; }
         #typing-mirror strong { color: #00d4ff; font-size: 0.9rem; display: block; margin-bottom: 5px; text-transform: uppercase; }
@@ -194,13 +204,14 @@
                 <button id="mirror-btn-send">INVIA</button>
             </div>
             
-            <!-- Bottoni standard (Aggiunta la classe btn-pulsante-fs) -->
+            <!-- Bottoni standard -->
             <a href="index.html" class="btn-home hide-in-fs" title="Torna alla Home">🏠</a>
             <a href="https://www.mixcloud.com/live/RossiDJ" target="_blank" class="btn-mixcloud hide-in-fs" id="btn-mixcloud-link" title="Guarda su Mixcloud">☁️ Vai su Mixcloud</a>
             <button class="btn-fullscreen-toggle hide-in-fs btn-pulsante-fs" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
 
-            <!-- Nuvoletta Suggerimento Mobile con Legenda -->
+            <!-- Nuvoletta Suggerimento Mobile con Legenda e Tasto X -->
             <div id="welcome-toast">
+                <button id="close-toast" onclick="chiudiToast()">✕</button>
                 <span style="font-size:1.1rem; color:#ff0055;">Consiglio per Smartphone:</span><br>
                 Usa il tasto <strong>"SCHERMO INTERO" 🔲</strong><br><br>
                 
@@ -225,7 +236,7 @@
                 
                 <div id="fs-full-chat-overlay"></div>
 
-                <!-- Controlli in basso a Destra (Aggiunto il tasto riduci chat) -->
+                <!-- Controlli in basso a Destra -->
                 <div class="fs-controls-bottom">
                     <div style="display:flex; gap:10px;" id="fs-primary-buttons">
                         <button class="fs-btn-circle" onclick="toggleMinimizeFsChat()" title="Riduci/Espandi Chat">↕️</button>
@@ -237,7 +248,6 @@
                     <div id="fs-input-box">
                         <input type="text" id="fs-input-text" placeholder="Scrivi un messaggio..." autocomplete="off">
                         <button id="fs-btn-send" onclick="sendFsMessage()">Invia</button>
-                        <!-- Pulsante annulla ingrandito e allineato -->
                         <button onclick="closeFsInput()" style="background: rgba(255,0,85,0.8); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;" title="Annulla">❌</button>
                     </div>
                 </div>
@@ -268,13 +278,18 @@
 
     let currentUserNick = null;
 
-    // --- NUOVO: Mostra Nuvoletta all'avvio ---
+    // --- GESTIONE NUOVO TOAST CON CHIUSURA MANUALE ---
+    window.chiudiToast = () => {
+        const toast = document.getElementById('welcome-toast');
+        if(toast) toast.style.opacity = '0';
+        setTimeout(() => { if(toast) toast.style.display = 'none'; }, 500);
+    };
+
     window.onload = () => {
         const toast = document.getElementById('welcome-toast');
-        // Mostra il toast solo se lo schermo è quello di uno smartphone (<=768px)
         if(window.innerWidth <= 768) {
-            setTimeout(() => { toast.style.opacity = '1'; }, 1000); // Compare dopo 1 secondo
-            setTimeout(() => { toast.style.opacity = '0'; }, 10000); // Scompare dopo 9 secondi
+            setTimeout(() => { toast.style.opacity = '1'; }, 1000); 
+            setTimeout(() => { chiudiToast(); }, 12000); // Scompare in automatico dopo 12s se non chiusa prima
         }
     };
 
@@ -339,21 +354,18 @@
         const data = snapshot.val();
         if (!data || !data.user || !data.text) return;
         
-        // 1. Aggiunge alla Sidebar Standard
         const sideBox = document.getElementById('messages-sidebar');
         const msgDiv = document.createElement('div');
         msgDiv.className = 'side-msg';
         msgDiv.innerHTML = `<strong>${data.user}</strong> ${data.text}`;
         sideBox.appendChild(msgDiv);
 
-        // 2. Aggiunge al Fullscreen Chat Overlay (che fa anche da chat ridotta)
         const fsFullBox = document.getElementById('fs-full-chat-overlay');
         const fsFullDiv = document.createElement('div');
         fsFullDiv.className = 'fs-full-msg';
         fsFullDiv.innerHTML = `<strong>${data.user}</strong>: ${data.text}`;
         fsFullBox.appendChild(fsFullDiv);
 
-        // 3. AUTOSCROLL FORZATO (Su tutte le versioni contemporaneamente)
         setTimeout(() => {
             sideBox.scrollTop = sideBox.scrollHeight;
             fsFullBox.scrollTop = fsFullBox.scrollHeight;
@@ -389,7 +401,7 @@
             videoWrapper.classList.remove('fullscreen-active');
             window.closeFsInput(); 
             fullChatOverlay.style.display = 'none';
-            fullChatOverlay.classList.remove('minimized-chat'); // Resetta lo stato se era ridotta
+            fullChatOverlay.classList.remove('minimized-chat');
         }
     }
 
@@ -405,10 +417,8 @@
         document.getElementById('fs-primary-buttons').style.display = 'flex';
     };
 
-    // --- NUOVO: Funzione per rimpicciolire la chat ---
     window.toggleMinimizeFsChat = () => {
         fullChatOverlay.classList.toggle('minimized-chat');
-        // Forza lo scorrimento verso il basso in modo che anche nello spazio piccolo si vedano gli ultimissimi messaggi
         setTimeout(() => {
             fullChatOverlay.scrollTop = fullChatOverlay.scrollHeight;
         }, 550);
@@ -432,7 +442,7 @@
     const sideInputBox = document.getElementById('side-input-text');
     const mirrorBtnSend = document.getElementById('mirror-btn-send');
     
-    let activeInputForMirror = null; // Ricorda su quale casella stiamo scrivendo
+    let activeInputForMirror = null;
 
     function syncMirror(e) {
         if (window.innerWidth <= 768) {
@@ -443,34 +453,29 @@
     function showMirror(e) {
         if (window.innerWidth <= 768) {
             activeInputForMirror = e.target;
-            typingMirror.style.display = 'flex'; // Usiamo flex per allineare testo e bottone
+            typingMirror.style.display = 'flex';
             mirrorText.textContent = e.target.value || "...";
         }
     }
 
     function hideMirror() {
-        // Mettiamo un piccolo ritardo (200ms) altrimenti la nuvoletta scompare 
-        // nel momento esatto in cui tocchi lo schermo e il clic su "INVIA" non parte!
         setTimeout(() => {
             typingMirror.style.display = 'none';
         }, 200);
     }
 
-    // Azione del nuovo tasto INVIA nella nuvoletta
     mirrorBtnSend.addEventListener('click', () => {
         if (activeInputForMirror) {
             if (activeInputForMirror.id === 'fs-input-text') window.sendFsMessage();
             if (activeInputForMirror.id === 'side-input-text') window.sendSideMessage();
-            typingMirror.style.display = 'none'; // Nascondi subito dopo l'invio
+            typingMirror.style.display = 'none';
         }
     });
 
-    // Applica le regole alla casella di testo in Fullscreen
     fsInputBox.addEventListener('input', syncMirror);
     fsInputBox.addEventListener('focus', showMirror);
     fsInputBox.addEventListener('blur', hideMirror);
 
-    // Applica le regole alla casella di testo Standard
     sideInputBox.addEventListener('input', syncMirror);
     sideInputBox.addEventListener('focus', showMirror);
     sideInputBox.addEventListener('blur', hideMirror);
