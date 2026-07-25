@@ -151,9 +151,34 @@
             #fs-full-chat-overlay { width: calc(100% - 40px); background: rgba(0,0,0,0.6); }
             #fs-input-box { width: 100%; }
         }
+	/* NUOVO: Nuvoletta specchio per testo su Smartphone */
+        #typing-mirror {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #00d4ff;
+            z-index: 9999; /* Sta sopra a qualsiasi altra cosa */
+            font-size: 1.1rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            word-wrap: break-word;
+            pointer-events: none; /* Ignora i tocchi */
+        }
+        #typing-mirror strong { color: #00d4ff; font-size: 0.9rem; display: block; margin-bottom: 5px; text-transform: uppercase; }
     </style>
 </head>
 <body>
+
+    <!-- Specchio del testo in digitazione (Anti-Tastiera) -->
+    <div id="typing-mirror"><strong>Stai scrivendo:</strong> <span id="mirror-text">...</span></div>
 
     <div class="main-layout">
         
@@ -165,17 +190,19 @@
             <a href="https://www.mixcloud.com/live/RossiDJ" target="_blank" class="btn-mixcloud hide-in-fs" id="btn-mixcloud-link" title="Guarda su Mixcloud">☁️ Vai su Mixcloud</a>
             <button class="btn-fullscreen-toggle hide-in-fs btn-pulsante-fs" id="btn-fs" onclick="toggleFullscreen()">🔲 Schermo Intero</button>
 
-            <!-- Nuvoletta Suggerimento Mobile -->
+            <!-- Nuvoletta Suggerimento Mobile con Legenda -->
             <div id="welcome-toast">
-                (Per smartphone: per vedere la chat usare il tasto "SCHERMO INTERO" 🔲) <br><br> Buona visione!
-            </div>
-
-            <!-- Offline -->
-            <div id="offline-screen">
-                <div class="offline-box">
-                    <h2 style="color: #ff0055; margin-top:0;">🔴 DIRETTA OFFLINE</h2>
-                    <p style="font-size: 1.2rem; margin-bottom: 10px;">RossiDJ al momento non è in onda.</p>
+                <span style="font-size:1.1rem; color:#ff0055;">Consiglio per Smartphone:</span><br>
+                Usa il tasto <strong>"SCHERMO INTERO" 🔲</strong><br><br>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: left; font-size: 0.85rem; display: inline-block;">
+                    <strong>Legenda Comandi:</strong><br>
+                    ↕️ Riduci/Espandi Chat<br>
+                    💬 Mostra/Nascondi Chat<br>
+                    ✏️ Scrivi Messaggio<br>
+                    ❌ Esci da Schermo Intero
                 </div>
+                <br><br>Buona visione!
             </div>
 
             <!-- CROPPER -->
@@ -237,7 +264,7 @@
         // Mostra il toast solo se lo schermo è quello di uno smartphone (<=768px)
         if(window.innerWidth <= 768) {
             setTimeout(() => { toast.style.opacity = '1'; }, 1000); // Compare dopo 1 secondo
-            setTimeout(() => { toast.style.opacity = '0'; }, 7000); // Scompare dopo 6 secondi
+            setTimeout(() => { toast.style.opacity = '0'; }, 10000); // Scompare dopo 9 secondi
         }
     };
 
@@ -387,6 +414,38 @@
             fullChatOverlay.style.display = 'none';
         }
     };
+    // --- GESTIONE SPECCHIO TESTO PER MOBILE (Anti-Tastiera) ---
+    const typingMirror = document.getElementById('typing-mirror');
+    const mirrorText = document.getElementById('mirror-text');
+    const fsInputBox = document.getElementById('fs-input-text');
+    const sideInputBox = document.getElementById('side-input-text');
+
+    function syncMirror(e) {
+        if (window.innerWidth <= 768) {
+            mirrorText.textContent = e.target.value || "...";
+        }
+    }
+
+    function showMirror(e) {
+        if (window.innerWidth <= 768) {
+            typingMirror.style.display = 'block';
+            mirrorText.textContent = e.target.value || "...";
+        }
+    }
+
+    function hideMirror() {
+        typingMirror.style.display = 'none';
+    }
+
+    // Applica le regole alla casella di testo in Fullscreen
+    fsInputBox.addEventListener('input', syncMirror);
+    fsInputBox.addEventListener('focus', showMirror);
+    fsInputBox.addEventListener('blur', hideMirror);
+
+    // Applica le regole alla casella di testo Standard
+    sideInputBox.addEventListener('input', syncMirror);
+    sideInputBox.addEventListener('focus', showMirror);
+    sideInputBox.addEventListener('blur', hideMirror);
 </script>
 </body>
 </html>
