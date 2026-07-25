@@ -152,7 +152,7 @@
             #fs-input-box { width: 100%; }
         }
         
-        /* NUOVO: Nuvoletta specchio per testo su Smartphone */
+        /* NUOVO: Nuvoletta specchio per testo su Smartphone (Cliccabile) */
         #typing-mirror {
             display: none;
             position: absolute;
@@ -166,14 +166,17 @@
             padding: 15px;
             border-radius: 12px;
             border: 2px solid #00d4ff;
-            z-index: 9999; /* Sta sopra a qualsiasi altra cosa */
+            z-index: 9999; 
             font-size: 1.1rem;
-            text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            word-wrap: break-word;
-            pointer-events: none; /* Ignora i tocchi */
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            pointer-events: auto; /* ORA È CLICCABILE! */
         }
+        .mirror-content { flex: 1; text-align: left; word-break: break-word; }
         #typing-mirror strong { color: #00d4ff; font-size: 0.9rem; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        #mirror-btn-send { background: #ff0055; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -183,8 +186,13 @@
         <!-- PARTE PLAYER -->
         <div id="video-wrapper" class="player-section">
 
-            <!-- Specchio del testo in digitazione (Anti-Tastiera) SPOSTATO QUI DENTRO -->
-            <div id="typing-mirror"><strong>Stai scrivendo:</strong> <span id="mirror-text">...</span></div>
+            <!-- Specchio del testo in digitazione con tasto INVIA (Anti-Tastiera) -->
+            <div id="typing-mirror">
+                <div class="mirror-content">
+                    <strong>Stai scrivendo:</strong> <span id="mirror-text">...</span>
+                </div>
+                <button id="mirror-btn-send">INVIA</button>
+            </div>
             
             <!-- Bottoni standard (Aggiunta la classe btn-pulsante-fs) -->
             <a href="index.html" class="btn-home hide-in-fs" title="Torna alla Home">🏠</a>
@@ -416,11 +424,15 @@
             fullChatOverlay.style.display = 'none';
         }
     };
+
     // --- GESTIONE SPECCHIO TESTO PER MOBILE (Anti-Tastiera) ---
     const typingMirror = document.getElementById('typing-mirror');
     const mirrorText = document.getElementById('mirror-text');
     const fsInputBox = document.getElementById('fs-input-text');
     const sideInputBox = document.getElementById('side-input-text');
+    const mirrorBtnSend = document.getElementById('mirror-btn-send');
+    
+    let activeInputForMirror = null; // Ricorda su quale casella stiamo scrivendo
 
     function syncMirror(e) {
         if (window.innerWidth <= 768) {
@@ -430,14 +442,28 @@
 
     function showMirror(e) {
         if (window.innerWidth <= 768) {
-            typingMirror.style.display = 'block';
+            activeInputForMirror = e.target;
+            typingMirror.style.display = 'flex'; // Usiamo flex per allineare testo e bottone
             mirrorText.textContent = e.target.value || "...";
         }
     }
 
     function hideMirror() {
-        typingMirror.style.display = 'none';
+        // Mettiamo un piccolo ritardo (200ms) altrimenti la nuvoletta scompare 
+        // nel momento esatto in cui tocchi lo schermo e il clic su "INVIA" non parte!
+        setTimeout(() => {
+            typingMirror.style.display = 'none';
+        }, 200);
     }
+
+    // Azione del nuovo tasto INVIA nella nuvoletta
+    mirrorBtnSend.addEventListener('click', () => {
+        if (activeInputForMirror) {
+            if (activeInputForMirror.id === 'fs-input-text') window.sendFsMessage();
+            if (activeInputForMirror.id === 'side-input-text') window.sendSideMessage();
+            typingMirror.style.display = 'none'; // Nascondi subito dopo l'invio
+        }
+    });
 
     // Applica le regole alla casella di testo in Fullscreen
     fsInputBox.addEventListener('input', syncMirror);
