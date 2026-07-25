@@ -186,7 +186,19 @@
         }
         .mirror-content { flex: 1; text-align: left; word-break: break-word; }
         #typing-mirror strong { color: #00d4ff; font-size: 0.9rem; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        #mirror-btn-send { background: #ff0055; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        #mirror-btn-send { background: #ff0055; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 	1rem; }
+
+	/* --- FALLBACK IOS: Finto schermo intero per iPhone --- */
+        .ios-fake-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100dvh !important;
+            z-index: 9999 !important;
+            border: none !important;
+        }
+
     </style>
 </head>
 <body>
@@ -376,49 +388,53 @@
     const overlayUI = document.getElementById('fs-overlay');
     const fullChatOverlay = document.getElementById('fs-full-chat-overlay');
 
-    // --- FULLSCREEN COMPATIBILE ANCHE CON IPHONE ---
+// --- FULLSCREEN COMPATIBILE ANCHE CON IPHONE ---
     window.toggleFullscreen = async () => {
-        const iframe = document.getElementById('live-frame');
+        const isFakeFs = videoWrapper.classList.contains('ios-fake-fullscreen');
 
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && !isFakeFs) {
             try {
-                // 1. Tentativo standard sul wrapper (per PC e Android)
+                // Tentativo standard per PC e Android
                 if (videoWrapper.requestFullscreen) {
                     await videoWrapper.requestFullscreen();
                 } else if (videoWrapper.webkitRequestFullscreen) {
                     await videoWrapper.webkitRequestFullscreen(); 
                 } else {
-                    // 2. Soluzione di fallback per iPhone/Safari se il div non accetta il Fullscreen
-                    const videoElement = iframe.contentWindow.document.querySelector('video');
-                    if (videoElement && videoElement.webkitEnterFullscreen) {
-                        videoElement.webkitEnterFullscreen();
-                    } else {
-                        // Se l'iframe è bloccato dalle policy di Apple, simuliamo l'espansione grafica totale via CSS
-                        videoWrapper.classList.add('ios-fake-fullscreen');
-                    }
+                    // Fallback iOS: Nessun supporto nativo, forziamo il "finto" schermo intero CSS
+                    videoWrapper.classList.add('ios-fake-fullscreen');
+                    handleFsChange();
                 }
             } catch (e) {
-                console.error("Errore schermo intero: ", e);
+                // Se la richiesta va in errore (es. blocco Apple), forza il fallback
+                videoWrapper.classList.add('ios-fake-fullscreen');
+                handleFsChange();
             }
         } else {
+            // Chiusura schermo intero
             try {
-                if (document.exitFullscreen) {
+                if (document.exitFullscreen && document.fullscreenElement) {
                     await document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
+                } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
                     await document.webkitExitFullscreen();
                 }
             } catch (e) {
                 console.error("Errore uscita schermo intero: ", e);
             }
+            // Rimuove il fallback iOS se era attivo
             videoWrapper.classList.remove('ios-fake-fullscreen');
+            handleFsChange();
         }
     };
 
     document.addEventListener('fullscreenchange', handleFsChange);
     document.addEventListener('webkitfullscreenchange', handleFsChange);
 
+    // Gestore interfaccia grafica (aggiornato per supportare l'iPhone)
     function handleFsChange() {
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
+        const isRealFs = document.fullscreenElement || document.webkitFullscreenElement;
+        const isFakeFs = videoWrapper.classList.contains('ios-fake-fullscreen');
+
+        if (isRealFs || isFakeFs) {
             overlayUI.style.display = 'block';
             videoWrapper.classList.add('fullscreen-active');
             fullChatOverlay.style.display = 'flex';
