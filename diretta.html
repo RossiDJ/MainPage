@@ -376,15 +376,41 @@
     const overlayUI = document.getElementById('fs-overlay');
     const fullChatOverlay = document.getElementById('fs-full-chat-overlay');
 
+    // --- FULLSCREEN COMPATIBILE ANCHE CON IPHONE ---
     window.toggleFullscreen = async () => {
+        const iframe = document.getElementById('live-frame');
+
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
             try {
-                if (videoWrapper.requestFullscreen) { await videoWrapper.requestFullscreen(); }
-                else if (videoWrapper.webkitRequestFullscreen) { await videoWrapper.webkitRequestFullscreen(); } 
-            } catch(e) { console.error(e); }
+                // 1. Tentativo standard sul wrapper (per PC e Android)
+                if (videoWrapper.requestFullscreen) {
+                    await videoWrapper.requestFullscreen();
+                } else if (videoWrapper.webkitRequestFullscreen) {
+                    await videoWrapper.webkitRequestFullscreen(); 
+                } else {
+                    // 2. Soluzione di fallback per iPhone/Safari se il div non accetta il Fullscreen
+                    const videoElement = iframe.contentWindow.document.querySelector('video');
+                    if (videoElement && videoElement.webkitEnterFullscreen) {
+                        videoElement.webkitEnterFullscreen();
+                    } else {
+                        // Se l'iframe è bloccato dalle policy di Apple, simuliamo l'espansione grafica totale via CSS
+                        videoWrapper.classList.add('ios-fake-fullscreen');
+                    }
+                }
+            } catch (e) {
+                console.error("Errore schermo intero: ", e);
+            }
         } else {
-            if (document.exitFullscreen) { await document.exitFullscreen(); }
-            else if (document.webkitExitFullscreen) { await document.webkitExitFullscreen(); }
+            try {
+                if (document.exitFullscreen) {
+                    await document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    await document.webkitExitFullscreen();
+                }
+            } catch (e) {
+                console.error("Errore uscita schermo intero: ", e);
+            }
+            videoWrapper.classList.remove('ios-fake-fullscreen');
         }
     };
 
