@@ -122,22 +122,8 @@
                 }
             }
 
-            // Ricostruiamo l'iframe in modo sicuro usando l'URL forzato
-            const safeIframe = `<iframe width="100%" height="120" src="${url}" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-	playsinline></iframe>`;
-            
-            grid.innerHTML += `
-                <div class="card">
-                    <div>
-                        <div class="card-title">🎵 ${item.title}</div>
-                    </div>
-                    <div class="widget-container">
-                        ${safeIframe}
-                    </div>
-                </div>`;
-        });
-    }
-           // Ricostruiamo l'iframe in modo sicuro usando solo il src salvato (con sblocco per Apple iPad/iOS)
-            const safeIframe = `<iframe width="100%" height="120" src="${item.src}" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-playsinline></iframe>`;
+            // Ricostruiamo l'iframe in modo sicuro usando l'URL forzato e gli sblocchi Apple iOS
+            const safeIframe = `<iframe width="100%" height="120" src="${url}" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-playsinline></iframe>`;
             
             grid.innerHTML += `
                 <div class="card">
