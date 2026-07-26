@@ -17,9 +17,9 @@
         
         .section-box { background: rgba(0, 0, 0, 0.5); border: 1px solid #444; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         
-        /* Griglia delle registrazioni */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 12px; border: 1px solid #444; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s; }
+        /* Layout in Colonna (Modificato per compatibilità con iOS 12) */
+        .grid { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+        .card { background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 12px; border: 1px solid #444; text-align: center; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; width: 100%; box-sizing: border-box; }
         .card:hover { transform: translateY(-5px); border-color: #ff9900; background: rgba(0, 0, 0, 0.8); }
         .card-title { font-size: 1.1rem; margin-bottom: 15px; color: #ff9900; font-weight: bold; word-wrap: break-word; }
         
@@ -72,7 +72,7 @@
         <div class="section-box">
             <h3 style="text-align: center; color: #ff9900; margin-top:0;">Riascolta i set precedenti</h3>
             <div id="registrazioni-grid" class="grid">
-                <p style="grid-column: 1 / -1; text-align: center; color: #888;">Caricamento registrazioni in corso...</p>
+                <p style="text-align: center; color: #888;">Caricamento registrazioni in corso...</p>
             </div>
         </div>
     </div>
@@ -107,7 +107,7 @@
         
         const keys = Object.keys(regData);
         if (keys.length === 0) {
-            grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888;">Nessuna registrazione disponibile al momento.</p>';
+            grid.innerHTML = '<p style="text-align: center; color: #888;">Nessuna registrazione disponibile al momento.</p>';
             return;
         }
 
