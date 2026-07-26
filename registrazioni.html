@@ -113,6 +113,29 @@
 
         keys.forEach(id => {
             const item = regData[id];
+            
+            // TRUCCHETTO IPAD/DESKTOP: Forza SEMPRE il widget orizzontale compatto
+            let url = item.src;
+            if (url && url.includes('mixcloud.com')) {
+                if (!url.includes('hide_cover=1')) {
+                    url += (url.includes('?') ? '&' : '?') + 'hide_cover=1';
+                }
+            }
+
+            // Ricostruiamo l'iframe in modo sicuro usando l'URL forzato
+            const safeIframe = `<iframe width="100%" height="120" src="${url}" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-	playsinline></iframe>`;
+            
+            grid.innerHTML += `
+                <div class="card">
+                    <div>
+                        <div class="card-title">🎵 ${item.title}</div>
+                    </div>
+                    <div class="widget-container">
+                        ${safeIframe}
+                    </div>
+                </div>`;
+        });
+    }
            // Ricostruiamo l'iframe in modo sicuro usando solo il src salvato (con sblocco per Apple iPad/iOS)
             const safeIframe = `<iframe width="100%" height="120" src="${item.src}" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-playsinline></iframe>`;
             
