@@ -113,8 +113,8 @@
 
         keys.forEach(id => {
             const item = regData[id];
-            // Ricostruiamo l'iframe in modo sicuro usando solo il src salvato
-            const safeIframe = `<iframe width="100%" height="120" src="${item.src}" frameborder="0" allow="encrypted-media; autoplay; speaker-selection;"></iframe>`;
+           // Ricostruiamo l'iframe in modo sicuro usando solo il src salvato (con sblocco per Apple iPad/iOS)
+            const safeIframe = `<iframe width="100%" height="120" src="${item.src}" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-playsinline></iframe>`;
             
             grid.innerHTML += `
                 <div class="card">
