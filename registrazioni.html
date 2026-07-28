@@ -88,25 +88,24 @@
 
     let regData = {};
 
-    // Legge in tempo reale le registrazioni da Firebase (cartella 'registrazioni')
     onValue(ref(db, 'registrazioni'), (snap) => {
         regData = snap.val() || {};
         renderPublic();
         renderAdminList();
     });
 
-    // Estrattore sicuro dell'URL dall'iframe fornito dall'utente
     function estraiSrcDaIframe(iframeString) {
         const match = iframeString.match(/src="([^"]+)"/);
         return match ? match[1] : null;
     }
 
-    // Mostra le registrazioni agli utenti
     function renderPublic() {
         const grid = document.getElementById('registrazioni-grid');
         grid.innerHTML = '';
         
-        const keys = Object.keys(regData);
+        // MODIFICA QUI: Aggiunto .reverse() per invertire l'ordine[cite: 4]
+        const keys = Object.keys(regData).reverse();
+        
         if (keys.length === 0) {
             grid.innerHTML = '<p style="text-align: center; color: #888;">Nessuna registrazione disponibile al momento.</p>';
             return;
@@ -115,7 +114,6 @@
         keys.forEach(id => {
             const item = regData[id];
             
-            // TRUCCHETTO IPAD/DESKTOP: Forza SEMPRE il widget orizzontale compatto
             let url = item.src;
             if (url && url.includes('mixcloud.com')) {
                 if (!url.includes('hide_cover=1')) {
@@ -123,7 +121,6 @@
                 }
             }
 
-            // Ricostruiamo l'iframe in modo sicuro usando l'URL forzato e gli sblocchi Apple iOS
             const safeIframe = `<iframe width="100%" height="120" src="${url}" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-playsinline></iframe>`;
             
             grid.innerHTML += `
@@ -138,12 +135,13 @@
         });
     }
 
-    // Mostra la lista nel pannello di controllo DJ
     function renderAdminList() {
         const adminList = document.getElementById('admin-list');
         adminList.innerHTML = '';
         
-        const keys = Object.keys(regData);
+        // MODIFICA QUI: Aggiunto .reverse() anche nel pannello DJ[cite: 4]
+        const keys = Object.keys(regData).reverse();
+        
         if (keys.length === 0) {
             adminList.innerHTML = '<p>Nessuna registrazione.</p>';
             return;
@@ -159,7 +157,6 @@
         });
     }
 
-    // Controllo Password DJ tramite Firebase
     window.checkAdmin = () => {
         const inputPass = document.getElementById('adminPass').value;
         get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
@@ -171,7 +168,6 @@
         });
     };
 
-    // Aggiungi nuova registrazione
     window.aggiungiRegistrazione = () => {
         const title = document.getElementById('newTitle').value.trim();
         const embedCode = document.getElementById('newEmbed').value.trim();
@@ -182,7 +178,6 @@
         
         if (!src) return alert("Il codice embed non è valido. Assicurati di incollare l'intero tag <iframe> fornito da Mixcloud.");
 
-        // Salviamo solo il titolo e il src dell'iframe per sicurezza
         push(ref(db, 'registrazioni'), { title: title, src: src })
             .then(() => {
                 alert("Registrazione pubblicata con successo!");
@@ -192,7 +187,6 @@
             .catch(e => alert("Errore: " + e.message));
     };
 
-    // Elimina registrazione
     window.eliminaRegistrazione = (id) => {
         if (confirm("Vuoi eliminare questa registrazione?")) {
             remove(ref(db, `registrazioni/${id}`));

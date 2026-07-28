@@ -37,7 +37,6 @@
         #admin-panel { border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; background: rgba(0, 0, 0, 0.85); border-radius: 10px; }
         .admin-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; text-align: left; flex-wrap: wrap; gap: 10px;}
 
-        /* Rimuovi la possibilità per l'utente di cliccare sul video così usa solo i comandi di Mixcloud */
         video { pointer-events: none; width: 100%; display: block; }
     </style>
 </head>
@@ -53,13 +52,11 @@
 
     <div class="container">
         
-        <!-- Pulsante per aprire il Pannello DJ -->
         <div style="text-align: right; margin-bottom: 15px;">
             <input type="password" id="adminPass" placeholder="Password DJ" style="width: 200px; display: inline-block;">
             <button class="btn btn-danger" onclick="checkAdmin()">Pannello DJ</button>
         </div>
         
-        <!-- Pannello DJ Nascosto -->
         <div id="admin-panel">
             <h2 style="color:#ff0055; margin-top:0;">🔴 Gestione VideoRegistrazioni</h2>
             <div class="section-box">
@@ -73,7 +70,6 @@
             <div id="admin-list">Nessuna registrazione presente.</div>
         </div>
 
-        <!-- Sezione Pubblica -->
         <div class="section-box">
             <h3 style="text-align: center; color: #00d4ff; margin-top:0;">Guarda e ascolta i set precedenti</h3>
             <div id="registrazioni-grid" class="grid">
@@ -92,7 +88,6 @@
 
     let regData = {};
 
-    // Legge in tempo reale dal nuovo nodo 'videoregistrazioni'
     onValue(ref(db, 'videoregistrazioni'), (snap) => {
         regData = snap.val() || {};
         renderPublic();
@@ -108,13 +103,14 @@
         const grid = document.getElementById('registrazioni-grid');
         grid.innerHTML = '';
         
-        const keys = Object.keys(regData);
+        // MODIFICA QUI: Invertito l'ordine[cite: 5]
+        const keys = Object.keys(regData).reverse();
+        
         if (keys.length === 0) {
             grid.innerHTML = '<p style="text-align: center; color: #888;">Nessun video disponibile al momento.</p>';
             return;
         }
 
-        // 1. Genera l'HTML
         keys.forEach(id => {
             const item = regData[id];
             
@@ -144,7 +140,6 @@
                 </div>`;
         });
 
-        // 2. Applica lo script di sincronizzazione a tutti i player generati
         setTimeout(() => {
             keys.forEach(id => {
                 const video = document.getElementById(`video-${id}`);
@@ -170,14 +165,16 @@
                     });
                 }
             });
-        }, 500); // Piccolo ritardo per assicurarsi che l'HTML sia nel DOM
+        }, 500); 
     }
 
     function renderAdminList() {
         const adminList = document.getElementById('admin-list');
         adminList.innerHTML = '';
         
-        const keys = Object.keys(regData);
+        // MODIFICA QUI: Invertito l'ordine per il pannello DJ[cite: 5]
+        const keys = Object.keys(regData).reverse();
+        
         if (keys.length === 0) {
             adminList.innerHTML = '<p>Nessuna registrazione.</p>';
             return;
