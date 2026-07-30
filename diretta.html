@@ -237,6 +237,14 @@
                 <br><br>Buona visione!
             </div>
 
+            <!-- SCHERMATA OFFLINE (Aggiunta per mostrare il timer) -->
+            <div id="offline-screen">
+                <div class="offline-box">
+                    <h2 style="margin: 0 0 10px 0; color: #00d4ff;">Rossi DJ</h2>
+                    <p id="countdown-text" style="font-size: 1.2rem; font-weight: bold; margin: 0; color: #fff;">Trasmissione Offline</p>
+                </div>
+            </div>
+
             <!-- CROPPER -->
             <div id="iframe-cropper">
                 <iframe id="live-frame" src="https://www.mixcloud.com/live/RossiDJ/" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" playsinline webkit-playsinline frameborder="0"></iframe>
@@ -289,6 +297,7 @@
     const auth = getAuth(app);
 
     let currentUserNick = null;
+    let countdownInterval = null; // Variabile per tracciare il timer
 
     // --- GESTIONE NUOVO TOAST CON CHIUSURA MANUALE ---
     window.chiudiToast = () => {
@@ -305,24 +314,78 @@
         }
     };
 
-    onValue(ref(db, 'settings/liveStatus'), (snap) => {
-        const isLive = snap.val();
+    // --- LOGICA MODIFICATA PER GESTIRE COUNTDOWN O DIRETTA ---
+    onValue(ref(db, 'settings'), (snap) => {
+        const data = snap.val() || {};
+        const isLive = data.liveStatus;
+        const startTime = data.liveStartTime || 0;
+
         const frame = document.getElementById('live-frame');
         const offlineScreen = document.getElementById('offline-screen');
         const btnFs = document.getElementById('btn-fs');
         const btnMix = document.getElementById('btn-mixcloud-link');
+        const countdownText = document.getElementById('countdown-text');
         
-        if(isLive) {
-            frame.style.display = 'block';
-            offlineScreen.style.display = 'none';
-            btnFs.style.display = 'block'; 
-            btnMix.style.display = 'block'; 
-            frame.src = frame.src; 
+        clearInterval(countdownInterval); // Pulisce eventuali timer precedenti
+        
+        if (isLive) {
+            const now = Date.now();
+            
+            if (startTime > now) {
+                // Modalità Programmazione: la data di inizio è nel futuro
+                frame.style.display = 'none';
+                offlineScreen.style.display = 'flex';
+                btnFs.style.display = 'none'; 
+                btnMix.style.display = 'none';
+                
+                const updateCountdown = () => {
+                    const currentTime = Date.now();
+                    const diff = startTime - currentTime;
+                    
+                    if (diff <= 0) {
+                        // Il timer è scaduto, avvia la diretta!
+                        clearInterval(countdownInterval);
+                        countdownText.innerHTML = "Avvio della diretta...";
+                        setTimeout(() => {
+                            frame.style.display = 'block';
+                            offlineScreen.style.display = 'none';
+                            btnFs.style.display = 'block'; 
+                            btnMix.style.display = 'block'; 
+                            frame.src = frame.src; 
+                        }, 1000);
+                    } else {
+                        // Calcolo Giorni, Ore, Minuti, Secondi
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+                        
+                        let timeString = "";
+                        if (d > 0) timeString += `${d}g `;
+                        timeString += `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                        
+                        countdownText.innerHTML = `La diretta partirà tra<br><span style="font-size:2rem; color:#ff0055;">${timeString}</span>`;
+                    }
+                };
+                
+                updateCountdown(); // Esegue subito senza attendere un secondo
+                countdownInterval = setInterval(updateCountdown, 1000);
+
+            } else {
+                // Diretta Iniziata Immediatamente o Timer già passato
+                frame.style.display = 'block';
+                offlineScreen.style.display = 'none';
+                btnFs.style.display = 'block'; 
+                btnMix.style.display = 'block'; 
+                frame.src = frame.src; 
+            }
         } else {
+            // Modalità Offline Normale
             frame.style.display = 'none';
             offlineScreen.style.display = 'flex';
             btnFs.style.display = 'none'; 
             btnMix.style.display = 'none'; 
+            if (countdownText) countdownText.innerHTML = "Trasmissione Offline";
             if (document.fullscreenElement) { document.exitFullscreen(); }
         }
     });
