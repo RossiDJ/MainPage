@@ -221,7 +221,7 @@
     // --- NUOVO CONTROLLO PASSWORD TRAMITE FIREBASE ---
     window.sbloccaAdminChat = () => {
         const inputPass = document.getElementById('passInputChat').value;
-        get(child(ref(db, 'settings/adminPass'))).then((snapshot) => {
+        get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
             if(snapshot.exists() && snapshot.val() === inputPass) {
                 document.getElementById('login-admin-area').classList.add('hidden');
                 document.getElementById('controlli-admin-area').classList.remove('hidden');
