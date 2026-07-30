@@ -243,15 +243,22 @@
         if (stato === true) {
             const timeInput = document.getElementById('live-time-input').value;
             if (timeInput) {
-                // Converte la data/ora locale inserita in un timestamp Unix assoluto
-                const timestamp = new Date(timeInput).getTime();
-                updateData.liveStartTime = timestamp;
+                // Converte la stringa in un oggetto data
+                const selectedDate = new Date(timeInput);
+                
+                // Converte la data nel fuso orario di Roma (Europa/Roma gestisce automaticamente l'ora legale)
+                const romeTzString = selectedDate.toLocaleString('en-US', { timeZone: 'Europe/Roma' });
+                const romeDate = new Date(romeTzString);
+                
+                // Calcola il timestamp corretto compensando lo scostamento
+                const diffMs = selectedDate.getTime() - romeDate.getTime();
+                const exactTimestamp = selectedDate.getTime() + diffMs;
+
+                updateData.liveStartTime = exactTimestamp;
             } else {
-                // Nessuna data selezionata, parte subito
                 updateData.liveStartTime = 0; 
             }
         } else {
-            // Spegne la diretta e resetta il timer
             updateData.liveStartTime = 0; 
             document.getElementById('live-time-input').value = '';
         }
