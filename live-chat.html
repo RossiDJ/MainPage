@@ -194,7 +194,21 @@
         else { currentUserNick = null; disattivaChatWeb(); }
     });
 
-    function attivaChatWeb() { document.getElementById('verifica-container').style.display = 'none'; document.getElementById('chat-interface').style.display = 'flex'; document.getElementById('btnLogout').style.display = 'block'; document.getElementById('btnNotifiche').style.display = 'block'; updateNotificheBtn(); }
+    function attivaChatWeb() { 
+        document.getElementById('verifica-container').style.display = 'none'; 
+        document.getElementById('chat-interface').style.display = 'flex'; 
+        document.getElementById('btnLogout').style.display = 'block'; 
+        document.getElementById('btnNotifiche').style.display = 'block'; 
+        updateNotificheBtn(); 
+        
+        // Forza lo scorrimento in basso non appena il riquadro diventa visibile
+        setTimeout(() => {
+            const messagesBox = document.getElementById('messages');
+            if (messagesBox) {
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            }
+        }, 150);
+    }
     function disattivaChatWeb() { document.getElementById('verifica-container').style.display = 'flex'; document.getElementById('chat-interface').style.display = 'none'; document.getElementById('btnLogout').style.display = 'none'; document.getElementById('btnNotifiche').style.display = 'none'; }
 
     // --- NUOVO CONTROLLO PASSWORD TRAMITE FIREBASE ---
@@ -260,11 +274,20 @@
             if (auth.currentUser) { const uid = auth.currentUser.uid.replace(/[^a-zA-Z0-9]/g, ""); if (likeSnap.exists() && likeSnap.val()[uid]) { likeBtn.style.backgroundColor = "rgba(255, 0, 85, 0.4)"; likeBtn.style.borderColor = "#ff0055"; } else { likeBtn.style.backgroundColor = "rgba(0,0,0,0.4)"; likeBtn.style.borderColor = "#444"; } }
         });
         
-        msgDiv.appendChild(textDiv); msgDiv.appendChild(footerDiv);
-        const deleteBtn = document.createElement('button'); deleteBtn.className = 'btn-elimina-msg'; deleteBtn.innerHTML = '🗑️'; deleteBtn.onclick = () => { if(confirm("Eliminare?")) remove(ref(db, 'messages/' + msgId)); };
+       msgDiv.appendChild(textDiv); msgDiv.appendChild(footerDiv);
+        const deleteBtn = document.createElement('button'); deleteBtn.className = 'btn-elimina-msg'; deleteBtn.innerHTML = '🗑️'; deleteBtn.onclick = () => 	{ if(confirm("Eliminare?")) remove(ref(db, 'messages/' + msgId)); };
         wrapperDiv.appendChild(msgDiv); wrapperDiv.appendChild(deleteBtn);
-        document.getElementById('messages').prepend(wrapperDiv);
+        
+        // MODIFICA: Inserisce il messaggio in fondo e forza lo scorrimento
+        const messagesBox = document.getElementById('messages');
+        messagesBox.appendChild(wrapperDiv);
+        
+        // Piccolo ritardo per dare tempo al browser di disegnare il messaggio prima di scorrere
+        setTimeout(() => {
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }, 50);
     });
+
     onChildRemoved(ref(db, 'messages'), (snapshot) => { const msgElement = document.getElementById('msg-' + snapshot.key); if (msgElement) msgElement.remove(); });
 </script>
 <!-- MODALE REGISTRAZIONE WHATSAPP -->
