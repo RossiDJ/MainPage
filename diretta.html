@@ -297,9 +297,8 @@
     const auth = getAuth(app);
 
     let currentUserNick = null;
-    let countdownInterval = null; // Variabile per tracciare il timer
+    let countdownInterval = null; 
 
-    // --- GESTIONE NUOVO TOAST CON CHIUSURA MANUALE ---
     window.chiudiToast = () => {
         const toast = document.getElementById('welcome-toast');
         if(toast) toast.style.opacity = '0';
@@ -310,11 +309,11 @@
         const toast = document.getElementById('welcome-toast');
         if(window.innerWidth <= 768) {
             setTimeout(() => { toast.style.opacity = '1'; }, 1000); 
-            setTimeout(() => { chiudiToast(); }, 12000); // Scompare in automatico dopo 12s se non chiusa prima
+            setTimeout(() => { chiudiToast(); }, 12000); 
         }
     };
 
-    // --- LOGICA MODIFICATA PER GESTIRE COUNTDOWN O DIRETTA ---
+    // LA RIGA CORRETTA È QUESTA:
     onValue(ref(db, 'settings'), (snap) => {
         const data = snap.val() || {};
         const isLive = data.liveStatus;
@@ -326,13 +325,12 @@
         const btnMix = document.getElementById('btn-mixcloud-link');
         const countdownText = document.getElementById('countdown-text');
         
-        clearInterval(countdownInterval); // Pulisce eventuali timer precedenti
+        clearInterval(countdownInterval);
         
         if (isLive) {
             const now = Date.now();
             
             if (startTime > now) {
-                // Modalità Programmazione: la data di inizio è nel futuro
                 frame.style.display = 'none';
                 offlineScreen.style.display = 'flex';
                 btnFs.style.display = 'none'; 
@@ -343,9 +341,8 @@
                     const diff = startTime - currentTime;
                     
                     if (diff <= 0) {
-                        // Il timer è scaduto, avvia la diretta!
                         clearInterval(countdownInterval);
-                        countdownText.innerHTML = "Avvio della diretta...";
+                        if(countdownText) countdownText.innerHTML = "Avvio della diretta...";
                         setTimeout(() => {
                             frame.style.display = 'block';
                             offlineScreen.style.display = 'none';
@@ -354,7 +351,6 @@
                             frame.src = frame.src; 
                         }, 1000);
                     } else {
-                        // Calcolo Giorni, Ore, Minuti, Secondi
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -364,15 +360,14 @@
                         if (d > 0) timeString += `${d}g `;
                         timeString += `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                         
-                        countdownText.innerHTML = `La diretta partirà tra<br><span style="font-size:2rem; color:#ff0055;">${timeString}</span>`;
+                        if(countdownText) countdownText.innerHTML = `La diretta partirà tra<br><span style="font-size:2rem; color:#ff0055;">${timeString}</span>`;
                     }
                 };
                 
-                updateCountdown(); // Esegue subito senza attendere un secondo
+                updateCountdown();
                 countdownInterval = setInterval(updateCountdown, 1000);
 
             } else {
-                // Diretta Iniziata Immediatamente o Timer già passato
                 frame.style.display = 'block';
                 offlineScreen.style.display = 'none';
                 btnFs.style.display = 'block'; 
@@ -380,7 +375,6 @@
                 frame.src = frame.src; 
             }
         } else {
-            // Modalità Offline Normale
             frame.style.display = 'none';
             offlineScreen.style.display = 'flex';
             btnFs.style.display = 'none'; 
@@ -451,29 +445,24 @@
     const overlayUI = document.getElementById('fs-overlay');
     const fullChatOverlay = document.getElementById('fs-full-chat-overlay');
 
-// --- FULLSCREEN COMPATIBILE ANCHE CON IPHONE ---
     window.toggleFullscreen = async () => {
         const isFakeFs = videoWrapper.classList.contains('ios-fake-fullscreen');
 
         if (!document.fullscreenElement && !document.webkitFullscreenElement && !isFakeFs) {
             try {
-                // Tentativo standard per PC e Android
                 if (videoWrapper.requestFullscreen) {
                     await videoWrapper.requestFullscreen();
                 } else if (videoWrapper.webkitRequestFullscreen) {
                     await videoWrapper.webkitRequestFullscreen(); 
                 } else {
-                    // Fallback iOS: Nessun supporto nativo, forziamo il "finto" schermo intero CSS
                     videoWrapper.classList.add('ios-fake-fullscreen');
                     handleFsChange();
                 }
             } catch (e) {
-                // Se la richiesta va in errore (es. blocco Apple), forza il fallback
                 videoWrapper.classList.add('ios-fake-fullscreen');
                 handleFsChange();
             }
         } else {
-            // Chiusura schermo intero
             try {
                 if (document.exitFullscreen && document.fullscreenElement) {
                     await document.exitFullscreen();
@@ -483,7 +472,6 @@
             } catch (e) {
                 console.error("Errore uscita schermo intero: ", e);
             }
-            // Rimuove il fallback iOS se era attivo
             videoWrapper.classList.remove('ios-fake-fullscreen');
             handleFsChange();
         }
@@ -492,7 +480,6 @@
     document.addEventListener('fullscreenchange', handleFsChange);
     document.addEventListener('webkitfullscreenchange', handleFsChange);
 
-    // Gestore interfaccia grafica (aggiornato per supportare l'iPhone)
     function handleFsChange() {
         const isRealFs = document.fullscreenElement || document.webkitFullscreenElement;
         const isFakeFs = videoWrapper.classList.contains('ios-fake-fullscreen');
@@ -540,7 +527,6 @@
         }
     };
 
-    // --- GESTIONE SPECCHIO TESTO PER MOBILE (Anti-Tastiera) ---
     const typingMirror = document.getElementById('typing-mirror');
     const mirrorText = document.getElementById('mirror-text');
     const fsInputBox = document.getElementById('fs-input-text');
@@ -584,6 +570,6 @@
     sideInputBox.addEventListener('input', syncMirror);
     sideInputBox.addEventListener('focus', showMirror);
     sideInputBox.addEventListener('blur', hideMirror);
-</script>
+</script></script>
 </body>
 </html>
