@@ -223,11 +223,11 @@
                 <br><br>Buona visione!
             </div>
 
-            <!-- SCHERMATA OFFLINE CON COUNTDOWN -->
+           <!-- SCHERMATA OFFLINE CON COUNTDOWN -->
             <div id="offline-screen">
                 <div class="offline-box">
                     <h2 style="margin: 0 0 10px 0; color: #00d4ff;">Rossi DJ</h2>
-                    <p id="countdown-text" style="font-size: 1.2rem; font-weight: bold; margin: 0; color: #fff;">Trasmissione Offline</p>
+                    <p id="countdown-text" style="font-size: 1.2rem; font-weight: bold; margin: 0; color: #fff;">In caricamento...</p>
                 </div>
             </div>
 
@@ -294,11 +294,12 @@
         }
     };
 
-    // LISTENER PRINCIPALE AGGIORNATO CON IL COUNTDOWN
-onValue(ref(db, 'settings'), (snap) => {
+    // LISTENER PRINCIPALE AGGIORNATO CON IL COUNTDOWN E AUTO-REFRESH
+    onValue(ref(db, 'settings'), (snap) => {
         const data = snap.val() || {};
-        const isLive = data.liveStatus;
-        // Forza la lettura del timestamp come numero intero
+        
+        // Controllo robusto per accertarsi che true venga interpretato correttamente (sia boolean che stringa)
+        const isLive = (data.liveStatus === true || String(data.liveStatus) === "true");
         const startTime = Number(data.liveStartTime) || 0;
 
         const frame = document.getElementById('live-frame');
@@ -327,11 +328,8 @@ onValue(ref(db, 'settings'), (snap) => {
                         clearInterval(countdownInterval);
                         if(countdownText) countdownText.innerHTML = "Avvio della diretta...";
                         setTimeout(() => {
-                            frame.style.display = 'block';
-                            offlineScreen.style.display = 'none';
-                            btnFs.style.display = 'block'; 
-                            btnMix.style.display = 'block'; 
-                            frame.src = frame.src; 
+                            // Effettua il refresh completo della pagina come richiesto
+                            window.location.reload(true);
                         }, 1000);
                     } else {
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -356,7 +354,6 @@ onValue(ref(db, 'settings'), (snap) => {
                 offlineScreen.style.display = 'none';
                 btnFs.style.display = 'block'; 
                 btnMix.style.display = 'block'; 
-                frame.src = frame.src; 
             }
         } else {
             // Offline
@@ -365,7 +362,7 @@ onValue(ref(db, 'settings'), (snap) => {
             btnFs.style.display = 'none'; 
             btnMix.style.display = 'none'; 
             if (countdownText) countdownText.innerHTML = "Trasmissione Offline";
-            if (document.fullscreenElement) { document.exitFullscreen(); }
+            if (document.fullscreenElement) { document.exitFullscreen().catch(()=>{}); }
         }
     });
 
