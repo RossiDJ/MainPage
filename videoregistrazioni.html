@@ -23,9 +23,20 @@
         .card:hover { border-color: #00d4ff; background: rgba(0, 0, 0, 0.8); }
         .card-title { font-size: 1.2rem; margin-bottom: 15px; color: #00d4ff; font-weight: bold; word-wrap: break-word; text-transform: uppercase; }
         
-        .video-container { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 10px; background: #000; border: 1px solid #333; }
-        .widget-container { width: 100%; border-radius: 8px; overflow: hidden; margin-top: 5px; }
+        /* Modifiche Layout Player per Fullscreen */
+        .player-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #333; margin-bottom: 10px; }
+        .player-wrapper .video-container { border: none; margin-bottom: 0; border-radius: 0; width: 100%; }
+        .player-wrapper .widget-container { margin-top: 0; border-radius: 0; width: 100%; }
         
+        /* Modalità Schermo Intero Attiva */
+        .player-wrapper.is-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; border: none; border-radius: 0; justify-content: center; margin: 0; }
+        .player-wrapper.is-fullscreen .video-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .player-wrapper.is-fullscreen video { max-height: calc(100vh - 120px); width: auto; object-fit: contain; }
+
+        .btn-fullscreen { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); color: #fff; border: 1px solid #00d4ff; padding: 8px 12px; border-radius: 5px; cursor: pointer; z-index: 10; font-weight: bold; transition: 0.2s; }
+        .btn-fullscreen:hover { background: #00d4ff; color: #000; }
+        
+        /* Controlli UI e Pannello DJ */
         .btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px; background: #00d4ff; color: #000; }
         .btn-danger { background: #ff0055; color: #fff; }
         .btn-success { background: #ff9900; color: #fff; }
@@ -127,14 +138,18 @@
                 <div class="card">
                     <div class="card-title">${item.title}</div>
                     
-                    <div class="video-container">
-                        <video id="video-${id}" data-offset="${offset}" muted playsinline preload="auto">
-                            <source src="${item.videoUrl}" type="video/mp4">
-                        </video>
-                    </div>
+                    <div class="player-wrapper" id="wrapper-${id}">
+                        <button class="btn-fullscreen" onclick="toggleFullscreen('wrapper-${id}')">🔲 Schermo Intero</button>
+                        
+                        <div class="video-container">
+                            <video id="video-${id}" data-offset="${offset}" muted playsinline preload="auto">
+                                <source src="${item.videoUrl}" type="video/mp4">
+                            </video>
+                        </div>
 
-                    <div class="widget-container">
-                        ${safeIframe}
+                        <div class="widget-container">
+                            ${safeIframe}
+                        </div>
                     </div>
                 </div>`;
         });
@@ -203,6 +218,37 @@
         });
     }
 
+    // Gestione Schermo Intero
+    window.toggleFullscreen = (wrapperId) => {
+        const elem = document.getElementById(wrapperId);
+        
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.error(err));
+            } else if (elem.webkitRequestFullscreen) { /* Safari/Mobile */
+                elem.webkitRequestFullscreen();
+            }
+            elem.classList.add('is-fullscreen');
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari/Mobile */
+                document.webkitExitFullscreen();
+            }
+            elem.classList.remove('is-fullscreen');
+        }
+    };
+
+    // Ascolta l'uscita tramite tasto ESC per togliere la classe CSS
+    const exitHandler = () => {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            document.querySelectorAll('.player-wrapper').forEach(el => el.classList.remove('is-fullscreen'));
+        }
+    };
+    document.addEventListener('fullscreenchange', exitHandler);
+    document.addEventListener('webkitfullscreenchange', exitHandler);
+
+    // Funzioni Admin
     window.checkAdmin = () => {
         const inputPass = document.getElementById('adminPass').value;
         get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
@@ -239,10 +285,7 @@
     window.aggiornaOffset = (id) => {
         const nuovoOffset = parseFloat(document.getElementById(`editOffset-${id}`).value) || 0;
         update(ref(db, `videoregistrazioni/${id}`), { offset: nuovoOffset })
-            .then(() => {
-                // Non serve un alert invasivo, i dati si ricaricano da soli in tempo reale grazie a onValue
-                console.log("Ritardo aggiornato con successo");
-            })
+            .then(() => console.log("Ritardo aggiornato con successo"))
             .catch(e => alert("Errore durante l'aggiornamento: " + e.message));
     };
 
