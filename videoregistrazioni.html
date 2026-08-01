@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Registrazioni - Rossi DJ</title>
-    <!-- Script Ufficiale Mixcloud -->
     <script src="//widget.mixcloud.com/media/js/widgetApi.js" type="text/javascript"></script>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; overflow-x: hidden; }
@@ -27,7 +26,6 @@
         .video-container { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 10px; background: #000; border: 1px solid #333; }
         .widget-container { width: 100%; border-radius: 8px; overflow: hidden; margin-top: 5px; }
         
-        /* Controlli UI e Pannello DJ */
         .btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px; background: #00d4ff; color: #000; }
         .btn-danger { background: #ff0055; color: #fff; }
         .btn-success { background: #ff9900; color: #fff; }
@@ -43,10 +41,10 @@
 <body>
 
     <header>
-        <h1 style="color:#00d4ff; margin:0; text-transform: uppercase;">🎥 Video Registrazioni</h1>
+        <h1 style="color:#00d4ff; margin:0; text-transform: uppercase;">🎧 Video Registrazioni</h1>
         <div class="nav-buttons">
             <a href="index.html" class="btn-nav" style="background-color: #ff9900; color: #fff;">🏠 Home</a>
-            <a href="registrazioni.html" class="btn-nav" style="background-color: #ff0055;">📼 Solo Audio</a>
+            <a href="registrazioni.html" class="btn-nav" style="background-color: #ff0055;">🎵 Solo Audio</a>
         </div>
     </header>
 
@@ -58,12 +56,13 @@
         </div>
         
         <div id="admin-panel">
-            <h2 style="color:#ff0055; margin-top:0;">🔴 Gestione VideoRegistrazioni</h2>
+            <h2 style="color:#ff0055; margin-top:0;">⚙️ Gestione VideoRegistrazioni</h2>
             <div class="section-box">
                 <h4>Aggiungi Nuovo Set Video</h4>
                 <input type="text" id="newTitle" placeholder="Titolo del set (es. Live set @ Discoteca)">
                 <input type="text" id="newVideoUrl" placeholder="URL diretto del Video MP4 (es. https://.../video.mp4)">
                 <textarea id="newEmbed" placeholder="Incolla qui il codice Embed (<iframe>) di Mixcloud"></textarea>
+                <input type="number" id="newOffset" placeholder="Regolazione ritardo (usa - per anticipare)" step="0.1" value="0">
                 <button class="btn btn-success" onclick="aggiungiVideoRegistrazione()">Pubblica Set</button>
             </div>
             <h3>Elenco VideoRegistrazioni</h3>
@@ -103,7 +102,6 @@
         const grid = document.getElementById('registrazioni-grid');
         grid.innerHTML = '';
         
-        // MODIFICA QUI: Invertito l'ordine[cite: 5]
         const keys = Object.keys(regData).reverse();
         
         if (keys.length === 0) {
@@ -113,6 +111,7 @@
 
         keys.forEach(id => {
             const item = regData[id];
+            const offset = item.offset || 0;
             
             let url = item.src;
             if (url && url.includes('mixcloud.com')) {
@@ -128,9 +127,8 @@
                     <div class="card-title">${item.title}</div>
                     
                     <div class="video-container">
-                        <video id="video-${id}" muted playsinline preload="auto">
+                        <video id="video-${id}" data-offset="${offset}" muted playsinline preload="auto">
                             <source src="${item.videoUrl}" type="video/mp4">
-                            Il tuo browser non supporta il tag video.
                         </video>
                     </div>
 
@@ -149,21 +147,30 @@
                     const widget = Mixcloud.PlayerWidget(iframe);
                     
                     widget.ready.then(function() {
-                        widget.events.play.on(() => video.play());
+                        widget.events.play.on(() => {
+                            const videoOffset = parseFloat(video.getAttribute('data-offset')) || 0;
+                            // Se non è richiesto un ritardo, avvia il video
+                            if (videoOffset >= 0) video.play(); 
+                        });
+                        
                         widget.events.pause.on(() => video.pause());
                         
                         widget.events.progress.on((position) => {
-    			// Imposta i secondi di sfasamento (puoi usare anche i decimali, es. 8.5 o 9.2)
-    			const offset = 8.5; 
-    
-   			// Se il video è in anticipo usa il "+", se è in ritardo prova col "-"
-    			const syncTime = position + offset; 
+                            const videoOffset = parseFloat(video.getAttribute('data-offset')) || 0;
+                            const syncTime = position + videoOffset;
 
-    			// Ricalcola la posizione aggiornata per il player video
-    			if (Math.abs(video.currentTime - syncTime) > 0.5) {
-       			video.currentTime = syncTime;
-    			}
-			});
+                            if (syncTime <= 0) {
+                                // Il video è in anticipo sull'audio: tienilo in pausa al secondo 0 finché l'audio non lo raggiunge
+                                if (Math.abs(video.currentTime - 0) > 0.1) video.currentTime = 0;
+                                if (!video.paused) video.pause();
+                            } else {
+                                // Tempo normale, riproduci e allinea
+                                if (video.paused) video.play();
+                                if (Math.abs(video.currentTime - syncTime) > 0.5) {
+                                    video.currentTime = syncTime;
+                                }
+                            }
+                        });
                         
                         widget.events.ended.on(() => {
                             video.pause();
@@ -178,15 +185,11 @@
     function renderAdminList() {
         const adminList = document.getElementById('admin-list');
         adminList.innerHTML = '';
-        
-        // MODIFICA QUI: Invertito l'ordine per il pannello DJ[cite: 5]
         const keys = Object.keys(regData).reverse();
-        
         if (keys.length === 0) {
             adminList.innerHTML = '<p>Nessuna registrazione.</p>';
             return;
         }
-
         keys.forEach(id => {
             const item = regData[id];
             adminList.innerHTML += `
@@ -199,7 +202,7 @@
 
     window.checkAdmin = () => {
         const inputPass = document.getElementById('adminPass').value;
-        get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
+        get(child(ref(db, 'settings/adminPass'))).then((snapshot) => {
             if(snapshot.exists() && snapshot.val() === inputPass) {
                 document.getElementById('admin-panel').style.display = 'block';
             } else {
@@ -212,27 +215,24 @@
         const title = document.getElementById('newTitle').value.trim();
         const videoUrl = document.getElementById('newVideoUrl').value.trim();
         const embedCode = document.getElementById('newEmbed').value.trim();
+        const offsetVal = parseFloat(document.getElementById('newOffset').value) || 0;
         
         if (!title || !embedCode || !videoUrl) return alert("Inserisci il titolo, il link del video e il codice embed!");
-
         const src = estraiSrcDaIframe(embedCode);
-        
-        if (!src) return alert("Il codice embed non è valido. Incolla l'intero tag <iframe> fornito da Mixcloud.");
+        if (!src) return alert("Il codice embed non è valido.");
 
-        push(ref(db, 'videoregistrazioni'), { title: title, src: src, videoUrl: videoUrl })
+        push(ref(db, 'videoregistrazioni'), { title: title, src: src, videoUrl: videoUrl, offset: offsetVal })
             .then(() => {
-                alert("VideoRegistrazione pubblicata con successo!");
+                alert("VideoRegistrazione pubblicata!");
                 document.getElementById('newTitle').value = '';
                 document.getElementById('newVideoUrl').value = '';
                 document.getElementById('newEmbed').value = '';
-            })
-            .catch(e => alert("Errore: " + e.message));
+                document.getElementById('newOffset').value = '0';
+            });
     };
 
     window.eliminaRegistrazione = (id) => {
-        if (confirm("Vuoi eliminare questa video registrazione?")) {
-            remove(ref(db, `videoregistrazioni/${id}`));
-        }
+        if (confirm("Vuoi eliminare questa video registrazione?")) remove(ref(db, `videoregistrazioni/${id}`));
     };
 </script>
 </body>
