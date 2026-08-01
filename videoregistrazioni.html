@@ -153,10 +153,17 @@
                         widget.events.pause.on(() => video.pause());
                         
                         widget.events.progress.on((position) => {
-                            if (Math.abs(video.currentTime - position) > 0.5) {
-                                video.currentTime = position;
-                            }
-                        });
+    			// Imposta i secondi di sfasamento (puoi usare anche i decimali, es. 8.5 o 9.2)
+    			const offset = 8.5; 
+    
+   			// Se il video è in anticipo usa il "+", se è in ritardo prova col "-"
+    			const syncTime = position + offset; 
+
+    			// Ricalcola la posizione aggiornata per il player video
+    			if (Math.abs(video.currentTime - syncTime) > 0.5) {
+       			video.currentTime = syncTime;
+    			}
+			});
                         
                         widget.events.ended.on(() => {
                             video.pause();
