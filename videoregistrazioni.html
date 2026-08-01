@@ -34,6 +34,7 @@
         
         #admin-panel { border: 2px solid #ff0055; padding: 15px; margin-top: 20px; display: none; background: rgba(0, 0, 0, 0.85); border-radius: 10px; }
         .admin-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; text-align: left; flex-wrap: wrap; gap: 10px;}
+        .admin-actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 
         video { pointer-events: none; width: 100%; display: block; }
     </style>
@@ -79,7 +80,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, get, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, get, child, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M", authDomain: "rossidj-chat.firebaseapp.com", databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app", projectId: "rossidj-chat", storageBucket: "rossidj-chat.firebasestorage.app", messagingSenderId: "247840582286", appId: "1:247840582286:web:5320cff622ffc8ab9377df" };
     const app = initializeApp(firebaseConfig);
@@ -149,7 +150,6 @@
                     widget.ready.then(function() {
                         widget.events.play.on(() => {
                             const videoOffset = parseFloat(video.getAttribute('data-offset')) || 0;
-                            // Se non è richiesto un ritardo, avvia il video
                             if (videoOffset >= 0) video.play(); 
                         });
                         
@@ -160,11 +160,9 @@
                             const syncTime = position + videoOffset;
 
                             if (syncTime <= 0) {
-                                // Il video è in anticipo sull'audio: tienilo in pausa al secondo 0 finché l'audio non lo raggiunge
                                 if (Math.abs(video.currentTime - 0) > 0.1) video.currentTime = 0;
                                 if (!video.paused) video.pause();
                             } else {
-                                // Tempo normale, riproduci e allinea
                                 if (video.paused) video.play();
                                 if (Math.abs(video.currentTime - syncTime) > 0.5) {
                                     video.currentTime = syncTime;
@@ -192,22 +190,29 @@
         }
         keys.forEach(id => {
             const item = regData[id];
+            const currentOffset = item.offset || 0;
             adminList.innerHTML += `
                 <div class="admin-row">
                     <div style="flex-grow: 1;"><strong>${item.title}</strong></div>
-                    <button class="btn btn-danger" onclick="eliminaRegistrazione('${id}')">🗑️ Elimina</button>
+                    <div class="admin-actions">
+                        <input type="number" id="editOffset-${id}" value="${currentOffset}" step="0.1" style="width: 70px; padding: 5px; margin: 0;">
+                        <button class="btn btn-success" style="padding: 5px 10px; margin: 0;" onclick="aggiornaOffset('${id}')">Salva</button>
+                        <button class="btn btn-danger" style="padding: 5px 10px; margin: 0;" onclick="eliminaRegistrazione('${id}')">🗑️</button>
+                    </div>
                 </div>`;
         });
     }
 
     window.checkAdmin = () => {
         const inputPass = document.getElementById('adminPass').value;
-        get(child(ref(db, 'settings/adminPass'))).then((snapshot) => {
+        get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
             if(snapshot.exists() && snapshot.val() === inputPass) {
                 document.getElementById('admin-panel').style.display = 'block';
             } else {
                 alert("Password DJ errata!");
             }
+        }).catch(err => {
+            console.error("Errore recupero password: ", err);
         });
     };
 
@@ -229,6 +234,16 @@
                 document.getElementById('newEmbed').value = '';
                 document.getElementById('newOffset').value = '0';
             });
+    };
+
+    window.aggiornaOffset = (id) => {
+        const nuovoOffset = parseFloat(document.getElementById(`editOffset-${id}`).value) || 0;
+        update(ref(db, `videoregistrazioni/${id}`), { offset: nuovoOffset })
+            .then(() => {
+                // Non serve un alert invasivo, i dati si ricaricano da soli in tempo reale grazie a onValue
+                console.log("Ritardo aggiornato con successo");
+            })
+            .catch(e => alert("Errore durante l'aggiornamento: " + e.message));
     };
 
     window.eliminaRegistrazione = (id) => {
