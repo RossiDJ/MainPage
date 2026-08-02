@@ -132,7 +132,15 @@
     let isAdminActive = false;
     let pageLoadTime = Date.now();
     
-    window.notificationsEnabled = (localStorage.getItem('chatNotifiche') === 'true' && Notification.permission === "granted");
+    // --- SCUDO ANTI-CRASH TOTALE PER LE NOTIFICHE ---
+    window.notificationsEnabled = false;
+    try {
+        if ('Notification' in window && typeof Notification !== "undefined") {
+            window.notificationsEnabled = (localStorage.getItem('chatNotifiche') === 'true' && Notification.permission === "granted");
+        }
+    } catch (e) {
+        console.log("Notifiche non supportate su questo browser.");
+    }
 
     function updateNotificheBtn() {
         const btn = document.getElementById('btnNotifiche');
@@ -144,15 +152,23 @@
     }
 
     window.toggleNotifications = () => {
-        if (!window.notificationsEnabled) {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") { window.notificationsEnabled = true; localStorage.setItem('chatNotifiche', 'true'); updateNotificheBtn(); }
-                else alert("Devi autorizzare le notifiche nelle impostazioni del browser.");
-            });
-        } else { window.notificationsEnabled = false; localStorage.setItem('chatNotifiche', 'false'); updateNotificheBtn(); }
+        try {
+            if (!('Notification' in window) || typeof Notification === "undefined") {
+                alert("Il tuo dispositivo o browser non supporta le notifiche push.");
+                return;
+            }
+            if (!window.notificationsEnabled) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") { window.notificationsEnabled = true; localStorage.setItem('chatNotifiche', 'true'); updateNotificheBtn(); }
+                    else alert("Devi autorizzare le notifiche nelle impostazioni del browser.");
+                });
+            } else { window.notificationsEnabled = false; localStorage.setItem('chatNotifiche', 'false'); updateNotificheBtn(); }
+        } catch (e) {
+            alert("Errore con le notifiche sul tuo dispositivo.");
+        }
     };
 
-// --- GESTIONE POPUP REGISTRAZIONE WHATSAPP ---
+    // --- GESTIONE POPUP REGISTRAZIONE WHATSAPP ---
     window.richiediAccountWhatsApp = () => {
         document.getElementById('modal-whatsapp').style.display = 'flex';
     };
@@ -193,8 +209,15 @@
         if (username && password) signInWithEmailAndPassword(auth, `${username.toLowerCase().replace(/\s/g, '')}@rossidj.it`, password).catch(() => alert("Nome utente o password errati!"));
         else alert("Inserisci Nome Utente e Password");
     });
-    document.getElementById('btn-google-login').addEventListener('click', () => signInWithPopup(auth, googleProvider));
-    document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+
+    // --- GESTIONE ACCESSO E USCITA GOOGLE ---
+    document.getElementById('btn-google-login').addEventListener('click', () => {
+        signInWithPopup(auth, googleProvider).catch(err => alert("Errore Google Login: " + err.message));
+    });
+    
+    document.getElementById('btnLogout').addEventListener('click', () => {
+        signOut(auth).catch(err => alert("Errore Logout: " + err.message));
+    });
 
     onAuthStateChanged(auth, (user) => {
         if (user) { currentUserNick = user.displayName || user.email.split('@')[0]; attivaChatWeb(); } 
@@ -243,15 +266,12 @@
         if (stato === true) {
             const timeInput = document.getElementById('live-time-input').value;
             if (timeInput) {
-                // Converte la data/ora locale inserita in un timestamp Unix assoluto
                 const timestamp = new Date(timeInput).getTime();
                 updateData.liveStartTime = timestamp;
             } else {
-                // Nessuna data selezionata, parte subito
                 updateData.liveStartTime = 0; 
             }
         } else {
-            // Spegne la diretta e resetta il timer
             updateData.liveStartTime = 0; 
             document.getElementById('live-time-input').value = '';
         }
@@ -282,7 +302,17 @@
 
     onChildAdded(ref(db, 'messages'), (snapshot) => {
         const data = snapshot.val(); const msgId = snapshot.key;
-        if (window.notificationsEnabled && data.timestamp > pageLoadTime && data.user !== currentUserNick && Notification.permission === "granted") new Notification(`Rossi DJ Chat - ${data.user}`, { body: data.text });
+        
+        // Verifica blindata sulle notifiche per impedire blocchi in ricezione
+        if (window.notificationsEnabled && data.timestamp > pageLoadTime && data.user !== currentUserNick) {
+            try {
+                if ('Notification' in window && Notification.permission === "granted") {
+                    new Notification(`Rossi DJ Chat - ${data.user}`, { body: data.text });
+                }
+            } catch (e) {
+                // Notifiche ignorate silenziosamente in caso di errore
+            }
+        }
         
         const wrapperDiv = document.createElement('div'); wrapperDiv.className = 'msg-container'; wrapperDiv.id = 'msg-' + msgId; 
         const msgDiv = document.createElement('div'); msgDiv.className = (data.user.toLowerCase() === 'rossidj' || data.source === 'admin') ? 'msg admin' : 'msg';
@@ -299,15 +329,13 @@
             if (auth.currentUser) { const uid = auth.currentUser.uid.replace(/[^a-zA-Z0-9]/g, ""); if (likeSnap.exists() && likeSnap.val()[uid]) { likeBtn.style.backgroundColor = "rgba(255, 0, 85, 0.4)"; likeBtn.style.borderColor = "#ff0055"; } else { likeBtn.style.backgroundColor = "rgba(0,0,0,0.4)"; likeBtn.style.borderColor = "#444"; } }
         });
         
-       msgDiv.appendChild(textDiv); msgDiv.appendChild(footerDiv);
-        const deleteBtn = document.createElement('button'); deleteBtn.className = 'btn-elimina-msg'; deleteBtn.innerHTML = '🗑️'; deleteBtn.onclick = () => 	{ if(confirm("Eliminare?")) remove(ref(db, 'messages/' + msgId)); };
+        msgDiv.appendChild(textDiv); msgDiv.appendChild(footerDiv);
+        const deleteBtn = document.createElement('button'); deleteBtn.className = 'btn-elimina-msg'; deleteBtn.innerHTML = '🗑️'; deleteBtn.onclick = () => { if(confirm("Eliminare?")) remove(ref(db, 'messages/' + msgId)); };
         wrapperDiv.appendChild(msgDiv); wrapperDiv.appendChild(deleteBtn);
         
-        // MODIFICA: Inserisce il messaggio in fondo e forza lo scorrimento
         const messagesBox = document.getElementById('messages');
         messagesBox.appendChild(wrapperDiv);
         
-        // Piccolo ritardo per dare tempo al browser di disegnare il messaggio prima di scorrere
         setTimeout(() => {
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }, 50);
@@ -315,6 +343,7 @@
 
     onChildRemoved(ref(db, 'messages'), (snapshot) => { const msgElement = document.getElementById('msg-' + snapshot.key); if (msgElement) msgElement.remove(); });
 </script>
+
 <!-- MODALE REGISTRAZIONE WHATSAPP -->
     <div id="modal-whatsapp" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
         <div style="background:rgba(20,20,20,0.95); border:2px solid #25D366; padding:25px; border-radius:15px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
