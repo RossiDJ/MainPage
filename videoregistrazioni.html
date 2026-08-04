@@ -10,11 +10,11 @@
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate; }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
-        header { width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.75); text-align: center; border-bottom: 2px solid #00d4ff; backdrop-filter: blur(4px); position: relative; z-index: 1; }
+        header { width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.75); text-align: center; border-bottom: 2px solid #00d4ff; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); position: relative; z-index: 1; }
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
         .btn-nav { padding: 10px 20px; background: #ff9900; color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
         
-        .container { width: 90%; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.75); padding: 25px; border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); position: relative; z-index: 1; }
+        .container { width: 90%; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.75); padding: 25px; border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); position: relative; z-index: 1; }
         
         .section-box { background: rgba(0, 0, 0, 0.5); border: 1px solid #444; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         
@@ -29,9 +29,22 @@
         .player-wrapper .widget-container { margin-top: 0; border-radius: 0; width: 100%; }
         
         /* Modalità Schermo Intero Attiva */
-        .player-wrapper.is-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; border: none; border-radius: 0; justify-content: center; margin: 0; }
+        /* Usiamo --vh (calcolata in JS) al posto di 100vh perché su iOS Safari
+           100vh non tiene conto della barra degli indirizzi che appare/scompare,
+           lasciando un vuoto in basso. --vh è sempre l'altezza reale visibile. */
+        .player-wrapper.is-fullscreen {
+            position: fixed; top: 0; left: 0; width: 100vw;
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+            z-index: 9999; border: none; border-radius: 0; justify-content: center; margin: 0;
+            background: #000;
+        }
         .player-wrapper.is-fullscreen .video-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
-        .player-wrapper.is-fullscreen video { max-height: calc(100vh - 120px); width: auto; object-fit: contain; }
+        .player-wrapper.is-fullscreen video {
+            max-height: calc(100vh - 120px);
+            max-height: calc((var(--vh, 1vh) * 100) - 120px);
+            width: auto; object-fit: contain;
+        }
 
         .btn-fullscreen { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); color: #fff; border: 1px solid #00d4ff; padding: 8px 12px; border-radius: 5px; cursor: pointer; z-index: 10; font-weight: bold; transition: 0.2s; }
         .btn-fullscreen:hover { background: #00d4ff; color: #000; }
@@ -98,6 +111,20 @@
     const db = getDatabase(app);
 
     let regData = {};
+
+    // --- FIX ALTEZZA REALE PER iOS ---
+    // Su iPhone/iPad la barra di Safari appare e scompare cambiando l'altezza
+    // visibile della pagina. 100vh non si aggiorna, --vh sì.
+    function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', () => setTimeout(setVH, 150));
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', setVH);
+    }
 
     onValue(ref(db, 'videoregistrazioni'), (snap) => {
         regData = snap.val() || {};
@@ -219,30 +246,40 @@
     }
 
     // Gestione Schermo Intero
+    // NB: iOS (soprattutto iPhone) non supporta la Fullscreen API standard su
+    // un <div>. Per questo NON ci basiamo su document.fullscreenElement per
+    // sapere se siamo "dentro" o "fuori": usiamo la classe CSS come unica fonte
+    // di verità, e la Fullscreen API nativa la proviamo solo come bonus dove
+    // è disponibile (es. desktop, alcuni iPad recenti).
     window.toggleFullscreen = (wrapperId) => {
         const elem = document.getElementById(wrapperId);
-        
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const isActive = elem.classList.contains('is-fullscreen');
+
+        if (!isActive) {
+            elem.classList.add('is-fullscreen');
+            document.body.style.overflow = 'hidden';
+            setVH();
             if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => console.error(err));
+                elem.requestFullscreen().catch(() => {});
             } else if (elem.webkitRequestFullscreen) { /* Safari/Mobile */
                 elem.webkitRequestFullscreen();
             }
-            elem.classList.add('is-fullscreen');
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { /* Safari/Mobile */
+            elem.classList.remove('is-fullscreen');
+            document.body.style.overflow = '';
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            } else if (document.webkitFullscreenElement) {
                 document.webkitExitFullscreen();
             }
-            elem.classList.remove('is-fullscreen');
         }
     };
 
-    // Ascolta l'uscita tramite tasto ESC per togliere la classe CSS
+    // Ascolta l'uscita tramite tasto ESC (desktop) per togliere la classe CSS
     const exitHandler = () => {
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            document.querySelectorAll('.player-wrapper').forEach(el => el.classList.remove('is-fullscreen'));
+            document.querySelectorAll('.player-wrapper.is-fullscreen').forEach(el => el.classList.remove('is-fullscreen'));
+            document.body.style.overflow = '';
         }
     };
     document.addEventListener('fullscreenchange', exitHandler);
