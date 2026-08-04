@@ -116,6 +116,12 @@
             
             let url = item.src;
             if (url && url.includes('mixcloud.com')) {
+                // Mixcloud reindirizza www.mixcloud.com/widget/... a m.mixcloud.com
+                // sui dispositivi mobile/riconosciuti come "vecchi", e quel redirect
+                // va spesso in errore mostrando solo il logo + link di fallback.
+                // Puntando direttamente al sottodominio del player si evita il redirect.
+                url = url.replace('https://www.mixcloud.com', 'https://player-widget.mixcloud.com')
+                         .replace('https://mixcloud.com', 'https://player-widget.mixcloud.com');
                 if (!url.includes('hide_cover=1')) {
                     url += (url.includes('?') ? '&' : '?') + 'hide_cover=1';
                 }
