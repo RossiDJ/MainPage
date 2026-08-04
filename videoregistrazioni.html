@@ -94,6 +94,8 @@
 
     let regData = {};
     const widgets = {}; // riferimenti ai player Mixcloud, per poterli sincronizzare col video
+    const manualSeekUntil = {}; // id -> timestamp: finché siamo prima di questo istante, ignoriamo le correzioni automatiche Mixcloud -> video
+    const programmaticSeek = {}; // id -> true se il prossimo evento "seeked" del video l'ha causato il nostro codice, non l'utente
 
     onValue(ref(db, 'videoregistrazioni'), (snap) => {
         regData = snap.val() || {};
@@ -175,15 +177,26 @@
                         widget.events.pause.on(() => video.pause());
                         
                         widget.events.progress.on((position) => {
+                            // Se l'utente ha appena spostato manualmente la barra
+                            // del video, aspettiamo qualche secondo prima di
+                            // rimettere in sync: altrimenti Mixcloud "risucchia
+                            // indietro" il video un attimo dopo, prima ancora che
+                            // l'audio abbia fatto in tempo a raggiungere il nuovo punto.
+                            if (manualSeekUntil[id] && Date.now() < manualSeekUntil[id]) return;
+
                             const videoOffset = parseFloat(video.getAttribute('data-offset')) || 0;
                             const syncTime = position + videoOffset;
 
                             if (syncTime <= 0) {
-                                if (Math.abs(video.currentTime - 0) > 0.1) video.currentTime = 0;
+                                if (Math.abs(video.currentTime - 0) > 0.1) {
+                                    programmaticSeek[id] = true;
+                                    video.currentTime = 0;
+                                }
                                 if (!video.paused) video.pause();
                             } else {
                                 if (video.paused) video.play();
                                 if (Math.abs(video.currentTime - syncTime) > 0.5) {
+                                    programmaticSeek[id] = true;
                                     video.currentTime = syncTime;
                                 }
                             }
@@ -259,11 +272,18 @@
         });
 
         video.addEventListener('seeked', () => {
-            if (!video.controls) return; // ignora i riposizionamenti automatici di sync
+            if (!video.controls) return; // fuori dal fullscreen, ignora sempre (l'utente non può toccarlo)
+            if (programmaticSeek[id]) {
+                // Questo "seeked" l'ha causato la nostra correzione automatica
+                // (sync Mixcloud -> video), non un trascinamento dell'utente.
+                programmaticSeek[id] = false;
+                return;
+            }
             const widget = widgets[id];
             if (!widget) return;
             const offset = parseFloat(video.getAttribute('data-offset')) || 0;
             const mixcloudTime = Math.max(0, video.currentTime - offset);
+            manualSeekUntil[id] = Date.now() + 3000; // congela la correzione automatica per 3 secondi
             widget.seek(mixcloudTime);
         });
     }
