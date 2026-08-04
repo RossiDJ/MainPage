@@ -8,10 +8,10 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; overflow-x: hidden; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate; }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-        header { width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.75); text-align: center; border-bottom: 2px solid #9900ff; backdrop-filter: blur(4px); position: relative; z-index: 1; }
+        header { width: 100%; padding: 20px 0; background: rgba(0, 0, 0, 0.75); text-align: center; border-bottom: 2px solid #9900ff; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); position: relative; z-index: 1; }
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
         .btn-nav { padding: 10px 20px; background: #9900ff; color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
-        .container { width: 90%; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.75); padding: 25px; border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); position: relative; z-index: 1; }
+        .container { width: 90%; max-width: 800px; margin: 20px auto; background: rgba(0, 0, 0, 0.75); padding: 25px; border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); position: relative; z-index: 1; }
         .section-box { background: rgba(0, 0, 0, 0.5); border: 1px solid #444; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
         .card { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 10px; border: 1px solid #444; text-align: center; transition: transform 0.2s; }
@@ -130,13 +130,20 @@
 
     onAuthStateChanged(auth, (user) => { document.getElementById('login-box').style.display = user ? 'none' : 'block'; document.getElementById('upload-box').style.display = user ? 'block' : 'none'; });
 
-    // --- NUOVO UPLOAD TRAMITE XHR CON BARRA DI PROGRESSO E GESTIONE ERRORI ---
+    // --- NUOVO UPLOAD TRAMITE XHR CON BARRA DI PROGRESSO E CONTROLLO PESO ---
     window.uploadFile = () => {
         const fileInput = document.getElementById('fileInput');
         const file = fileInput.files[0]; 
         const title = document.getElementById('photoTitle').value || "Senza Titolo";
         
         if (!file) return alert("Seleziona un file prima di cliccare su Carica!");
+
+        // --- CONTROLLO SICUREZZA: Limite di peso a 95 MB ---
+        const maxSizeMB = 95; 
+        if (file.size > maxSizeMB * 1024 * 1024) {
+            const actualSize = (file.size / (1024 * 1024)).toFixed(1);
+            return alert(`Il file è troppo pesante (${actualSize} MB)! Il limite del server è ${maxSizeMB} MB.\n\nConsiglio: per comprimere il video senza perdere qualità, invialo a te stesso su WhatsApp e poi carica quella versione salvata.`);
+        }
 
         const fd = new FormData(); 
         fd.append("file", file); 
@@ -191,7 +198,7 @@
             } else {
                 progressBar.style.background = "#ff0055"; // Colore rosso di errore
                 progressText.innerText = "Errore!";
-                alert("Errore durante l'upload. Assicurati che il video non superi i limiti di dimensione impostati su Cloudinary.");
+                alert("Errore durante l'upload. Assicurati che il file rientri nei limiti consentiti.");
             }
             
             // Nasconde la barra dopo 3 secondi
@@ -218,6 +225,7 @@
             }, 3000);
         });
 
+        // Indirizzo API Aggiornato con /auto/upload
         xhr.open("POST", "https://api.cloudinary.com/v1_1/fyiatbs6/auto/upload");
         xhr.send(fd);
     };
@@ -246,7 +254,7 @@
         Object.keys(galleryData).forEach(id => {
             const item = galleryData[id];
             if(item.status === 'approved' && (filter === 'Tutti' || item.album === filter)) {
-                const safeTitle = (item.title || 'Senza Titolo').replace(/'/g, "\\'"); const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`; const likesCount = item.likes ? Object.keys(item.likes).length : 0;
+                const safeTitle = (item.title || 'Senza Titolo').replace(/'/g, "\\'"); const media = item.type === 'video' ? `<video src="${item.url}" muted playsinline webkit-playsinline preload="metadata"></video>` : `<img src="${item.url}">`; const likesCount = item.likes ? Object.keys(item.likes).length : 0;
                 photosHtml += `<div class="card"><div onclick="openModal('${item.url}', '${item.type}', '${safeTitle}')">${media}<div class="card-title">🔍 ${item.title || 'Senza Titolo'}</div></div><div class="like-btn" onclick="mettiLikeMedia('${id}', this)">❤️ ${likesCount}</div></div>`;
             }
         });
@@ -257,14 +265,14 @@
 
     window.apriCartellaEvento = (nomeCartella) => { document.getElementById('filterSelect').value = nomeCartella; renderPublicGallery(); document.getElementById('filtriAncora').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     
-    window.openModal = (url, type, title) => { const container = document.getElementById('modalMediaContainer'); document.getElementById('modalTitle').innerText = title; container.innerHTML = type === 'video' ? `<video src="${url}" class="modal-content" controls autoplay></video>` : `<img src="${url}" class="modal-content">`; document.getElementById('mediaModal').style.display = 'flex'; };
+    window.openModal = (url, type, title) => { const container = document.getElementById('modalMediaContainer'); document.getElementById('modalTitle').innerText = title; container.innerHTML = type === 'video' ? `<video src="${url}" class="modal-content" controls autoplay playsinline webkit-playsinline></video>` : `<img src="${url}" class="modal-content">`; document.getElementById('mediaModal').style.display = 'flex'; };
     window.closeModal = () => { document.getElementById('mediaModal').style.display = 'none'; document.getElementById('modalMediaContainer').innerHTML = ''; };
 
     window.renderAdmin = () => {
         const pendingDiv = document.getElementById('pending-queue'); const approvedDiv = document.getElementById('approved-queue');
         pendingDiv.innerHTML = ''; approvedDiv.innerHTML = ''; let folderOptions = ''; customFolders.forEach(f => folderOptions += `<option value="${f}">${f}</option>`);
         Object.keys(galleryData).forEach(id => {
-            const item = galleryData[id]; const media = item.type === 'video' ? `<video src="${item.url}"></video>` : `<img src="${item.url}">`;
+            const item = galleryData[id]; const media = item.type === 'video' ? `<video src="${item.url}" muted playsinline webkit-playsinline preload="metadata"></video>` : `<img src="${item.url}">`;
             const htmlRow = `<div class="admin-row">${media}<input type="text" id="title-${id}" value="${item.title || 'Senza Titolo'}" placeholder="Nome foto"><select id="sel-${id}"><option value="${item.album}" selected>In: ${item.album}</option>${folderOptions}</select><button class="btn btn-success" onclick="gestisciSingolo('${id}', 'approve')">✅ Salva</button><button class="btn btn-danger" onclick="gestisciSingolo('${id}', 'delete')">❌ Elimina</button></div>`;
             if(item.status === 'pending') pendingDiv.innerHTML += htmlRow; else approvedDiv.innerHTML += htmlRow;
         });
