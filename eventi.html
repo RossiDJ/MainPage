@@ -12,19 +12,46 @@
         .nav-buttons { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .bottone-pagine { padding: 10px 25px; background: #00d4ff; color: #000; text-decoration: none; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.3s; }
         .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
-        .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.9); padding: 25px; border-radius: 20px; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
-        .admin-section { padding-bottom: 20px; border-bottom: 1px solid #444; margin-bottom: 25px; }
+        .bottone-pagine:disabled { opacity: 0.6; cursor: wait; transform: none; }
+        .container { width: 90%; max-width: 550px; margin: 30px 10px; background: rgba(0, 0, 0, 0.9); padding: 25px; border-radius: 20px; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); box-sizing: border-box; }
         .hidden { display: none !important; }
         .form-group { display: flex; flex-direction: column; gap: 10px; }
-        input { padding: 12px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; }
-        .evento-card { background: rgba(255, 255, 255, 0.05); padding: 18px; border-radius: 15px; border-left: 6px solid #00d4ff; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
-        .evento-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+        input { padding: 12px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; font-size: 1rem; }
+
+        /* --- Tasto DJ in alto a destra --- */
+        .btn-dj { position: absolute; top: 12px; right: 12px; padding: 5px 12px; background: transparent; color: #00d4ff; border: 2px solid #00d4ff; border-radius: 50px; font-weight: bold; font-size: 0.75rem; cursor: pointer; letter-spacing: 1px; transition: 0.3s; }
+        .btn-dj:hover { background: #00d4ff; color: #000; }
+        .gestione-attiva .btn-dj { background: #00d4ff; color: #000; box-shadow: 0 0 10px #00d4ff; }
+
+        /* --- Popup --- */
+        .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; box-sizing: border-box; }
+        .modal-box { position: relative; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; background: #0a0a0a; border: 2px solid #00d4ff; border-radius: 20px; padding: 25px; box-shadow: 0 0 25px rgba(0, 212, 255, 0.4); box-sizing: border-box; }
+        .modal-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #aaa; font-size: 1.8rem; cursor: pointer; line-height: 1; }
+        .modal-close:hover { color: #fff; }
+        .file-label { display: block; padding: 12px; border: 2px dashed #00d4ff; border-radius: 10px; text-align: center; color: #00d4ff; cursor: pointer; font-size: 0.9rem; }
+        .file-label:hover { background: rgba(0, 212, 255, 0.1); }
+        #anteprima { position: relative; }
+        #anteprima img { width: 100%; border-radius: 10px; display: block; }
+        #anteprima button { position: absolute; top: 6px; right: 6px; background: #ff4d4d; color: #fff; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
+
+        /* --- Card eventi --- */
+        .evento-card { position: relative; background: rgba(255, 255, 255, 0.05); padding: 18px; border-radius: 15px; border-left: 6px solid #00d4ff; margin-bottom: 18px; display: flex; flex-direction: column; }
+        .locandina { width: 100%; border-radius: 10px; margin-bottom: 12px; display: block; cursor: zoom-in; }
+        .evento-info { display: flex; flex-direction: column; gap: 5px; }
         .evento-data { color: #00d4ff; font-weight: bold; font-size: 1.2rem; }
         .evento-luogo { color: #ddd; font-size: 1rem; }
         .btn-link { display: inline-block; padding: 8px 15px; background: transparent; color: #00d4ff; border: 2px solid #00d4ff; text-decoration: none; border-radius: 10px; font-size: 0.85rem; font-weight: bold; margin-top: 10px; transition: 0.3s; width: fit-content; }
         .btn-link:hover { background: #00d4ff; color: #000; }
-        .btn-elimina { background: #ff4d4d; color: #fff; border: none; padding: 10px; border-radius: 10px; cursor: pointer; display: none; margin-left: 10px; font-size: 1.2rem; }
-        .gestione-attiva .btn-elimina { display: block; }
+        .azioni-admin { position: absolute; top: 10px; right: 10px; display: none; gap: 6px; z-index: 2; }
+        .gestione-attiva .azioni-admin { display: flex; }
+        .btn-elimina, .btn-modifica { border: none; padding: 8px 10px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 0 8px rgba(0,0,0,0.6); }
+        .btn-elimina { background: #ff4d4d; color: #fff; }
+        .btn-modifica { background: #00d4ff; color: #000; }
+
+        /* --- Locandina a schermo intero --- */
+        #lightbox img { max-width: 95vw; max-height: 90vh; border-radius: 10px; box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); }
+        #lightbox { cursor: zoom-out; }
+
         .video-box { margin-top: 30px; text-align: center; border-top: 1px solid #444; padding-top: 20px; }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 15px; border: 2px solid #00d4ff; margin-top: 15px; }
         .video-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -33,6 +60,7 @@
 <body id="main-body">
     <div class="page-overlay">
         <header>
+            <button class="btn-dj" onclick="apriDJ()" title="Area riservata DJ">DJ</button>
             <h1 style="color:#00d4ff; margin:0;">🎧 EVENTI & PROMO</h1>
             <div class="nav-buttons">
                 <a href="index.html" class="bottone-pagine">🏠 Home</a>
@@ -41,25 +69,6 @@
         </header>
 
         <div class="container">
-            <div id="login-area" class="admin-section">
-                <h3 style="color:#00d4ff; margin-top:0;">Area Riservata DJ</h3>
-                <div class="form-group">
-                    <input type="password" id="passInput" placeholder="Password">
-                    <button onclick="sblocca()" class="bottone-pagine">ACCEDI</button>
-                </div>
-            </div>
-
-            <div id="menu-area" class="admin-section hidden">
-                <h3 style="color:#00d4ff; margin-top:0;">Nuovo Evento</h3>
-                <div class="form-group">
-                    <input type="text" id="dataE" placeholder="Quando? (es. Sabato 20/04)">
-                    <input type="text" id="luogoE" placeholder="Dove?">
-                    <input type="text" id="linkE" placeholder="Link Mappa (Opzionale)">
-                    <button onclick="aggiungi()" id="btn-aggiungi" class="bottone-pagine">PUBBLICA</button>
-                    <button onclick="chiudi()" style="background:none; color:#ff4d4d; border:none; cursor:pointer;">Esci</button>
-                </div>
-            </div>
-
             <div id="lista-eventi"><p>Caricamento eventi...</p></div>
 
             <div class="video-box">
@@ -69,55 +78,237 @@
         </div>
     </div>
 
+    <!-- POPUP AREA DJ -->
+    <div id="modal-dj" class="modal hidden" onclick="if(event.target === this) chiudiDJ()">
+        <div class="modal-box">
+            <button class="modal-close" onclick="chiudiDJ()" aria-label="Chiudi">&times;</button>
+
+            <div id="login-area">
+                <h3 style="color:#00d4ff; margin-top:0;">Area Riservata DJ</h3>
+                <div class="form-group">
+                    <input type="password" id="passInput" placeholder="Password" onkeydown="if(event.key==='Enter') sblocca()">
+                    <button onclick="sblocca()" class="bottone-pagine">ACCEDI</button>
+                </div>
+            </div>
+
+            <div id="menu-area" class="hidden">
+                <h3 id="titolo-form" style="color:#00d4ff; margin-top:0;">Nuovo Evento</h3>
+                <div class="form-group">
+                    <input type="text" id="dataE" placeholder="Quando? (es. Sabato 20/04)">
+                    <input type="text" id="luogoE" placeholder="Dove?">
+                    <input type="text" id="linkE" placeholder="Link Mappa (Opzionale)">
+                    <label for="locandinaE" class="file-label" id="file-label">🖼️ Aggiungi locandina (JPEG, opzionale)</label>
+                    <input type="file" id="locandinaE" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="scegliLocandina(this)">
+                    <div id="anteprima" class="hidden"><img id="anteprima-img" alt="Anteprima locandina"><button onclick="togliLocandina()" title="Rimuovi">✕</button></div>
+                    <button onclick="aggiungi()" id="btn-aggiungi" class="bottone-pagine">PUBBLICA</button>
+                    <button onclick="annullaModifica()" id="btn-annulla" class="hidden" style="background:none; color:#aaa; border:1px solid #555; border-radius:50px; cursor:pointer; padding:8px;">Annulla modifica</button>
+                    <p style="color:#888; font-size:0.8rem; margin:0; text-align:center;">Con l'area attiva, su ogni evento trovi ✏️ per modificarlo e 🗑️ per eliminarlo</p>
+                    <button onclick="esci()" style="background:none; color:#ff4d4d; border:none; cursor:pointer; padding:8px;">Esci</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOCANDINA A SCHERMO INTERO -->
+    <div id="lightbox" class="modal hidden" onclick="this.classList.add('hidden')">
+        <img id="lightbox-img" alt="Locandina">
+    </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, get, set, remove, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M", authDomain: "rossidj-chat.firebaseapp.com", databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app", projectId: "rossidj-chat", storageBucket: "rossidj-chat.firebasestorage.app", messagingSenderId: "247840582286", appId: "1:247840582286:web:5320cff622ffc8ab9377df" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLQcF5MEC_SdK5Lhg8gaAK-QoJ5IQh2HjEJEfXL4SYQJwTMi8klmwca9luhvpAom3B/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLQcF5MEC_SdK5Lhg8gaAK-QoJ5IQh2HjEJEfXL4SYQJwTMi8klmwca9luhvpAom3B/exec';
 
+    let loggato = false;
+    let locandinaDati = null; // immagine compressa (data URL JPEG) pronta da salvare
+    let modifica = null;      // evento in modifica: { riga, d, l, lnk, img } — null = nuovo evento
+    const eventiCache = {};   // dati degli eventi caricati, per riga del foglio
+
+    // Chiave univoca della locandina, ricavata da data + luogo dell'evento
+    function chiaveEvento(d, l) {
+        const s = `${d}|${l}`.trim().toLowerCase();
+        let h = 0;
+        for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+        return 'ev_' + (h >>> 0).toString(36);
+    }
+
+    // --- CARICAMENTO EVENTI ---
     window.caricaEventi = async function() {
         try {
-            const response = await fetch(SCRIPT_URL); const eventi = await response.json(); const lista = document.getElementById('lista-eventi'); lista.innerHTML = ''; 
+            const [response, snap] = await Promise.all([
+                fetch(SCRIPT_URL),
+                get(child(ref(db), 'locandine')).catch(() => null)
+            ]);
+            const eventi = await response.json();
+            const locandine = (snap && snap.exists()) ? snap.val() : {};
+            const lista = document.getElementById('lista-eventi'); lista.innerHTML = '';
             const eventiValidi = eventi.slice(1);
             if (eventiValidi.length === 0) { lista.innerHTML = '<p style="text-align:center; color:#888;">Nessun evento in programma.</p>'; return; }
             eventiValidi.forEach((ev, index) => {
-                const rigaFisica = index + 2; const d = ev[0]; const l = ev[1]; const lnk = ev[2]; 
+                const rigaFisica = index + 2; const d = ev[0]; const l = ev[1]; const lnk = ev[2];
+                const chiave = chiaveEvento(d, l);
                 const card = document.createElement('div'); card.className = 'evento-card';
-                let linkHTML = ''; if(lnk && lnk.toString().trim().length > 1) { const cleanLink = lnk.toString().startsWith('http') ? lnk : `https://${lnk}`; linkHTML = `<a href="${cleanLink}" target="_blank" class="btn-link">📍 Info / Mappa</a>`; }
-                card.innerHTML = `<div class="evento-info"><span class="evento-data">${d}</span><span class="evento-luogo">${l}</span>${linkHTML}</div><button class="btn-elimina" onclick="eliminaEvento(${rigaFisica})">🗑️</button>`;
+                let linkHTML = ''; if (lnk && lnk.toString().trim().length > 1) { const cleanLink = lnk.toString().startsWith('http') ? lnk : `https://${lnk}`; linkHTML = `<a href="${cleanLink}" target="_blank" class="btn-link">📍 Info / Mappa</a>`; }
+                eventiCache[rigaFisica] = { riga: rigaFisica, d: String(d ?? ''), l: String(l ?? ''), lnk: String(lnk ?? ''), img: locandine[chiave] || null };
+                const imgHTML = locandine[chiave] ? `<img src="${locandine[chiave]}" class="locandina" alt="Locandina ${d}" loading="lazy" onclick="apriLocandina(this.src)">` : '';
+                card.innerHTML = `${imgHTML}<div class="evento-info"><span class="evento-data">${d}</span><span class="evento-luogo">${l}</span>${linkHTML}</div><div class="azioni-admin"><button class="btn-modifica" onclick="apriModifica(${rigaFisica})" title="Modifica">✏️</button><button class="btn-elimina" onclick="eliminaEvento(${rigaFisica}, '${chiave}')" title="Elimina">🗑️</button></div>`;
                 lista.appendChild(card);
             });
         } catch (e) { document.getElementById('lista-eventi').innerHTML = "Errore di caricamento."; }
     }
     window.onload = window.caricaEventi;
 
-    // --- NUOVO CONTROLLO PASSWORD ---
+    // --- POPUP DJ ---
+    window.apriDJ = function() {
+        document.getElementById('modal-dj').classList.remove('hidden');
+        document.getElementById('login-area').classList.toggle('hidden', loggato);
+        document.getElementById('menu-area').classList.toggle('hidden', !loggato);
+        if (!loggato) setTimeout(() => document.getElementById('passInput').focus(), 50);
+    }
+    window.chiudiDJ = function() { document.getElementById('modal-dj').classList.add('hidden'); }
+    window.apriLocandina = function(src) {
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox').classList.remove('hidden');
+    }
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { chiudiDJ(); document.getElementById('lightbox').classList.add('hidden'); }
+    });
+
+    // --- CONTROLLO PASSWORD ---
     window.sblocca = function() {
         const inputPass = document.getElementById('passInput').value;
         get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
-            if(snapshot.exists() && snapshot.val() === inputPass) {
+            if (snapshot.exists() && snapshot.val() === inputPass) {
+                loggato = true;
+                document.getElementById('passInput').value = '';
                 document.getElementById('login-area').classList.add('hidden');
                 document.getElementById('menu-area').classList.remove('hidden');
                 document.getElementById('main-body').classList.add('gestione-attiva');
             } else { alert('Password Errata!'); }
         });
     }
+    window.esci = function() {
+        loggato = false;
+        annullaModifica();
+        document.getElementById('main-body').classList.remove('gestione-attiva');
+        togliLocandina();
+        chiudiDJ();
+    }
 
+    // --- LOCANDINA: ridimensiona e converte in JPEG ---
+    function comprimiImmagine(file, maxLato = 1200, qualita = 0.82) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const img = new Image();
+                img.onload = () => {
+                    const scala = Math.min(1, maxLato / Math.max(img.width, img.height));
+                    const w = Math.round(img.width * scala), h = Math.round(img.height * scala);
+                    const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+                    ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', qualita));
+                };
+                img.onerror = reject;
+                img.src = reader.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    window.scegliLocandina = async function(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { alert('Seleziona un\'immagine (JPEG).'); input.value = ''; return; }
+        try {
+            locandinaDati = await comprimiImmagine(file);
+            document.getElementById('anteprima-img').src = locandinaDati;
+            document.getElementById('anteprima').classList.remove('hidden');
+            document.getElementById('file-label').classList.add('hidden');
+        } catch (e) { alert('Impossibile leggere l\'immagine.'); locandinaDati = null; }
+    }
+    window.togliLocandina = function() {
+        locandinaDati = null;
+        document.getElementById('locandinaE').value = '';
+        document.getElementById('anteprima').classList.add('hidden');
+        document.getElementById('file-label').classList.remove('hidden');
+    }
+    function mostraAnteprima(src) {
+        document.getElementById('anteprima-img').src = src;
+        document.getElementById('anteprima').classList.remove('hidden');
+        document.getElementById('file-label').classList.add('hidden');
+    }
+
+    // --- MODIFICA EVENTO ESISTENTE ---
+    window.apriModifica = function(riga) {
+        const ev = eventiCache[riga]; if (!ev) return;
+        modifica = ev;
+        document.getElementById('dataE').value = ev.d;
+        document.getElementById('luogoE').value = ev.l;
+        document.getElementById('linkE').value = ev.lnk;
+        togliLocandina();
+        if (ev.img) { locandinaDati = ev.img; mostraAnteprima(ev.img); }
+        document.getElementById('titolo-form').innerText = 'Modifica Evento';
+        document.getElementById('btn-aggiungi').innerText = 'SALVA MODIFICHE';
+        document.getElementById('btn-annulla').classList.remove('hidden');
+        apriDJ();
+    }
+    window.annullaModifica = function() {
+        modifica = null;
+        ['dataE', 'luogoE', 'linkE'].forEach(id => document.getElementById(id).value = '');
+        togliLocandina();
+        document.getElementById('titolo-form').innerText = 'Nuovo Evento';
+        document.getElementById('btn-aggiungi').innerText = 'PUBBLICA';
+        document.getElementById('btn-annulla').classList.add('hidden');
+    }
+    async function salvaModifica(d, l, lnk, btn) {
+        const vecchiaChiave = chiaveEvento(modifica.d, modifica.l);
+        const nuovaChiave = chiaveEvento(d, l);
+        const testoCambiato = d !== modifica.d || l !== modifica.l || lnk !== modifica.lnk;
+        try {
+            if (locandinaDati) {
+                // se data/luogo cambiano, la vecchia copia resta come riserva finché il foglio non è aggiornato
+                if (locandinaDati !== modifica.img || nuovaChiave !== vecchiaChiave) await set(ref(db, 'locandine/' + nuovaChiave), locandinaDati);
+            } else if (modifica.img) {
+                await remove(ref(db, 'locandine/' + vecchiaChiave));
+                if (nuovaChiave !== vecchiaChiave) await remove(ref(db, 'locandine/' + nuovaChiave));
+            }
+        } catch (e) { alert('Impossibile salvare la locandina.'); btn.innerText = "SALVA MODIFICHE"; btn.disabled = false; return; }
+        try {
+            if (testoCambiato) {
+                const url = `${SCRIPT_URL}?action=update&row=${modifica.riga}&dataE=${encodeURIComponent(d)}&luogoE=${encodeURIComponent(l)}&linkE=${encodeURIComponent(lnk)}`;
+                await fetch(url, { mode: 'no-cors' });
+            }
+            alert("Evento modificato!"); location.reload();
+        } catch (e) { alert('Errore di connessione.'); btn.innerText = "SALVA MODIFICHE"; btn.disabled = false; }
+    }
+
+    // --- AGGIUNGI / ELIMINA ---
     window.aggiungi = async function() {
-        const d = document.getElementById('dataE').value; const l = document.getElementById('luogoE').value; const lnk = document.getElementById('linkE').value;
-        if(!d || !l) return alert('Inserisci almeno Data e Luogo!');
+        const d = document.getElementById('dataE').value.trim(); const l = document.getElementById('luogoE').value.trim(); const lnk = document.getElementById('linkE').value.trim();
+        if (!d || !l) return alert('Inserisci almeno Data e Luogo!');
         const btn = document.getElementById('btn-aggiungi'); btn.innerText = "INVIO..."; btn.disabled = true;
+        if (modifica) return salvaModifica(d, l, lnk, btn);
+
+        if (locandinaDati) {
+            try { await set(ref(db, 'locandine/' + chiaveEvento(d, l)), locandinaDati); }
+            catch (e) { alert('Impossibile caricare la locandina: evento non pubblicato.'); btn.innerText = "PUBBLICA"; btn.disabled = false; return; }
+        }
         try { const url = `${SCRIPT_URL}?action=add&dataE=${encodeURIComponent(d)}&luogoE=${encodeURIComponent(l)}&linkE=${encodeURIComponent(lnk)}`; await fetch(url, { mode: 'no-cors' }); alert("Evento aggiunto!"); location.reload(); } catch (error) { alert('Errore di connessione.'); btn.innerText = "PUBBLICA"; btn.disabled = false; }
     }
-    window.eliminaEvento = async function(riga) {
-        if(!confirm("Vuoi eliminare questo evento definitivamente dal foglio?")) return;
-        try { const url = `${SCRIPT_URL}?action=delete&row=${riga}`; await fetch(url, { mode: 'no-cors' }); alert("Evento eliminato!"); location.reload(); } catch (error) { alert('Errore durante l\'eliminazione.'); }
+    window.eliminaEvento = async function(riga, chiave) {
+        if (!confirm("Vuoi eliminare questo evento definitivamente dal foglio?")) return;
+        try {
+            await remove(ref(db, 'locandine/' + chiave)).catch(() => {});
+            const url = `${SCRIPT_URL}?action=delete&row=${riga}`; await fetch(url, { mode: 'no-cors' }); alert("Evento eliminato!"); location.reload();
+        } catch (error) { alert('Errore durante l\'eliminazione.'); }
     }
-    window.chiudi = function() { document.getElementById('login-area').classList.remove('hidden'); document.getElementById('menu-area').classList.add('hidden'); document.getElementById('main-body').classList.remove('gestione-attiva'); }
 </script>
 </body>
 </html>
