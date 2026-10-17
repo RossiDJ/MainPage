@@ -9,21 +9,21 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; overflow-x: hidden; }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('flx10live1.jpg'); background-size: cover; background-position: center; z-index: -1; animation: respiroSfondo 20s ease-in-out infinite alternate; }
         @keyframes respiroSfondo { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-        
+
         .container { max-width: 600px; width: 90%; padding: 40px 20px; background: rgba(0, 0, 0, 0.75); border-radius: 20px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); position: relative; z-index: 1; box-sizing: border-box; margin: 20px 0; }
         h1 { color: #00d4ff; text-transform: uppercase; margin-top: 0; }
-        
-        .bottone-pagine { 
-            display: inline-block; 
-            margin: 10px auto; 
-            padding: 15px 20px; 
-            background-color: #00d4ff; 
-            color: #000; 
-            text-decoration: none; 
-            font-weight: bold; 
-            border-radius: 50px; 
-            font-size: 1.1rem; 
-            transition: transform 0.2s, background-color 0.2s; 
+
+        .bottone-pagine {
+            display: inline-block;
+            margin: 10px auto;
+            padding: 15px 20px;
+            background-color: #00d4ff;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: transform 0.2s, background-color 0.2s;
             width: 100%;
             max-width: 320px;
             box-sizing: border-box;
@@ -34,51 +34,107 @@
             touch-action: pan-y;
         }
         .bottone-pagine:hover { transform: scale(1.05); background-color: #00b8e6; }
-        
+
         .bottone-live { background-color: #ff0055; color: #ffffff; border: 2px solid #ff0055; }
         .bottone-live:hover { background-color: #cc0044; color: #ffffff; }
-        
+
         @keyframes pulsateLive { 0% { transform: scale(1); box-shadow: 0 0 10px #ff0055; } 50% { transform: scale(1.05); box-shadow: 0 0 20px #ff0055; } 100% { transform: scale(1); box-shadow: 0 0 10px #ff0055; } }
         .btn-pulsante { animation: pulsateLive 2s infinite; }
-        
+
         .social-section { margin-top: 25px; display: flex; justify-content: center; gap: 20px; }
         .social-icon { font-size: 2rem; color: #ffffff; transition: color 0.3s, transform 0.2s; text-decoration: none; }
         .social-icon:hover { color: #00d4ff; transform: translateY(-3px); }
-        
+
         /* SEZIONE CONTATTI AGGIORNATA */
         .contact-info { margin-top: 30px; font-size: 1rem; color: #e0e0e0; border-top: 1px solid #444; padding-top: 20px; display: flex; flex-direction: column; gap: 10px; }
         .contact-info a { color: #20c997; text-decoration: none; font-weight: bold; transition: color 0.2s; }
         .contact-info a:hover { color: #00d4ff; }
+
+        /* ===== SEZIONE NEWS ===== */
+        .news-section { position: relative; margin: 25px 0 10px; padding: 20px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; }
+        .news-title { color: #00d4ff; text-transform: uppercase; letter-spacing: 4px; margin: 0 0 15px; font-size: 1.6rem; }
+        .news-video { border-radius: 15px; overflow: hidden; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.25); background: #000; }
+        .news-video video { width: 100%; display: block; max-height: 60vh; background: #000; }
+        .btn-dj { position: absolute; top: 14px; right: 0; padding: 4px 12px; background: transparent; color: #00d4ff; border: 2px solid #00d4ff; border-radius: 50px; font-weight: bold; font-size: 0.7rem; letter-spacing: 1px; cursor: pointer; -webkit-appearance: none; appearance: none; transition: 0.3s; }
+        .btn-dj:hover { background: #00d4ff; color: #000; }
+        .gestione-attiva .btn-dj { background: #00d4ff; color: #000; box-shadow: 0 0 10px #00d4ff; }
+
+        #news-lista { margin-top: 20px; text-align: left; }
+        .news-card { position: relative; background: rgba(255, 255, 255, 0.05); border: 1px solid #444; border-left: 5px solid #00d4ff; border-radius: 12px; padding: 16px; margin-bottom: 15px; }
+        .news-data { color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .news-card h3 { color: #00d4ff; margin: 6px 0 8px; font-size: 1.15rem; }
+        .news-testo { color: #e0e0e0; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; margin: 0; }
+        .news-media { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 12px; }
+        .news-media img, .news-media video { width: 100%; max-height: 180px; object-fit: cover; border-radius: 10px; display: block; background: #000; }
+        .news-media img { cursor: zoom-in; }
+        .news-vuoto { color: #888; text-align: center; margin: 10px 0 0; }
+        .btn-elimina-news { position: absolute; top: 10px; right: 10px; background: #ff0055; color: #fff; border: none; border-radius: 8px; padding: 6px 9px; font-size: 1rem; cursor: pointer; display: none; }
+        .gestione-attiva .btn-elimina-news { display: block; }
+        #btn-mostra-tutte { background: none; border: 1px solid #555; color: #aaa; border-radius: 50px; padding: 8px 18px; cursor: pointer; font-size: 0.85rem; margin-top: 5px; }
+        #btn-mostra-tutte:hover { border-color: #00d4ff; color: #00d4ff; }
+
+        /* ===== POPUP ===== */
+        .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 16px; box-sizing: border-box; }
+        .modal-box { position: relative; width: 100%; max-width: 430px; max-height: 90vh; overflow-y: auto; background: #0a0a0a; border: 2px solid #00d4ff; border-radius: 20px; padding: 25px; box-shadow: 0 0 25px rgba(0, 212, 255, 0.4); box-sizing: border-box; text-align: left; }
+        .modal-close { position: absolute; top: 8px; right: 14px; background: none; border: none; color: #aaa; font-size: 1.8rem; line-height: 1; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .modal-box h3 { color: #00d4ff; margin-top: 0; }
+        .form-group { display: flex; flex-direction: column; gap: 10px; }
+        .form-group input[type=text], .form-group input[type=password], .form-group textarea { padding: 12px; border-radius: 10px; border: 1px solid #555; background: #222; color: #fff; font-family: inherit; font-size: 1rem; box-sizing: border-box; width: 100%; }
+        .form-group textarea { min-height: 110px; resize: vertical; }
+        .btn-form { padding: 12px 20px; background: #00d4ff; color: #000; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; -webkit-appearance: none; appearance: none; font-size: 1rem; }
+        .btn-form:disabled { opacity: 0.6; cursor: wait; }
+        .file-label { display: block; padding: 12px; border: 2px dashed #00d4ff; border-radius: 10px; text-align: center; color: #00d4ff; cursor: pointer; font-size: 0.9rem; }
+        .file-label:hover { background: rgba(0, 212, 255, 0.1); }
+        .hidden { display: none !important; }
+        #lista-file { color: #aaa; font-size: 0.85rem; margin: 0; }
+        #progress-container { display: none; width: 100%; background: #222; border-radius: 8px; overflow: hidden; border: 1px solid #444; height: 24px; position: relative; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #9900ff, #00d4ff); transition: width 0.2s ease; }
+        #progress-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: #fff; text-shadow: 1px 1px 3px #000; }
+
+        #lightbox { cursor: zoom-out; }
+        #lightbox img { max-width: 95vw; max-height: 90vh; border-radius: 10px; box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); }
     </style>
 </head>
-<body>
+<body id="main-body">
     <div class="container">
         <h1>RossiDJ</h1>
         <p>Esperienze sonore uniche e dedicate per ogni evento, dal locale alla festa privata.</p>
+
+        <!-- ===== SEZIONE NEWS ===== -->
+        <div class="news-section">
+            <button class="btn-dj" onclick="apriDJ()" title="Area riservata DJ">DJ</button>
+            <h2 class="news-title">News</h2>
+            <div class="news-video" id="news-video-box">
+                <video src="NEWS01.mp4" controls playsinline webkit-playsinline preload="metadata" onerror="document.getElementById('news-video-box').style.display='none'"></video>
+            </div>
+            <div id="news-lista"><p class="news-vuoto">Caricamento news...</p></div>
+            <button id="btn-mostra-tutte" class="hidden" onclick="mostraTutteNews()">Mostra tutte le news</button>
+        </div>
 
         <!-- Bottone Diretta (Nascosto di default) -->
         <a href="diretta.html" id="btn-live-home" class="bottone-pagine bottone-live btn-pulsante" style="display: none;">
             🔴 GUARDA LA DIRETTA LIVE
         </a>
-        
+
         <!-- Bottone Registrazioni -->
         <a href="registrazioni.html" class="bottone-pagine" style="background-color: #ff9900; color: #fff; border: 2px solid #ff9900;">
             📼 VECCHIE REGISTRAZIONI
         </a>
-        
+
 	<!-- Nuovo Bottone VideoRegistrazioni -->
         <a href="videoregistrazioni.html" class="bottone-pagine" style="background-color: #00d4ff; color: #000; border: 2px solid #00d4ff;">
             🎥 GUARDA I VIDEO SET
         </a>
 
         <a href="live-chat.html" class="bottone-pagine">💬 ENTRA NELLA LIVE CHAT</a>
-        
+
         <a href="richieste.html" class="bottone-pagine">🎵 RICHIEDI UNA CANZONE</a>
-        
+
         <a href="eventi.html" class="bottone-pagine">📅 PROSSIMI EVENTI</a>
-        
+
         <a href="galleria.html" class="bottone-pagine" style="background-color: #9900ff; color: #fff;">📸 GALLERIA FOTO & VIDEO</a>
-        
+
         <a href="prenotazioni.html" class="bottone-pagine">🎟️ PRENOTA IL TUO EVENTO</a>
 
         <div class="social-section">
@@ -92,7 +148,7 @@
                 <i class="fab fa-mixcloud"></i>
             </a>
         </div>
-        
+
         <!-- SEZIONE CONTATTI -->
         <div class="contact-info">
             <div>Email: <a href="mailto:RossiDJ@live.it">RossiDJ@live.it</a></div>
@@ -100,19 +156,237 @@
         </div>
     </div> <!-- Fine del contenitore corretto -->
 
+    <!-- ===== POPUP AREA DJ ===== -->
+    <div id="modal-dj" class="modal hidden" onclick="if(event.target === this) chiudiDJ()">
+        <div class="modal-box">
+            <button class="modal-close" onclick="chiudiDJ()" aria-label="Chiudi">&times;</button>
+
+            <div id="login-area">
+                <h3>Area Riservata DJ</h3>
+                <div class="form-group">
+                    <input type="password" id="passInput" placeholder="Password" onkeydown="if(event.key==='Enter') sblocca()">
+                    <button class="btn-form" onclick="sblocca()">ACCEDI</button>
+                </div>
+            </div>
+
+            <div id="menu-area" class="hidden">
+                <h3>Nuova News</h3>
+                <div class="form-group">
+                    <input type="text" id="titoloN" placeholder="Titolo della news">
+                    <textarea id="testoN" placeholder="Scrivi qui la news..."></textarea>
+                    <label for="fileN" class="file-label">🖼️ Aggiungi foto o video (opzionale)</label>
+                    <input type="file" id="fileN" accept="image/*,video/*" multiple class="hidden" onchange="mostraFileScelti()">
+                    <p id="lista-file"></p>
+                    <div id="progress-container"><div id="progress-bar"></div><div id="progress-text">0%</div></div>
+                    <button class="btn-form" id="btn-pubblica" onclick="pubblicaNews()">PUBBLICA NEWS</button>
+                    <p style="color:#888; font-size:0.8rem; margin:0;">Con l'area attiva puoi eliminare le news col tasto 🗑️</p>
+                    <button onclick="esci()" style="background:none; color:#ff0055; border:none; cursor:pointer; padding:8px;">Esci</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lightbox" class="modal hidden" onclick="this.classList.add('hidden')"><img id="lightbox-img" alt=""></div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-    
+    import { getDatabase, ref, onValue, push, remove, get, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
     const firebaseConfig = { apiKey: "AIzaSyAXFX5kkba800EX9lowCg3os6Ifn2rzd8M", authDomain: "rossidj-chat.firebaseapp.com", databaseURL: "https://rossidj-chat-default-rtdb.europe-west1.firebasedatabase.app", projectId: "rossidj-chat", storageBucket: "rossidj-chat.firebasestorage.app", messagingSenderId: "247840582286", appId: "1:247840582286:web:5320cff622ffc8ab9377df" };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
+    // Stesso canale di upload usato dalla galleria
+    const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/fyiatbs6/auto/upload";
+    const UPLOAD_PRESET = "daapprovare";
+    const MAX_MB = 95;
+
+    let loggato = false;
+    let newsData = {};
+    let mostraTutte = false;
 
     // Mostra/Nasconde il tasto della Live
     onValue(ref(db, 'settings/liveStatus'), (snap) => {
         const isLive = snap.val();
         document.getElementById('btn-live-home').style.display = isLive ? 'inline-block' : 'none';
     });
+
+    // ===== LETTURA E STAMPA DELLE NEWS =====
+    onValue(ref(db, 'news'), (snap) => { newsData = snap.val() || {}; renderNews(); });
+
+    function renderNews() {
+        const lista = document.getElementById('news-lista');
+        const btnTutte = document.getElementById('btn-mostra-tutte');
+        const items = Object.keys(newsData).map(id => ({ id, ...newsData[id] })).sort((a, b) => (b.data || 0) - (a.data || 0));
+        lista.innerHTML = '';
+        if (items.length === 0) { lista.innerHTML = '<p class="news-vuoto">Nessuna news al momento.</p>'; btnTutte.classList.add('hidden'); return; }
+
+        const daMostrare = mostraTutte ? items : items.slice(0, 3);
+        daMostrare.forEach(n => lista.appendChild(creaCard(n)));
+
+        btnTutte.classList.toggle('hidden', items.length <= 3);
+        btnTutte.innerText = mostraTutte ? 'Mostra solo le ultime' : `Mostra tutte le news (${items.length})`;
+    }
+
+    function creaCard(n) {
+        const card = document.createElement('div');
+        card.className = 'news-card';
+
+        if (n.data) {
+            const d = document.createElement('div');
+            d.className = 'news-data';
+            d.innerText = new Date(n.data).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+            card.appendChild(d);
+        }
+        if (n.titolo) {
+            const h = document.createElement('h3');
+            h.innerText = n.titolo;
+            card.appendChild(h);
+        }
+        if (n.testo) {
+            const p = document.createElement('p');
+            p.className = 'news-testo';
+            p.innerText = n.testo;
+            card.appendChild(p);
+        }
+        if (n.media && n.media.length) {
+            const box = document.createElement('div');
+            box.className = 'news-media';
+            n.media.forEach(m => {
+                if (m.type === 'video') {
+                    const v = document.createElement('video');
+                    v.src = m.url; v.controls = true; v.playsInline = true; v.preload = 'metadata';
+                    v.setAttribute('webkit-playsinline', '');
+                    box.appendChild(v);
+                } else {
+                    const img = document.createElement('img');
+                    img.src = m.url; img.loading = 'lazy'; img.alt = n.titolo || 'Foto news';
+                    img.onclick = () => apriFoto(m.url);
+                    box.appendChild(img);
+                }
+            });
+            card.appendChild(box);
+        }
+
+        const del = document.createElement('button');
+        del.className = 'btn-elimina-news';
+        del.title = 'Elimina news';
+        del.innerText = '🗑️';
+        del.onclick = () => eliminaNews(n.id);
+        card.appendChild(del);
+        return card;
+    }
+
+    window.mostraTutteNews = function() { mostraTutte = !mostraTutte; renderNews(); }
+    window.apriFoto = function(url) {
+        document.getElementById('lightbox-img').src = url;
+        document.getElementById('lightbox').classList.remove('hidden');
+    }
+
+    // ===== POPUP DJ =====
+    window.apriDJ = function() {
+        document.getElementById('modal-dj').classList.remove('hidden');
+        document.getElementById('login-area').classList.toggle('hidden', loggato);
+        document.getElementById('menu-area').classList.toggle('hidden', !loggato);
+        if (!loggato) setTimeout(() => document.getElementById('passInput').focus(), 50);
+    }
+    window.chiudiDJ = function() { document.getElementById('modal-dj').classList.add('hidden'); }
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { chiudiDJ(); document.getElementById('lightbox').classList.add('hidden'); }
+    });
+
+    window.sblocca = function() {
+        const inputPass = document.getElementById('passInput').value;
+        get(child(ref(db), 'settings/adminPass')).then((snapshot) => {
+            if (snapshot.exists() && snapshot.val() === inputPass) {
+                loggato = true;
+                document.getElementById('passInput').value = '';
+                document.getElementById('login-area').classList.add('hidden');
+                document.getElementById('menu-area').classList.remove('hidden');
+                document.getElementById('main-body').classList.add('gestione-attiva');
+            } else { alert('Password DJ errata!'); }
+        }).catch(() => alert('Impossibile verificare la password.'));
+    }
+    window.esci = function() {
+        loggato = false;
+        document.getElementById('main-body').classList.remove('gestione-attiva');
+        chiudiDJ();
+    }
+
+    // ===== UPLOAD FOTO / VIDEO SU CLOUDINARY =====
+    window.mostraFileScelti = function() {
+        const files = Array.from(document.getElementById('fileN').files);
+        document.getElementById('lista-file').innerText = files.length
+            ? files.map(f => `• ${f.name} (${(f.size / 1048576).toFixed(1)} MB)`).join('\n')
+            : '';
+    }
+
+    function caricaFile(file, onProgress) {
+        return new Promise((resolve, reject) => {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('upload_preset', UPLOAD_PRESET);
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', e => { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); });
+            xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        resolve({ url: data.secure_url, type: file.type.includes('video') ? 'video' : 'image' });
+                    } catch (err) { reject(new Error('Risposta non valida da Cloudinary.')); }
+                } else { reject(new Error('Upload rifiutato (codice ' + xhr.status + ').')); }
+            });
+            xhr.addEventListener('error', () => reject(new Error('Connessione interrotta durante il caricamento.')));
+            xhr.open('POST', CLOUDINARY_URL);
+            xhr.send(fd);
+        });
+    }
+
+    window.pubblicaNews = async function() {
+        const titolo = document.getElementById('titoloN').value.trim();
+        const testo = document.getElementById('testoN').value.trim();
+        const files = Array.from(document.getElementById('fileN').files);
+        if (!titolo && !testo && files.length === 0) return alert('Scrivi almeno un titolo o un testo!');
+
+        const troppoGrande = files.find(f => f.size > MAX_MB * 1024 * 1024);
+        if (troppoGrande) return alert(`"${troppoGrande.name}" è troppo pesante (${(troppoGrande.size / 1048576).toFixed(1)} MB). Il limite è ${MAX_MB} MB.`);
+
+        const btn = document.getElementById('btn-pubblica');
+        const cont = document.getElementById('progress-container');
+        const bar = document.getElementById('progress-bar');
+        const txt = document.getElementById('progress-text');
+        btn.disabled = true; btn.innerText = 'PUBBLICO...';
+
+        const media = [];
+        try {
+            if (files.length) {
+                cont.style.display = 'block';
+                for (let i = 0; i < files.length; i++) {
+                    media.push(await caricaFile(files[i], p => {
+                        bar.style.width = p + '%';
+                        txt.innerText = files.length > 1 ? `File ${i + 1} di ${files.length} — ${p}%` : p + '%';
+                    }));
+                }
+            }
+            await push(ref(db, 'news'), { titolo, testo, media, data: Date.now() });
+            alert('News pubblicata!');
+            document.getElementById('titoloN').value = '';
+            document.getElementById('testoN').value = '';
+            document.getElementById('fileN').value = '';
+            document.getElementById('lista-file').innerText = '';
+            chiudiDJ();
+        } catch (e) {
+            alert('Errore: ' + e.message);
+        } finally {
+            btn.disabled = false; btn.innerText = 'PUBBLICA NEWS';
+            cont.style.display = 'none'; bar.style.width = '0%'; txt.innerText = '0%';
+        }
+    }
+
+    window.eliminaNews = async function(id) {
+        if (!confirm('Eliminare questa news?')) return;
+        try { await remove(ref(db, 'news/' + id)); } catch (e) { alert('Impossibile eliminare la news.'); }
+    }
 </script>
 </body>
 </html>
