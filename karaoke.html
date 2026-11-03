@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Karaoke | RossiDJ</title>
+<style>
+:root{--bg:#101016;--panel:#1c1c26;--line:#32323f;--text:#f3f3f7;--dim:#a6a6b5;--accent:#ff4f8b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 Segoe UI,system-ui,sans-serif;padding:16px;max-width:480px;margin-inline:auto}
+h1{font-size:26px;margin:12px 0 4px}
+p{color:var(--dim);margin:0 0 16px}
+label{display:block;margin-bottom:12px}
+input,button{display:block;width:100%;margin-top:4px;font:inherit;border-radius:8px;border:1px solid var(--line);padding:12px;background:var(--panel);color:var(--text)}
+button{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6}
+.nascosto{position:absolute;left:-9999px}
+#esito{min-height:24px;margin-top:12px;color:var(--text)}
+</style>
+</head>
+<body>
+<h1>Canta con RossiDJ</h1>
+<p>Scrivi la canzone: la vedrò subito in console.</p>
+<form id="modulo">
+  <label>Il tuo nome<input id="nome" maxlength="40" required autocomplete="name"></label>
+  <label>Canzone e artista<input id="canzone" maxlength="100" required autocomplete="off"></label>
+  <label>Codice serata<input id="codice" maxlength="8" inputmode="numeric" required autocomplete="off"></label>
+  <button id="invia">Invia richiesta</button>
+</form>
+<p id="esito" role="status"></p>
+<script>
+const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxw7Q1XzeYOeu5eWUFLM__-4zrUXAwxZ5qXn3dpxuyaOw4PPPEZeyygYh_1N013B7J80w/exec';
+const $ = id => document.getElementById(id);
+const codice = new URLSearchParams(location.search).get('c');
+if (codice) $('codice').value = codice;
+try { $('nome').value = localStorage.getItem('karaokeNome') || ''; } catch (e) {}
+$('modulo').onsubmit = async event => {
+  event.preventDefault();
+  $('invia').disabled = true;
+  $('esito').textContent = 'Invio…';
+  try {
+    const risposta = await fetch(URL_SCRIPT, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({azione: 'richiesta', nome: $('nome').value, canzone: $('canzone').value, codice: $('codice').value})
+    });
+    const dati = await risposta.json();
+    if (dati.ok) {
+      $('esito').textContent = 'Richiesta inviata!';
+      $('canzone').value = '';
+      try { localStorage.setItem('karaokeNome', $('nome').value); } catch (e) {}
+    } else {
+      $('esito').textContent = dati.errore;
+    }
+  } catch (e) {
+    $('esito').textContent = 'Invio non riuscito, controlla la connessione';
+  }
+  $('invia').disabled = false;
+};
+</script>
+</body>
+</html>
